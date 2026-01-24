@@ -12,13 +12,11 @@ import {
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link";
-import { Navigation } from "@/components/my_ui/navigation";
 
 export default function Home() {
   const company_name: string = "ParkPing";
   return (
     <div className="dark:bg-background-dark font-display text-[#0d161b] dark:text-slate-50 transition-colors duration-300">
-      <Navigation />
 
       <main className="max-w-300 mx-auto px-6">
         {/* Hero Section */}
