@@ -1,8 +1,12 @@
 import { ModeToggle } from "@/components/ui/mode_toggle";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { IsLoggedIn, deleteAllCookie, getName } from "@/app/actions";
 
-export function Navigation() {
+export async function Navigation() {
+  const isLoggedIn = await IsLoggedIn();
+  const user_name = await getName();
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/80 px-6 py-3 backdrop-blur-md dark:bg-black/80">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
@@ -14,11 +18,21 @@ export function Navigation() {
         </div>
         <div className="flex items-center gap-4">
           <ModeToggle />
-          <Link href={"/register"}>
-            <Button className="bg-blue-400 text-white">
-              Login
-            </Button>
-          </Link>
+          {!isLoggedIn && (
+            <Link href="/login">
+              <Button className="bg-blue-400 text-white">
+                Login
+              </Button>
+            </Link>
+          )}
+          {isLoggedIn && (
+            <>
+              Hello, {user_name}
+              <Button onClick={deleteAllCookie} className="bg-blue-400 text-white">
+                Log Out
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </nav>

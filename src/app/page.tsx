@@ -5,19 +5,21 @@ import {
   BellRing,
   QrCode,
   Car,
-  Github,
-  Mail,
-  MapPin
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link";
+import { setLoginCookie, deleteAllCookie } from "./actions";
 
 export default function Home() {
-  const company_name: string = "ParkPing";
   return (
     <div className="dark:bg-background-dark font-display text-[#0d161b] dark:text-slate-50 transition-colors duration-300">
-
+      <Button onClick={setLoginCookie}>
+        set
+      </Button>
+      <Button onClick={deleteAllCookie}>
+        delete
+      </Button>
       <main className="max-w-300 mx-auto px-6">
         {/* Hero Section */}
         <section className="py-16 md:py-24">
@@ -27,17 +29,25 @@ export default function Home() {
                 <BadgeCheck className="h-4 w-4 text-primary" />
                 Trusted by 10,000+ Drivers
               </div>
-              <h1 className="text-5xl md:text-6xl font-black leading-tight tracking-tight text-[#0d161b] dark:text-white">
-                Your Car&apos;s Privacy, <span className="text-blue-500 font-extrabold">Protected.</span>
+              <h1 className="text-5xl md:text-6xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">
+                Ping the Owner.
+                <br />
+                Save the <span className="text-blue-600 font-extrabold">Tow.</span>
               </h1>
+
               <p className="text-lg text-slate-600 dark:text-slate-400 max-w-125 leading-relaxed">
-                Register your vehicle and stay reachable without sharing your phone number. Safe, anonymous
-                communication via secure QR codes.
+                Register your vehicle and stay reachable during parking issues — without ever sharing your phone number. Communicate safely using secure QR codes.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href={"/home"}>
                   <Button className="bg-blue-500 hover:bg-blue-500/90 text-white font-bold h-14 px-10 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
-                    <span>Let&apos;s Go</span>
+                    <span>Register your Vehicle</span>
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link href={"/search"}>
+                  <Button variant={"outline"} className="font-bold h-14 px-10 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center">
+                    <span>Search a Vehicle</span>
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
@@ -84,7 +94,7 @@ export default function Home() {
               <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Response Time</p>
               <div className="flex items-center gap-3">
                 <p className="text-3xl font-bold tracking-tight">Instant</p>
-                <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs font-bold">Push Notifications</span>
+                <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs font-bold">Notifications</span>
               </div>
             </div>
           </div>
@@ -93,7 +103,7 @@ export default function Home() {
         {/* Features Section */}
         <section className="py-24">
           <div className="flex flex-col gap-4 mb-16 max-w-180">
-            <h2 className="text-4xl font-black tracking-tight">Modern Vehicle Safety</h2>
+            <h2 className="text-4xl font-black tracking-tight">Modern Vehicle Safety, Built for Privacy</h2>
             <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
               Stay connected while keeping your personal data private. Our platform ensures you&apos;re always reachable for emergencies without sacrificing privacy.
             </p>
@@ -107,7 +117,7 @@ export default function Home() {
               <div className="flex flex-col gap-2">
                 <h3 className="text-xl font-bold">Privacy First</h3>
                 <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-                  Communicate anonymously without sharing your phone number. Your contact details are never exposed to strangers.
+                  Communicate anonymously without sharing your phone number. Get notified instantly via Email or SMS when something happens to your car.
                 </p>
               </div>
             </div>
@@ -208,7 +218,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className=" bg-white dark:bg-black border-t border-[#cfdde7] dark:border-slate-800 py-16">
+      {/* <footer className=" bg-white dark:bg-black border-t border-[#cfdde7] dark:border-slate-800 py-16">
         <div className="max-w-300 mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
             <div className="flex flex-col gap-6 col-span-1 md:col-span-1">
@@ -263,7 +273,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 }

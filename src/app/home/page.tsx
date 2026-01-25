@@ -1,46 +1,40 @@
 import Link from "next/link";
-import {
-  ShieldCheck,
-  PlusSquare,
-  Search,
-  QrCode,
-  Edit3,
-  Trash2,
-  ArrowRight,
-  EyeOff,
-  ScanQrCode,
-  BadgeCheck,
-} from "lucide-react";
+import { ShieldCheck, PlusSquare, Search, QrCode, Edit3, Trash2, ArrowRight, EyeOff, ScanQrCode, BadgeCheck } from "lucide-react";
+import { getVehiclesFromCookies } from "@/app/actions";
 
-export default function HomePage() {
+export default async function HomePage() {
   const company_name = "ParkPing";
+  const vehiclesList = await getVehiclesFromCookies();
 
   return (
     <main
       className="min-h-screen bg-linear-to-br  from-slate-50  via-blue-50/40  to-slate-100  dark:from-slate-950  dark:via-blue-950/30  dark:to-slate-900  text-slate-900  dark:text-slate-100 "
     >
-      <div className="max-w-7xl mx-auto px-6 py-14">
+      <div className="max-w-7xl mx-auto px-6 py-5">
         {/* Header */}
-        <header className="flex flex-col gap-8 mb-16">
-          <div className="flex items-center gap-4">
-            <div className="bg-linear-to-br from-blue-500 to-indigo-500 p-3 rounded-xl text-white shadow-lg">
-              <ShieldCheck className="size-7" />
+        <header className="flex flex-col gap-4 mb-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-linear-to-br from-blue-500 to-indigo-500 p-3 rounded-xl text-white shadow-lg">
+                <ShieldCheck className="size-7" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-black">ParkPing</h1>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Vehicle Safety &amp; Contact Platform
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-black">{company_name}</h1>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                Vehicle Safety Platform
-              </p>
-            </div>
+
+            <VehicleBox vehiclesList={Array.isArray(vehiclesList) ? vehiclesList : []} />
           </div>
 
-          <div>
+          <div className="mt-4">
             <h2 className="text-4xl font-black tracking-tight mb-3">
-              Safer Roads. Smarter Connections.
+              Safer Parking. Smarter Connections.
             </h2>
             <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
-              {company_name} lets vehicle owners stay anonymous while still being
-              reachable for safety alerts and emergencies.
+              {company_name} lets vehicle owners stay anonymous while remaining reachable during parking issues, safety alerts, and emergencies.
             </p>
           </div>
         </header>
@@ -56,21 +50,21 @@ export default function HomePage() {
           <ActionCard
             icon={<PlusSquare />}
             title="Register Vehicle"
-            desc="Add your vehicle and enable anonymous contact."
-            href="/register"
+            desc="Add your vehicle and allow others to contact you safely."
+            href="/registercar"
           />
 
           <ActionCard
             icon={<Search />}
             title="Search Owner"
-            desc="Look up a vehicle and send a safety message."
+            desc="Look up a vehicle and send an urgent safety message."
             href="/search"
           />
 
           <ActionCard
             icon={<QrCode />}
             title="Generate QR"
-            desc="Create a QR for your windshield to receive alerts."
+            desc="Create a QR for your windshield to receive instant alerts."
             href="/qr"
           />
 
@@ -78,14 +72,14 @@ export default function HomePage() {
             icon={<Edit3 />}
             title="Update Details"
             desc="Edit vehicle info or contact preferences."
-            href="/profile"
+            href="/update"
           />
 
           <DangerCard
             icon={<Trash2 />}
             title="Remove Vehicle"
-            desc="Delete a vehicle and deactivate its QR."
-            href="/delete"
+            desc="Delete a vehicle or your account."
+            href="/deletecar"
           />
         </section>
 
@@ -97,7 +91,7 @@ export default function HomePage() {
             <TipCard
               icon={<EyeOff />}
               title="Always Anonymous"
-              desc="Your phone number and identity are never shared. Messages are securely relayed."
+              desc="Your phone number and identity are never shared. Messages are securely relayed through ParkPing."
             />
 
             <TipCard
@@ -107,25 +101,6 @@ export default function HomePage() {
             />
           </div>
         </section>
-
-        {/* Footer */}
-        <footer className="mt-24 border-t border-slate-200/70 dark:border-slate-800/70 pt-10 flex flex-col md:flex-row items-center justify-between gap-6">
-          <p className="text-sm text-slate-500">
-            © 2025 {company_name}. All rights reserved.
-          </p>
-
-          <div className="flex gap-6 text-sm font-medium">
-            <Link href="#" className="hover:text-blue-600 transition">
-              Privacy Policy
-            </Link>
-            <Link href="#" className="hover:text-blue-600 transition">
-              Terms of Service
-            </Link>
-            <Link href="#" className="hover:text-blue-600 transition">
-              Security
-            </Link>
-          </div>
-        </footer>
       </div>
     </main>
   );
@@ -212,7 +187,7 @@ function DangerCard({
       </p>
 
       <span className="mt-auto flex items-center gap-1 text-red-500 font-semibold text-sm">
-        Remove
+        Delete
         <ArrowRight className="size-4 group-hover:translate-x-1 transition" />
       </span>
     </Link>
@@ -235,6 +210,26 @@ function TipCard({
         <p className="font-bold mb-1">{title}</p>
         <p className="text-sm text-slate-600 dark:text-slate-400">{desc}</p>
       </div>
+    </div>
+  );
+}
+
+function VehicleBox({ vehiclesList }: { vehiclesList: { name: string; number: string }[] }) {
+  return (
+    <div className="sticky w-64 p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur rounded-xl border border-slate-200/60 dark:border-slate-800/60 shadow-md">
+      <h4 className="font-bold text-lg mb-2">Total Cars: {vehiclesList.length}</h4>
+      <hr className="border-slate-300/50 dark:border-slate-700/50 mb-2" />
+      {vehiclesList.length === 0 ? (
+        <p className="text-sm text-slate-500 dark:text-slate-400">No vehicles added</p>
+      ) : (
+        <ul className="space-y-1">
+          {vehiclesList.map((v, i) => (
+            <li key={i} className="text-sm text-slate-700 dark:text-slate-300">
+              {v.name}: {v.number}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
