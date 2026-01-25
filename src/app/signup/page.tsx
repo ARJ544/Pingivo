@@ -4,8 +4,10 @@ import { useState } from 'react'
 import { User, Mail, Lock, Phone, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function Signup() {
+  const router = useRouter();
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [user_name, setName] = useState('')
@@ -36,7 +38,7 @@ export default function Signup() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: user_name.trim,
+          name: user_name,
           email,
           phone,
           password,
@@ -49,8 +51,9 @@ export default function Signup() {
       }
 
       setMessage('✅ User registered successfully!');
+      router.push("/login");
     } catch (err: any) {
-      setMessage(`${err.message}`);
+      setMessage(`Error: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -100,7 +103,7 @@ export default function Signup() {
                 name='email'
                 onChange={(e) => { setEmail(e.target.value) }}
                 type="email"
-                placeholder="user_name@example.com"
+                placeholder="name@example.com"
                 className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
                   ${isEmailValid
                     ? 'border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
@@ -193,7 +196,7 @@ export default function Signup() {
 
           {/* Submit */}
           <Button
-            disabled={!emailRegex.test(email) || !phoneRegex.test(phone) || loading}
+            disabled={!emailRegex.test(email) || !phoneRegex.test(phone) || user_name === " " || user_name === "" || loading}
             className="mt-4 w-full bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 text-white font-bold py-3.5 rounded-lg transition"
           >
             {loading ? 'Signing UP...' : 'SignUp'}
