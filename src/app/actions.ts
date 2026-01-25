@@ -18,7 +18,7 @@ export async function setLoginCookie() {
     path: "/",        // available everywhere
     maxAge: 60 * 60 * 24 * 15,
   });
-  // cookieStore.set("name", "ARJ");
+  cookieStore.set("name", "Abhinav Ranjan Jha");
   // cookieStore.set("vehi1", "BR01P8888");
   // cookieStore.set("vehi2", "BR01P8620");
 }

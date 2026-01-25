@@ -42,6 +42,7 @@ export default function Login() {
                 size={18}
               />
               <input
+                name='email'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
@@ -71,8 +72,9 @@ export default function Login() {
                 size={18}
               />
               <input
+                name='password'
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value.replace(/^\s+|\s+$/g, ''))}
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
                 className={`w-full pl-10 pr-12 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition

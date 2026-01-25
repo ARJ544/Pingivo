@@ -51,6 +51,7 @@ export default function RegisterClient() {
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
               />
               <input
+                name='email'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
@@ -80,8 +81,9 @@ export default function RegisterClient() {
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
               />
               <input
+                name='password'
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value.replace(/^\s+|\s+$/g, ''))}
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
                 className={`w-full pl-10 pr-12 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
@@ -118,6 +120,7 @@ export default function RegisterClient() {
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
               />
               <input
+                name='vehi'
                 type="text"
                 placeholder="ABC-1234"
                 className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition font-mono uppercase"

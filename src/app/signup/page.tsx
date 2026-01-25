@@ -8,7 +8,9 @@ import Link from 'next/link'
 export default function Signup() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [user_name, setName] = useState('')
   const [password, setPassword] = useState('')
+
   const [showPassword, setShowPassword] = useState(false)
   const strongPasswordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/
@@ -21,6 +23,39 @@ export default function Signup() {
   const isEmailValid = email === '' || emailRegex.test(email)
   const isPhoneValid = phone === '' || phoneRegex.test(phone)
 
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: user_name.trim,
+          email,
+          phone,
+          password,
+        }),
+      });
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || 'Something went wrong');
+      }
+
+      setMessage('✅ User registered successfully!');
+    } catch (err: any) {
+      setMessage(`${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+
+  };
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50 dark:bg-slate-950">
       <div className="w-full max-w-140 bg-white dark:bg-slate-900 p-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl">
@@ -34,8 +69,7 @@ export default function Signup() {
           </p>
         </div>
 
-        <form className="flex flex-col gap-5">
-
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold text-slate-900 dark:text-slate-100">
               Full Name
@@ -43,6 +77,9 @@ export default function Signup() {
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input
+                name='user_name'
+                value={user_name}
+                onChange={(e) => setName(e.target.value.replace(/\s{2,}/g, ' '))}
                 required
                 type="text"
                 placeholder="e.g., John Doe"
@@ -60,9 +97,10 @@ export default function Signup() {
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name='email'
+                onChange={(e) => { setEmail(e.target.value) }}
                 type="email"
-                placeholder="name@example.com"
+                placeholder="user_name@example.com"
                 className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
                   ${isEmailValid
                     ? 'border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
@@ -85,8 +123,9 @@ export default function Signup() {
             <div className="relative">
               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input
+                name='phone'
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setPhone(e.target.value.replace(/^\s+|\s+$/g, ''))}
                 type="tel"
                 placeholder="+919876543210"
                 className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
@@ -113,9 +152,10 @@ export default function Signup() {
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
 
               <input
+                name='password'
                 required
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value.replace(/^\s+|\s+$/g, ''))}
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
                 className={`w-full pl-10 pr-12 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
@@ -153,10 +193,10 @@ export default function Signup() {
 
           {/* Submit */}
           <Button
-            disabled={!emailRegex.test(email) || !phoneRegex.test(phone)}
+            disabled={!emailRegex.test(email) || !phoneRegex.test(phone) || loading}
             className="mt-4 w-full bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 text-white font-bold py-3.5 rounded-lg transition"
           >
-            Sign Up
+            {loading ? 'Signing UP...' : 'SignUp'}
           </Button>
 
           <div className="flex items-center justify-center gap-2 text-sm mt-2">
@@ -170,7 +210,7 @@ export default function Signup() {
               Login
             </Link>
           </div>
-
+          {message && <p>{message}</p>}
         </form>
       </div>
     </div>

@@ -27,7 +27,7 @@ export async function Navigation() {
           )}
           {isLoggedIn && (
             <>
-              Hello, {user_name}
+              Hello, {user_name?.trim().split(' ')[0].slice(0,9)}
               <Button onClick={deleteAllCookie} className="bg-blue-400 text-white">
                 Log Out
               </Button>
