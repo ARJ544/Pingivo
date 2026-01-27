@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
     const { data: existingUser } = await supabase
       .from('users')
-      .select('id, email, phone_num')
+      .select('email, phone_num')
       .or(`email.eq.${email},phone_num.eq.${phone}`)
       .maybeSingle()
 

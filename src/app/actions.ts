@@ -23,7 +23,7 @@ export async function IsLoggedIn() {
 export async function setAllCookie(user: Partial<UserCookie>) {
   const cookieStore = await cookies();
 
-  cookieStore.set("loggedin", "true", {
+  cookieStore.set("loggedin", String(user.loggedin), {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
