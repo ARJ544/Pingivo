@@ -1,7 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import { getAllCookie } from '@/app/actions'
-import { cookies } from 'next/headers'
 import bcrypt from 'bcrypt'
 
 export const runtime = 'nodejs'
