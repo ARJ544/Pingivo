@@ -12,11 +12,11 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-
 export default function RegisterClient() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+
 
   // Validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/

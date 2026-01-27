@@ -4,15 +4,51 @@ import { Mail, Lock, Eye } from 'lucide-react'
 import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/navigation'
+import { setAllCookie } from '@/app/actions'
 
 export default function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   const isEmailValid = email === '' || emailRegex.test(email)
   const isPasswordValid = password === '' || password.length >= 8
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || 'Something went wrong');
+      }
+      
+      setAllCookie(result.user);
+
+      setMessage('✅ User Loggedin successfully!');
+      router.push("/home");
+    } catch (err: any) {
+      setMessage(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50 dark:bg-slate-950">
@@ -29,7 +65,7 @@ export default function Login() {
         </div>
 
         {/* Form */}
-        <form className="flex flex-col gap-5">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
           {/* Email */}
           <div className="flex flex-col gap-2">
@@ -106,8 +142,9 @@ export default function Login() {
             disabled={!emailRegex.test(email) || password.length < 8}
             className="mt-4 w-full bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 text-white font-bold py-3.5 rounded-lg shadow-lg shadow-blue-500/20 transition-all"
           >
-            Login
+            {loading ? 'Logging IN...' : 'Login'}
           </Button>
+          {message && <p className='text-xl text-red-500'>{message}</p>}
 
           {/* Signup */}
           <div className="flex items-center justify-center gap-2 text-sm mt-2">

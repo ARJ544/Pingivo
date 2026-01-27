@@ -213,7 +213,7 @@ export default function Signup() {
               Login
             </Link>
           </div>
-          {message && <p>{message}</p>}
+          {message && <p className='text-xl text-red-500'>{message}</p>}
         </form>
       </div>
     </div>

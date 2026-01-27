@@ -9,17 +9,10 @@ import {
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link";
-import { setLoginCookie, deleteAllCookie } from "./actions";
 
 export default function Home() {
   return (
     <div className="dark:bg-background-dark font-display text-[#0d161b] dark:text-slate-50 transition-colors duration-300">
-      <Button onClick={setLoginCookie}>
-        set
-      </Button>
-      <Button onClick={deleteAllCookie}>
-        delete
-      </Button>
       <main className="max-w-300 mx-auto px-6">
         {/* Hero Section */}
         <section className="py-16 md:py-24">

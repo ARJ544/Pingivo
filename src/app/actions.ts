@@ -1,6 +1,18 @@
 'use server'
 
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+
+type UserCookie = {
+  loggedin: boolean,
+  name?: string,
+  email?: string,
+  password?: string,
+  phone_num?: string,
+  total_vehi?: string,
+  vehi1?: string,
+  vehi2?: string
+}
 
 export async function IsLoggedIn() {
   const cookieStore = await cookies()
@@ -8,43 +20,60 @@ export async function IsLoggedIn() {
   return loggedin?.value === 'true'
 }
 
-export async function setLoginCookie() {
+export async function setAllCookie(user: Partial<UserCookie>) {
   const cookieStore = await cookies();
 
   cookieStore.set("loggedin", "true", {
-    httpOnly: true,   // cannot be accessed by JS
-    secure: true,     // true in production
-    sameSite: "lax",  // CSRF protection
-    path: "/",        // available everywhere
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
     maxAge: 60 * 60 * 24 * 15,
   });
-  cookieStore.set("name", "Abhinav Ranjan Jha");
-  // cookieStore.set("vehi1", "BR01P8888");
-  // cookieStore.set("vehi2", "BR01P8620");
+
+  if (user.name) cookieStore.set("name", user.name);
+  if (user.email) cookieStore.set("email", user.email);
+  if (user.password) cookieStore.set("password", user.password);
+  if (user.phone_num) cookieStore.set("phone_num", user.phone_num);
+  if (user.vehi1) cookieStore.set("vehi1", user.vehi1);
+  if (user.vehi2) cookieStore.set("vehi2", user.vehi2);
+  const totalVehicles = [user.vehi1, user.vehi2].filter(Boolean).length;
+  cookieStore.set("total_vehi", totalVehicles.toString());
+
 }
 
 export async function deleteAllCookie() {
   const cookieStore = await cookies();
-
   cookieStore.getAll().forEach(cookie => {
     cookieStore.delete(cookie.name);
   });
+  redirect("/");
 }
 
-export async function getName() {
+export async function getAllCookie(): Promise<UserCookie> {
   const cookieStore = await cookies();
-  const name = cookieStore.get("name");
-  return name?.value;
-}
+  const allCookies = cookieStore.getAll();
 
-export async function getVehiclesFromCookies() {
-  const cookieStore = await cookies();
-  const vehicles: { name: string; number: string }[] = [];
-  const vehi1 = cookieStore.get("vehi1")?.value;
-  const vehi2 = cookieStore.get("vehi2")?.value;
+  const userCookie: UserCookie = {
+    loggedin: false
+  };
 
-  if (vehi1) vehicles.push({ name: "Vehicle 1", number: vehi1 });
-  if (vehi2) vehicles.push({ name: "Vehicle 2", number: vehi2 });
+  allCookies.forEach(cookie => {
+    switch (cookie.name) {
+      case "loggedin":
+        userCookie.loggedin = cookie.value === "true";
+        break;
+      case "name":
+      case "email":
+      case "password":
+      case "phone_num":
+      case "total_vehi":
+      case "vehi1":
+      case "vehi2":
+        (userCookie as any)[cookie.name] = cookie.value;
+        break;
+    }
+  });
 
-  return vehicles;
+  return userCookie;
 }

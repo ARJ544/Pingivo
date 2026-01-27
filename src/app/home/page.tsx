@@ -1,10 +1,16 @@
 import Link from "next/link";
 import { ShieldCheck, PlusSquare, Search, QrCode, Edit3, Trash2, ArrowRight, EyeOff, ScanQrCode, BadgeCheck } from "lucide-react";
-import { getVehiclesFromCookies } from "@/app/actions";
+import { getAllCookie } from "@/app/actions";
 
 export default async function HomePage() {
   const company_name = "ParkPing";
-  const vehiclesList = await getVehiclesFromCookies();
+  const vehi1 = (await getAllCookie()).vehi1;
+  const vehi2 = (await getAllCookie()).vehi2;
+  const totalVehicle = (await getAllCookie()).total_vehi;
+  const vehicleslist = [
+    { name: "Vehicle 1", number: vehi1 },
+    { name: "Vehicle 2", number: vehi2 },
+  ].filter(v => v.number !== undefined);
 
   return (
     <main
@@ -26,7 +32,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <VehicleBox vehiclesList={Array.isArray(vehiclesList) ? vehiclesList : []} />
+            <VehicleBox vehiclesList={vehicleslist} />
           </div>
 
           <div className="mt-4">
@@ -52,12 +58,15 @@ export default async function HomePage() {
             title="Register Vehicle"
             desc="Add your vehicle and allow others to contact you safely."
             href="/registercar"
+            customText={totalVehicle === "2"? "Slot full 2/2" : "Register"}
+            disabled={totalVehicle === "2"}
           />
 
           <ActionCard
             icon={<Search />}
             title="Search Owner"
             desc="Look up a vehicle and send an urgent safety message."
+            customText="Search"
             href="/search"
           />
 
@@ -65,13 +74,15 @@ export default async function HomePage() {
             icon={<QrCode />}
             title="Generate QR"
             desc="Create a QR for your windshield to receive instant alerts."
+            customText="Generate QR"
             href="/qr"
           />
 
           <ActionCard
             icon={<Edit3 />}
             title="Update Details"
-            desc="Edit vehicle info or contact preferences."
+            desc="Edit profile info or contact preferences."
+            customText="Update"
             href="/update"
           />
 
@@ -111,15 +122,19 @@ function ActionCard({
   title,
   desc,
   href,
+  customText,
+  disabled
 }: {
   icon: React.ReactNode;
   title: string;
   desc: string;
   href: string;
+  customText: string;
+  disabled?: boolean;
 }) {
   return (
     <Link
-      href={href}
+      href={disabled ? "#" : href}
       className="
         group
         bg-white/80 dark:bg-slate-900/80
@@ -143,7 +158,7 @@ function ActionCard({
       </p>
 
       <span className="mt-auto flex items-center gap-1 text-blue-600 font-semibold text-sm">
-        Get Started
+        {customText}
         <ArrowRight className="size-4 group-hover:translate-x-1 transition" />
       </span>
     </Link>
@@ -214,10 +229,10 @@ function TipCard({
   );
 }
 
-function VehicleBox({ vehiclesList }: { vehiclesList: { name: string; number: string }[] }) {
+function VehicleBox({ vehiclesList }: { vehiclesList: { name: string | undefined; number: string | undefined }[] }) {
   return (
     <div className="sticky w-64 p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur rounded-xl border border-slate-200/60 dark:border-slate-800/60 shadow-md">
-      <h4 className="font-bold text-lg mb-2">Total Cars: {vehiclesList.length}</h4>
+      <h4 className="font-bold text-lg mb-2">Total Vehicles: {vehiclesList.length} / 2</h4>
       <hr className="border-slate-300/50 dark:border-slate-700/50 mb-2" />
       {vehiclesList.length === 0 ? (
         <p className="text-sm text-slate-500 dark:text-slate-400">No vehicles added</p>

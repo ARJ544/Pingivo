@@ -1,11 +1,11 @@
 import { ModeToggle } from "@/components/ui/mode_toggle";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { IsLoggedIn, deleteAllCookie, getName } from "@/app/actions";
+import { IsLoggedIn, getAllCookie, deleteAllCookie } from "@/app/actions";
 
 export async function Navigation() {
   const isLoggedIn = await IsLoggedIn();
-  const user_name = await getName();
+  const user_name = (await getAllCookie()).name;
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/80 px-6 py-3 backdrop-blur-md dark:bg-black/80">

@@ -1,21 +1,54 @@
 import { createClient } from '@supabase/supabase-js'
-import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server'
+import bcrypt from 'bcrypt'
 
-const supabaseUrl: any = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey: any = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
-const supabase = createClient(supabaseUrl, supabaseKey)
+export const runtime = 'nodejs'
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  const { name, email, phone, password } = body;
+  try {
+    const { name, email, phone, password } = await request.json()
 
-  const { data, error } = await supabase
-    .from('Users')
-    .insert({ name: name, email: email, phone_num: phone, password: password });
+    if (!name || !email || !phone || !password) {
+      return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
+    }
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id, email, phone_num')
+      .or(`email.eq.${email},phone_num.eq.${phone}`)
+      .maybeSingle()
+
+    if (existingUser) {
+      if (existingUser.email === email) {
+        return NextResponse.json({ error: 'Email already registered' }, { status: 409 })
+      } else {
+        return NextResponse.json({ error: 'Phone number already registered' }, { status: 409 })
+      }
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    const { error: insertError } = await supabase.from('users').insert({
+      name,
+      email,
+      phone_num: phone,
+      password: hashedPassword,
+    })
+
+    if (insertError) {
+      if (insertError.code === '23505') {
+        return NextResponse.json({ error: 'Email or phone already exists' }, { status: 409 })
+      }
+      return NextResponse.json({ error: insertError.message }, { status: 400 })
+    }
+
+    return NextResponse.json({ message: 'User registered successfully' }, { status: 201 })
+  } catch {
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
-
-  return NextResponse.json({ data }, { status: 201 });
 }

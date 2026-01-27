@@ -1,8 +1,14 @@
+import DeleteCarClient from "@/app/deletecar/DeleteClient";
+import { IsLoggedIn } from "@/app/actions";
+import { redirect } from "next/navigation";
 
-export default function DeleteCar() {
+export default async function DeleteCar() {
+  const isLoggedIn = await IsLoggedIn();
+
+  if (!isLoggedIn) {
+    redirect("/login");
+  }
   return (
-    <>
-    Delete 
-    </>
+    <DeleteCarClient />
   );
 }
