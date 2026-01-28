@@ -38,7 +38,7 @@ export default function Login() {
       if (!res.ok) {
         throw new Error(result.error || 'Something went wrong');
       }
-      
+
       setAllCookie(result.user);
 
       setMessage('✅ User Loggedin successfully!');
@@ -136,6 +136,8 @@ export default function Login() {
             )}
           </div>
 
+          {message && <p className='text-xl text-red-500'>{message}</p>}
+
           {/* Login Button */}
           <Button
             type="submit"
@@ -144,7 +146,6 @@ export default function Login() {
           >
             {loading ? 'Logging IN...' : 'Login'}
           </Button>
-          {message && <p className='text-xl text-red-500'>{message}</p>}
 
           {/* Signup */}
           <div className="flex items-center justify-center gap-2 text-sm mt-2">

@@ -37,11 +37,18 @@ export async function Navigation() {
           <ModeToggle />
 
           {!isLoggedIn && (
-            <Link href="/login">
-              <Button className="rounded-full px-5">
-                Login
-              </Button>
-            </Link>
+            <>
+              <Link href="/login">
+                <Button className="rounded-full px-3">
+                  Login
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button className="rounded-full px-3">
+                  Sign Up
+                </Button>
+              </Link>
+            </>
           )}
 
           {isLoggedIn && (

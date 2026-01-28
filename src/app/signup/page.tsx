@@ -193,6 +193,7 @@ export default function Signup() {
             )}
           </div>
 
+          {message && <p className='text-xl text-red-500'>{message}</p>}
 
           {/* Submit */}
           <Button
@@ -213,7 +214,6 @@ export default function Signup() {
               Login
             </Link>
           </div>
-          {message && <p className='text-xl text-red-500'>{message}</p>}
         </form>
       </div>
     </div>
