@@ -1,7 +1,6 @@
 'use server'
 
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
 
 type UserCookie = {
   loggedin: boolean,
@@ -47,7 +46,6 @@ export async function deleteAllCookie() {
   cookieStore.getAll().forEach(cookie => {
     cookieStore.delete(cookie.name);
   });
-  redirect("/");
 }
 
 export async function getAllCookie(): Promise<UserCookie> {

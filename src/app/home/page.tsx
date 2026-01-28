@@ -4,13 +4,7 @@ import { getAllCookie } from "@/app/actions";
 
 export default async function HomePage() {
   const company_name = "ParkPing";
-  const vehi1 = (await getAllCookie()).vehi1;
-  const vehi2 = (await getAllCookie()).vehi2;
   const totalVehicle = (await getAllCookie()).total_vehi;
-  const vehicleslist = [
-    { name: "Vehicle 1", number: vehi1 },
-    { name: "Vehicle 2", number: vehi2 },
-  ].filter(v => v.number !== undefined);
 
   return (
     <main
@@ -31,8 +25,6 @@ export default async function HomePage() {
                 </p>
               </div>
             </div>
-
-            <VehicleBox vehiclesList={vehicleslist} />
           </div>
 
           <div className="mt-4">
@@ -58,7 +50,7 @@ export default async function HomePage() {
             title="Register Vehicle"
             desc="Add your vehicle and allow others to contact you safely."
             href="/registercar"
-            customText={totalVehicle === "2"? "Slot full 2/2" : "Register"}
+            customText={totalVehicle === "2" ? "Slot full 2/2" : "Register"}
             disabled={totalVehicle === "2"}
           />
 
@@ -229,22 +221,3 @@ function TipCard({
   );
 }
 
-function VehicleBox({ vehiclesList }: { vehiclesList: { name: string | undefined; number: string | undefined }[] }) {
-  return (
-    <div className="sticky w-64 p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur rounded-xl border border-slate-200/60 dark:border-slate-800/60 shadow-md">
-      <h4 className="font-bold text-lg mb-2">Total Vehicles: {vehiclesList.length} / 2</h4>
-      <hr className="border-slate-300/50 dark:border-slate-700/50 mb-2" />
-      {vehiclesList.length === 0 ? (
-        <p className="text-sm text-slate-500 dark:text-slate-400">No vehicles added</p>
-      ) : (
-        <ul className="space-y-1">
-          {vehiclesList.map((v, i) => (
-            <li key={i} className="text-sm text-slate-700 dark:text-slate-300">
-              {v.name}: {v.number}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
