@@ -1,16 +1,12 @@
 import { ModeToggle } from "@/components/ui/mode_toggle";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { IsLoggedIn, getAllCookie, deleteAllCookie } from "@/app/actions";
+import { IsLoggedIn, getAllCookie } from "@/app/actions";
 import ProfileDropdown from "@/components/my_ui/profile-dropdown";
 
 export async function Navigation() {
   const isLoggedIn = await IsLoggedIn();
   const cookies = await getAllCookie();
-
-  if (!isLoggedIn) {
-    deleteAllCookie();
-  }
 
   const vehicles = [
     { name: "Vehicle 1", number: cookies.vehi1 },
@@ -56,7 +52,7 @@ export async function Navigation() {
                 vehicles={vehicles}
               />
 
-              <span className="mt-1 text-[11px] text-muted-foreground">
+              <span className="mt-1 text-[11px] text-orange-600 font-bold">
                 View Profile
               </span>
             </div>
