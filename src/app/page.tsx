@@ -9,6 +9,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -49,15 +50,22 @@ export default function Home() {
             <div className="relative group">
               <div className="absolute -inset-4 bg-primary/10 rounded-3xl blur-2xl group-hover:bg-primary/20 transition-all duration-500"></div>
               <div className="relative rounded-2xl overflow-hidden border border-[#cfdde7] dark:border-slate-700 bg-white dark:bg-slate-800 shadow-2xl">
-                <div
-                  className="aspect-4/3 w-full bg-cover bg-center"
-                  style={{
-                    backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuCLFgpAj46u25I0zT4nO2pE718Z-zqJQQ3tYSN-qHgg6KWyD7hR31MuzpZW14D_-YsQEgESFvVvF05M4dx973bTIi3M1kiEL_EaCvBxtD-hcvclY6PfoyQc1bsTVhMVxHpFCLGJPrzuxdbmIyoP_7u2Fma9tYncsbyp-L9e3HtxJ4rvgOuq1XqVJgMTBP5B5ffOMUVVfeKcTVcgkslqAtJtXj2zezKcZouiTrUpHqHBg_GAxx74pAtkpAqCQ9Y1pJPtNzZxGf_XeCv7')`
-                  }}
-                >
+
+                <div className="relative aspect-4/3 w-full">
+                  <Image
+                    src="/pingownerpic3.png"
+                    alt="ParkPing Logo"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority
+                  />
+
                   <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent flex items-end p-8">
                     <div className="text-white">
-                      <h3 className="text-xl font-bold">Secure Scan Integration</h3>
+                      <h3 className="text-xl font-bold">
+                        Secure Scan Integration
+                      </h3>
                     </div>
                   </div>
                 </div>

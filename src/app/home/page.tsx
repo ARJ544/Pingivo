@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ShieldCheck, PlusSquare, Search, QrCode, Edit3, Trash2, ArrowRight, EyeOff, ScanQrCode, BadgeCheck } from "lucide-react";
-import { IsLoggedIn, getAllCookie, deleteAllCookie } from "@/app/actions";
+import { IsLoggedIn, getAllCookie } from "@/app/actions";
 
 export default async function HomePage() {
   const company_name = "ParkPing";

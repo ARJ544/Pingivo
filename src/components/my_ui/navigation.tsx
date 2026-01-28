@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { IsLoggedIn, getAllCookie } from "@/app/actions";
 import ProfileDropdown from "@/components/my_ui/profile-dropdown";
+import Image from "next/image";
 
 export async function Navigation() {
   const isLoggedIn = await IsLoggedIn();
@@ -22,10 +23,13 @@ export async function Navigation() {
           href="/"
           className="flex items-center gap-2 transition hover:opacity-90"
         >
-          <img
+          <Image
             src="/logo.png"
             alt="ParkPing Logo"
             className="h-8 w-8 rounded-sm"
+            height={32}
+            width={32}
+            priority={true}
           />
           <span className="text-lg font-bold tracking-tight text-foreground">
             ParkPing

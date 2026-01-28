@@ -35,7 +35,7 @@ export default function ProfileDropdown({
 
       <DropdownMenuContent
         align="end"
-        className="w-64 rounded-xl border bg-background p-2 shadow-lg"
+        className="min-w-50 max-w-64 rounded-xl border bg-background p-2 shadow-lg"
       >
         {/* User */}
         <DropdownMenuLabel className="flex flex-col gap-0.5 px-2">
