@@ -22,24 +22,27 @@ export async function IsLoggedIn() {
 export async function setAllCookie(user: Partial<UserCookie>) {
   const cookieStore = await cookies();
 
-  cookieStore.set("loggedin", String(user.loggedin), {
+  const maxAge = 60 * 60 * 24 * 15;
+
+  cookieStore.set("loggedin", String(user.loggedin ?? false), {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60 * 24 * 15,
+    maxAge,
   });
 
-  if (user.name) cookieStore.set("name", user.name);
-  if (user.email) cookieStore.set("email", user.email);
-  if (user.password) cookieStore.set("password", user.password);
-  if (user.phone_num) cookieStore.set("phone_num", user.phone_num);
-  if (user.vehi1) cookieStore.set("vehi1", user.vehi1);
-  if (user.vehi2) cookieStore.set("vehi2", user.vehi2);
-  const totalVehicles = [user.vehi1, user.vehi2].filter(Boolean).length;
-  cookieStore.set("total_vehi", totalVehicles.toString());
+  if (user.name) cookieStore.set("name", user.name, { path: "/", maxAge });
+  if (user.email) cookieStore.set("email", user.email, { path: "/", maxAge });
+  if (user.password) cookieStore.set("password", user.password, { path: "/", maxAge });
+  if (user.phone_num) cookieStore.set("phone_num", user.phone_num, { path: "/", maxAge });
+  if (user.vehi1) cookieStore.set("vehi1", user.vehi1, { path: "/", maxAge });
+  if (user.vehi2) cookieStore.set("vehi2", user.vehi2, { path: "/", maxAge });
 
+  const totalVehicles = [user.vehi1, user.vehi2].filter(Boolean).length;
+  cookieStore.set("total_vehi", totalVehicles.toString(), { path: "/", maxAge });
 }
+
 
 export async function deleteAllCookie() {
   const cookieStore = await cookies();

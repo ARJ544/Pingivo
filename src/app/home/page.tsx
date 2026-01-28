@@ -5,11 +5,7 @@ import { IsLoggedIn, getAllCookie, deleteAllCookie } from "@/app/actions";
 export default async function HomePage() {
   const company_name = "ParkPing";
   const totalVehicle = (await getAllCookie()).total_vehi;
-  const isLoggedIn = IsLoggedIn();
-
-  if(!isLoggedIn){
-    deleteAllCookie();
-  }
+  const isLoggedIn = (await IsLoggedIn());
 
   return (
     <main
@@ -30,6 +26,24 @@ export default async function HomePage() {
                 </p>
               </div>
             </div>
+            {isLoggedIn && (<div className="flex flex-col w-full max-w-xs bg-white/50 dark:bg-slate-900/50 backdrop-blur p-4 rounded-xl shadow-sm border border-slate-200/40 dark:border-slate-800/40">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Vehicles Used</span>
+                <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">{totalVehicle} / 2</span>
+              </div>
+
+              <div className="w-full h-3 rounded-full bg-gray-200 dark:bg-slate-700 overflow-hidden">
+                <div
+                  className={`h-3 rounded-full transition-all duration-500 ${totalVehicle === "2" ? "bg-red-500" : "bg-blue-500"
+                    }`}
+                  style={{ width: `${(Number(totalVehicle) / 2) * 100}%` }}
+                />
+              </div>
+
+              <span className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                {totalVehicle === "2" ? "All slots full" : "Slots available"}
+              </span>
+            </div>)}
           </div>
 
           <div className="mt-4">

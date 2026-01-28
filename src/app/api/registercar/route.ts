@@ -17,7 +17,9 @@ export async function POST(request: Request) {
     if (!isLoggedin) {
       return NextResponse.json({ error: 'Login then comeback' }, { status: 400 });
     }
-    const { password, vehiNum } = await request.json()
+    let { password, vehiNum } = await request.json()
+
+    vehiNum = vehiNum.toUpperCase().trim()
 
     if (!vehiNum || !password) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 });

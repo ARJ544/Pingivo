@@ -12,7 +12,7 @@ export default function RegisterClient() {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [vehiNum, setvehiNum] = useState('')
-  const [password, setPassword] = useState('')
+  let [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const isPasswordValid = password === '' || password.length >= 8
 
@@ -115,7 +115,7 @@ export default function RegisterClient() {
               <input
                 name='vehicle'
                 value={vehiNum}
-                onChange={(e) => setvehiNum(e.target.value)}
+                onChange={(e) => setvehiNum(e.target.value.toUpperCase())}
                 type="text"
                 placeholder="ABC-1234"
                 className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition font-mono uppercase"
