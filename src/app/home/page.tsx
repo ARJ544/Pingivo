@@ -9,9 +9,9 @@ export default async function HomePage() {
 
   return (
     <main
-      className="min-h-screen bg-linear-to-br  from-slate-50  via-blue-50/40  to-slate-100  dark:from-slate-950  dark:via-blue-950/30  dark:to-slate-900  text-slate-900  dark:text-slate-100 "
+      className="min-h-screen bg-linear-to-br overflow-x-hidden  from-slate-50  via-blue-50/40  to-slate-100  dark:from-slate-950  dark:via-blue-950/30  dark:to-slate-900  text-slate-900  dark:text-slate-100 "
     >
-      <div className="max-w-7xl mx-auto px-6 py-5">
+      <div className="max-w-7xl mx-auto px-4 py-5">
         {/* Header */}
         <header className="flex flex-col gap-4 mb-10">
           <div className="flex items-center justify-between">
@@ -26,18 +26,9 @@ export default async function HomePage() {
                 </p>
               </div>
             </div>
-            {isLoggedIn && (<div className="flex flex-col w-full max-w-xs bg-white/50 dark:bg-slate-900/50 backdrop-blur p-4 rounded-xl shadow-sm border border-slate-200/40 dark:border-slate-800/40">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Vehicles Used</span>
-                <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">{totalVehicle} / 2</span>
-              </div>
-
-              <div className="w-full h-3 rounded-full bg-gray-200 dark:bg-slate-700 overflow-hidden">
-                <div
-                  className={`h-3 rounded-full transition-all duration-500 ${totalVehicle === "2" ? "bg-red-500" : "bg-blue-500"
-                    }`}
-                  style={{ width: `${(Number(totalVehicle) / 2) * 100}%` }}
-                />
+            {isLoggedIn && (<div className="flex flex-col max-w-xs bg-white/50 dark:bg-slate-900/50 backdrop-blur p-4 rounded-xl shadow-sm border border-slate-200/40 dark:border-slate-800/40">
+              <div className="flex gap-5 items-center mb-2">
+                <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">Vehicles Used: {totalVehicle}/2</span>
               </div>
 
               <span className="mt-2 text-xs text-slate-500 dark:text-slate-400">
@@ -63,7 +54,7 @@ export default async function HomePage() {
         </div>
 
         {/* Action Cards */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <section className="min-w-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           <ActionCard
             icon={<PlusSquare />}
             title="Register Vehicle"
@@ -163,7 +154,7 @@ function ActionCard({
         {icon}
       </div>
 
-      <h4 className="font-bold text-lg mb-2">{title}</h4>
+      <h4 className="font-bold text-lg mb-2 wrap-break-words">{title}</h4>
       <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
         {desc}
       </p>
