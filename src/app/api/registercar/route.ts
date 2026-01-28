@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
-import { getAllCookie } from '@/app/actions'
+import { getAllCookie, deleteAllCookie } from '@/app/actions'
 import bcrypt from 'bcrypt'
 
 export const runtime = 'nodejs'
@@ -12,31 +12,33 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const isLoggedin = (await getAllCookie()).loggedin;
-    const email = (await getAllCookie()).email;
-    if (!isLoggedin) {
-      return NextResponse.json({ error: 'Login then comeback' }, { status: 400 });
+    const { loggedin, email } = await getAllCookie();
+
+    if (!loggedin || !email) {
+      return NextResponse.json({ error: 'Login first' }, { status: 401 });
     }
-    let { password, vehiNum } = await request.json()
 
-    vehiNum = vehiNum.toUpperCase().trim()
+    let { password, vehiNum } = await request.json();
 
-    if (!vehiNum || !password) {
+    if (!password || !vehiNum) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
     }
 
+    vehiNum = vehiNum.toUpperCase().trim();
+
     const { data: user, error: fetchError } = await supabase
       .from('users')
-      .select('name, email, phone_num, password, vehi1, vehi2')
+      .select('password, vehi1, vehi2')
       .eq('email', email)
-      .maybeSingle()
+      .single();
 
     if (fetchError) {
       return NextResponse.json({ error: fetchError.message }, { status: 500 })
     }
     if (!user) {
-      return NextResponse.json({ error: 'No user found. Please sign up.' }, { status: 404 })
+      return NextResponse.json({ error: 'User not found. Please sign up.' }, { status: 404 });
     }
+
     const passwordMatch = await bcrypt.compare(password, user.password)
     if (!passwordMatch) {
       return NextResponse.json({ error: 'Wrong password' }, { status: 401 })
@@ -46,69 +48,36 @@ export async function POST(request: Request) {
     if (user?.vehi1) {
       validVehiColumn = "vehi2";
     }
-
-    if (validVehiColumn === "vehi1") {
-      const { data: user1, error: ftchError } = await supabase
-        .from('users')
-        .select('name, email, phone_num, password, vehi1, vehi2')
-        .eq('email', email)
-        .maybeSingle()
-
-      if (ftchError) {
-        return NextResponse.json({ error: ftchError.message }, { status: 500 })
-      }
-      if (user1?.vehi1 === vehiNum) {
-        return NextResponse.json({ error: 'This car number already exists. If it was not added by you, Please contact me.' }, { status: 401 })
-      }
-      if (user1?.vehi2 === vehiNum) {
-        return NextResponse.json({ error: 'This car number already exists. If it was not added by you, Please contact me.' }, { status: 401 })
-      }
-
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ [validVehiColumn]: vehiNum })
-        .eq('email', email)
-
-      if (updateError) {
-        if (updateError.code === '23505') {
-          return NextResponse.json({ error: 'This car number already exists. If it was not added by you, Please contact me.' }, { status: 409 })
-        }
-        return NextResponse.json({ error: updateError.message }, { status: 400 })
-      }
-
-    }
-    if (validVehiColumn === "vehi2") {
-      const { data: user2, error: ftchError } = await supabase
-        .from('users')
-        .select('name, email, phone_num, password, vehi1, vehi2')
-        .eq('email', email)
-        .maybeSingle()
-
-      if (ftchError) {
-        return NextResponse.json({ error: ftchError.message }, { status: 500 })
-      }
-      if (user2?.vehi2 === vehiNum) {
-        return NextResponse.json({ error: 'This car number already exists. If it was not added by you, Please contact me.' }, { status: 401 })
-      }
-      if (user2?.vehi1 === vehiNum) {
-        return NextResponse.json({ error: 'This car number already exists. If it was not added by you, Please contact me.' }, { status: 401 })
-      }
-
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ [validVehiColumn]: vehiNum })
-        .eq('email', email)
-
-      if (updateError) {
-        if (updateError.code === '23505') {
-          return NextResponse.json({ error: 'This car number already exists. If it was not added by you, Please contact me.' }, { status: 409 })
-        }
-        return NextResponse.json({ error: updateError.message }, { status: 400 })
-      }
-
+    if (user?.vehi1 && user?.vehi2) {
+      return NextResponse.json({ error: 'Your slot is full 2/2' }, { status: 500 })
     }
 
-    const { data: finalCheck, error: Error } = await supabase
+    const { data: existingVehicle } = await supabase
+      .from('users')
+      .select('id')
+      .or(`vehi1.eq.${vehiNum},vehi2.eq.${vehiNum}`)
+      .maybeSingle();
+
+    if (existingVehicle) {
+      return NextResponse.json(
+        { error: 'Vehicle number already registered' },
+        { status: 409 }
+      );
+    }
+
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ [validVehiColumn]: vehiNum })
+      .eq('email', email);
+
+    if (updateError) {
+      if (updateError.code === '23505') {
+        return NextResponse.json({ error: 'This car number already exists. If it was not added by you, Please contact me.' }, { status: 409 })
+      }
+      return NextResponse.json({ error: updateError.message }, { status: 400 })
+    }
+
+    const { data: latestDetails, error: Error } = await supabase
       .from('users')
       .select('name, email, phone_num, password, vehi1, vehi2')
       .eq('email', email)
@@ -117,21 +86,22 @@ export async function POST(request: Request) {
     if (Error) {
       return NextResponse.json({ error: Error.message }, { status: 500 })
     }
-    if (!finalCheck) {
+    if (!latestDetails) {
       return NextResponse.json({ error: 'No user found. Please sign up.' }, { status: 404 })
     }
 
+    await deleteAllCookie();
 
     return NextResponse.json({
       message: 'Vehicle Registered successfully',
       user: {
         loggedin: true,
-        name: finalCheck.name,
-        email: finalCheck.email,
-        password: finalCheck.password,
-        phone_num: finalCheck.phone_num,
-        vehi1: finalCheck.vehi1,
-        vehi2: finalCheck.vehi2
+        name: latestDetails.name,
+        email: latestDetails.email,
+        password: latestDetails.password,
+        phone_num: latestDetails.phone_num,
+        vehi1: latestDetails.vehi1,
+        vehi2: latestDetails.vehi2
       }
     }, { status: 200 })
 
