@@ -13,6 +13,7 @@ type UserCookie = {
   vehi1_name?: string,
   vehi2?: string
   vehi2_name?: string
+  verified: boolean
 }
 
 export async function IsLoggedIn() {
@@ -33,6 +34,13 @@ export async function setAllCookie(user: Partial<UserCookie>) {
     path: "/",
     maxAge,
   });
+  cookieStore.set("verified", String(user.verified ?? false), {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge,
+  });
 
   if (user.name) cookieStore.set("name", user.name, { path: "/", maxAge });
   if (user.email) cookieStore.set("email", user.email, { path: "/", maxAge });
@@ -47,7 +55,6 @@ export async function setAllCookie(user: Partial<UserCookie>) {
   cookieStore.set("total_vehi", totalVehicles.toString(), { path: "/", maxAge });
 }
 
-
 export async function deleteAllCookie() {
   const cookieStore = await cookies();
   cookieStore.getAll().forEach(cookie => {
@@ -58,29 +65,23 @@ export async function deleteAllCookie() {
 export async function getAllCookie(): Promise<UserCookie> {
   const cookieStore = await cookies();
   const allCookies = cookieStore.getAll();
+  const get = (name: string) => cookieStore.get(name)?.value
 
-  const userCookie: UserCookie = {
-    loggedin: false
-  };
+  const loggedin = get("loggedin") === 'true'
+  const verified = get("verified") === 'true'
 
-  allCookies.forEach(cookie => {
-    switch (cookie.name) {
-      case "loggedin":
-        userCookie.loggedin = cookie.value === "true";
-        break;
-      case "name":
-      case "email":
-      case "password":
-      case "phone_num":
-      case "total_vehi":
-      case "vehi1":
-      case "vehi1_name":
-      case "vehi2":
-      case "vehi2_name":
-        (userCookie as any)[cookie.name] = cookie.value;
-        break;
-    }
-  });
+  return {
+    loggedin,
+    verified,
+    name: get('name'),
+    email: get('email'),
+    password: get('password'),
+    phone_num: get('phone_num'),
+    total_vehi: get('total_vehi'),
+    vehi1: get('vehi1'),
+    vehi1_name: get('vehi1_name'),
+    vehi2: get('vehi2'),
+    vehi2_name: get('vehi2_name'),
+  }
 
-  return userCookie;
 }

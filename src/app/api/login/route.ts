@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
     const { data: user, error: fetchError } = await supabase
       .from('users')
-      .select('name, email, phone_num, password, vehi1, vehi1_name, vehi2, vehi2_name')
+      .select('name, email, phone_num, password, vehi1, vehi1_name, vehi2, vehi2_name, verified')
       .eq('email', email)
       .maybeSingle()
 
@@ -48,7 +48,8 @@ export async function POST(request: Request) {
         vehi1: user.vehi1,
         vehi1_name: user.vehi1_name,
         vehi2: user.vehi2,
-        vehi2_name: user.vehi2_name
+        vehi2_name: user.vehi2_name,
+        verified: user.verified
       }
     }, { status: 200 })
 
