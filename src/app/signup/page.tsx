@@ -31,8 +31,10 @@ export default function Signup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setMessage("");
+
     try {
-      const res = await fetch('/api/signup', {
+      const res = await fetch('/api/signup/init', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,15 +52,14 @@ export default function Signup() {
         throw new Error(result.error || 'Something went wrong');
       }
 
-      setMessage('✅ User registered successfully!');
-      router.push("/login");
+      router.push('/verify-phone');
     } catch (err: any) {
-      setMessage(`Error: ${err.message}`);
+      setMessage(err.message);
     } finally {
       setLoading(false);
     }
-
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50 dark:bg-slate-950">
       <div className="w-full max-w-140 bg-white dark:bg-slate-900 p-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl">

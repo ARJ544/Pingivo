@@ -21,6 +21,11 @@ export async function IsLoggedIn() {
   const loggedin = cookieStore.get('loggedin')
   return loggedin?.value === 'true'
 }
+export async function IsVerified() {
+  const cookieStore = await cookies()
+  const verified = cookieStore.get('verified')
+  return verified?.value === 'true'
+}
 
 export async function setAllCookie(user: Partial<UserCookie>) {
   const cookieStore = await cookies();
@@ -64,7 +69,6 @@ export async function deleteAllCookie() {
 
 export async function getAllCookie(): Promise<UserCookie> {
   const cookieStore = await cookies();
-  const allCookies = cookieStore.getAll();
   const get = (name: string) => cookieStore.get(name)?.value
 
   const loggedin = get("loggedin") === 'true'
