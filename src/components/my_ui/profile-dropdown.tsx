@@ -8,12 +8,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CircleUserRound, LogOut, Car } from "lucide-react";
+import { CircleUserRound, LogOut, Car, BadgeCheck } from "lucide-react";
 import { deleteAllCookie } from "@/app/actions";
 
 type ProfileDropdownProps = {
   user_name: string;
   totalVehicle: string;
+  isVerified: boolean;
   vehicles: {
     name: string;
     number: string;
@@ -23,6 +24,7 @@ type ProfileDropdownProps = {
 export default function ProfileDropdown({
   user_name,
   totalVehicle,
+  isVerified,
   vehicles,
 }: ProfileDropdownProps) {
   return (
@@ -38,10 +40,20 @@ export default function ProfileDropdown({
         className="min-w-50 max-w-64 rounded-xl border bg-background p-2 shadow-lg"
       >
         {/* User */}
-        <DropdownMenuLabel className="flex flex-col gap-0.5 px-2">
-          <span className="text-sm font-semibold text-foreground">
-            {user_name}
-          </span>
+        <DropdownMenuLabel className="flex flex-col gap-1 px-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-foreground">
+              {user_name}
+            </span>
+
+            {isVerified && (
+              <span className="flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700 ring-1 ring-green-600/20 dark:bg-green-900/30 dark:text-green-400">
+                <BadgeCheck className="h-3.5 w-3.5" />
+                Verified
+              </span>
+            )}
+          </div>
+          {/* <DropdownMenuSeparator /> */}
           <span className="text-xs text-muted-foreground">
             Account Overview
           </span>

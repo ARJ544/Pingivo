@@ -1,12 +1,13 @@
 import { ModeToggle } from "@/components/ui/mode_toggle";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { IsLoggedIn, getAllCookie } from "@/app/actions";
+import { IsLoggedIn, getAllCookie, IsVerified } from "@/app/actions";
 import ProfileDropdown from "@/components/my_ui/profile-dropdown";
 import Image from "next/image";
 
 export async function Navigation() {
   const isLoggedIn = await IsLoggedIn();
+  const isVerified = await IsVerified();
   const cookies = await getAllCookie();
 
   const vehicles = [
@@ -60,6 +61,7 @@ export async function Navigation() {
               <ProfileDropdown
                 user_name={cookies.name ?? "Unknown"}
                 totalVehicle={cookies.total_vehi ?? "0"}
+                isVerified={isVerified}
                 vehicles={vehicles}
               />
 
