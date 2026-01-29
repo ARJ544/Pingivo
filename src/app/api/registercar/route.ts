@@ -18,17 +18,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Login first' }, { status: 401 });
     }
 
-    let { password, vehiNum } = await request.json();
+    let { password, vehiNum, vehiName } = await request.json();
 
-    if (!password || !vehiNum) {
+    if (!password || !vehiNum || !vehiName) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
     }
 
     vehiNum = vehiNum.toUpperCase().trim();
+    vehiName = vehiName.toUpperCase().trim();
 
     const { data: user, error: fetchError } = await supabase
       .from('users')
-      .select('password, vehi1, vehi2')
+      .select('password, vehi1, vehi1_name, vehi2, vehi2_name')
       .eq('email', email)
       .single();
 
@@ -48,6 +49,11 @@ export async function POST(request: Request) {
     if (user?.vehi1) {
       validVehiColumn = "vehi2";
     }
+    let validVehiNameColumn = "vehi1_name";
+    if (user?.vehi1_name) {
+      validVehiNameColumn = "vehi2_name";
+    }
+
     if (user?.vehi1 && user?.vehi2) {
       return NextResponse.json({ error: 'Your slot is full 2/2' }, { status: 500 })
     }
@@ -67,7 +73,7 @@ export async function POST(request: Request) {
 
     const { error: updateError } = await supabase
       .from('users')
-      .update({ [validVehiColumn]: vehiNum })
+      .update({ [validVehiColumn]: vehiNum, [validVehiNameColumn]: vehiName })
       .eq('email', email);
 
     if (updateError) {
@@ -79,7 +85,7 @@ export async function POST(request: Request) {
 
     const { data: latestDetails, error: Error } = await supabase
       .from('users')
-      .select('name, email, phone_num, password, vehi1, vehi2')
+      .select('name, email, phone_num, password, vehi1, vehi2, vehi1_name, vehi2_name')
       .eq('email', email)
       .maybeSingle()
 
@@ -101,7 +107,9 @@ export async function POST(request: Request) {
         password: latestDetails.password,
         phone_num: latestDetails.phone_num,
         vehi1: latestDetails.vehi1,
-        vehi2: latestDetails.vehi2
+        vehi1_name: latestDetails.vehi1_name,
+        vehi2: latestDetails.vehi2,
+        vehi2_name: latestDetails.vehi2_name
       }
     }, { status: 200 })
 

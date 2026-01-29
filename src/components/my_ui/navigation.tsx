@@ -10,8 +10,8 @@ export async function Navigation() {
   const cookies = await getAllCookie();
 
   const vehicles = [
-    { name: "Vehicle 1", number: cookies.vehi1 },
-    { name: "Vehicle 2", number: cookies.vehi2 },
+    { name: cookies.vehi1_name, number: cookies.vehi1 },
+    { name: cookies.vehi2_name, number: cookies.vehi2 },
   ].filter((v): v is { name: string; number: string } => Boolean(v.number));
 
   return (

@@ -12,6 +12,7 @@ export default function RegisterClient() {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [vehiNum, setvehiNum] = useState('')
+  const [vehiName, setvehiName] = useState('')
   let [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const isPasswordValid = password === '' || password.length >= 8
@@ -28,6 +29,7 @@ export default function RegisterClient() {
         body: JSON.stringify({
           password,
           vehiNum,
+          vehiName,
         }),
       });
       const result = await res.json();
@@ -122,13 +124,34 @@ export default function RegisterClient() {
               />
             </div>
           </div>
+
+          {/* Vehicle Name */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+              Car Name/Model
+            </label>
+            <div className="relative">
+              <Car
+                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <input
+                name='vehicle_name'
+                value={vehiName}
+                onChange={(e) => setvehiName(e.target.value.toUpperCase())}
+                type="text"
+                placeholder="Tesla Model X"
+                className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition font-mono uppercase"
+              />
+            </div>
+          </div>
           {message}
 
           {/* Submit */}
           <div className="mt-6 flex flex-col gap-4">
             <Button
               type="submit"
-              disabled={password.length < 8 || vehiNum.length > 15}
+              disabled={password.length < 8 || vehiNum.length > 15 || !vehiName.trim() || !vehiNum.trim()}
               className="w-full bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 text-white font-bold py-4 rounded-lg shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2 group"
             >
               {loading ? "Registering" : "Register"}

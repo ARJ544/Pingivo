@@ -10,7 +10,9 @@ type UserCookie = {
   phone_num?: string,
   total_vehi?: string,
   vehi1?: string,
+  vehi1_name?: string,
   vehi2?: string
+  vehi2_name?: string
 }
 
 export async function IsLoggedIn() {
@@ -37,7 +39,9 @@ export async function setAllCookie(user: Partial<UserCookie>) {
   if (user.password) cookieStore.set("password", user.password, { path: "/", maxAge });
   if (user.phone_num) cookieStore.set("phone_num", user.phone_num, { path: "/", maxAge });
   if (user.vehi1) cookieStore.set("vehi1", user.vehi1, { path: "/", maxAge });
+  if (user.vehi1_name) cookieStore.set("vehi1_name", user.vehi1_name, { path: "/", maxAge });
   if (user.vehi2) cookieStore.set("vehi2", user.vehi2, { path: "/", maxAge });
+  if (user.vehi2_name) cookieStore.set("vehi2_name", user.vehi2_name, { path: "/", maxAge });
 
   const totalVehicles = [user.vehi1, user.vehi2].filter(Boolean).length;
   cookieStore.set("total_vehi", totalVehicles.toString(), { path: "/", maxAge });
@@ -70,7 +74,9 @@ export async function getAllCookie(): Promise<UserCookie> {
       case "phone_num":
       case "total_vehi":
       case "vehi1":
+      case "vehi1_name":
       case "vehi2":
+      case "vehi2_name":
         (userCookie as any)[cookie.name] = cookie.value;
         break;
     }

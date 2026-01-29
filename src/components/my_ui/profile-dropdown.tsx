@@ -60,7 +60,7 @@ export default function ProfileDropdown({
 
           {vehicles.map((v) => (
             <div
-              key={v.name}
+              key={v.number}
               className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted transition"
             >
               <Car className="h-4 w-4 text-muted-foreground" />
