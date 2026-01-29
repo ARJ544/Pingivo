@@ -17,12 +17,12 @@ export async function Navigation() {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
 
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 transition hover:opacity-90"
+          className="flex items-center gap-1 transition hover:opacity-90"
         >
           <Image
             src="/logo.png"
@@ -44,12 +44,12 @@ export async function Navigation() {
           {!isLoggedIn && (
             <>
               <Link href="/login">
-                <Button className="rounded-full px-3">
+                <Button className="rounded-full px-2">
                   Login
                 </Button>
               </Link>
               <Link href="/signup">
-                <Button className="rounded-full px-3">
+                <Button className="rounded-full px-2">
                   Sign Up
                 </Button>
               </Link>
