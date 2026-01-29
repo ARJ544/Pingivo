@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 
 
-function ShowOwnerDetail({ name, carName, user_ph_num }: { name: string, carName: string, user_ph_num: string }) {
+function ShowOwnerDetail({ name, carName, user_ph_num, isVerified }: { name: string, carName: string, user_ph_num: string, isVerified: boolean }) {
   const [user_phnum, setPhnum] = useState(user_ph_num);
 
   const phoneRegex = /^\+[1-9]\d{1,14}$/
@@ -37,59 +37,65 @@ function ShowOwnerDetail({ name, carName, user_ph_num }: { name: string, carName
         </div>
       </div>
 
-      {/* Verify Ownership Section */}
-      <div className="p-8 bg-primary/5 border-b border-slate-100 dark:border-slate-800">
-        <div className="flex flex-col items-center max-w-lg mx-auto">
-          <div className="size-10 rounded-full bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-primary mb-3">
-            <Lock size={24} />
-          </div>
-          <h4 className="text-lg font-bold mb-2 text-center">Verify Ownership to Contact</h4>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-8 text-center">
-            For security reasons, please provide the following details to verify your authorization to contact this owner.
-          </p>
-
-          <div className="w-full flex flex-col gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-              <label className="flex flex-col gap-1.5">
-                <span className="text-xs font-bold uppercase text-slate-500 tracking-wide">Car Number (Last 4)</span>
-                <input
-                  className="w-full h-12 px-4 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-base font-semibold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-center tracking-widest"
-                  maxLength={4}
-                  placeholder="e.g. 9942"
-                  type="text"
-                />
-              </label>
-
-              <label className="flex flex-col gap-1.5">
-                <span className="text-xs font-bold uppercase text-slate-500 tracking-wide">Your Phone Number (E.164)</span>
-                <input
-                  name="user_phnum"
-                  value={user_phnum ? user_phnum : ""}
-                  onChange={(e) => setPhnum(e.target.value.replace(/^\s+|\s+$/g, ''))}
-                  type="tel"
-                  placeholder="+918830123433"
-                  className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
-                    ${isPhoneValid
-                      ? 'border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
-                      : 'border-red-500 focus:ring-1 focus:ring-red-500'
-                    }`}
-                />
-
-              </label>
+      {isVerified && (
+        <>
+          Call Section
+        </>
+      )}
+      {!isVerified && (
+        <div className="p-8 bg-primary/5 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex flex-col items-center max-w-lg mx-auto">
+            <div className="size-10 rounded-full bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-primary mb-3">
+              <Lock size={24} />
             </div>
+            <h4 className="text-lg font-bold mb-2 text-center">Verify Ownership to Contact</h4>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-8 text-center">
+              For security reasons, please provide the following details to verify your authorization to contact this owner.
+            </p>
 
-            <Button className="w-full bg-primary text-white dark:text-slate-700 font-bold h-12 rounded-lg hover:bg-primary/90 transition-colors shadow-sm shadow-primary/20 mt-2">
-              Verify & Unlock Contact
-            </Button>
+            <div className="w-full flex flex-col gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs font-bold uppercase text-slate-500 tracking-wide">Car Number (Last 4)</span>
+                  <input
+                    className="w-full h-12 px-4 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-base font-semibold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-center tracking-widest"
+                    maxLength={4}
+                    placeholder="e.g. 9942"
+                    type="text"
+                  />
+                </label>
+
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs font-bold uppercase text-slate-500 tracking-wide">Your Phone Number (E.164)</span>
+                  <input
+                    name="user_phnum"
+                    value={user_phnum ? user_phnum : ""}
+                    onChange={(e) => setPhnum(e.target.value.replace(/^\s+|\s+$/g, ''))}
+                    type="tel"
+                    placeholder="+918830123433"
+                    className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
+                    ${isPhoneValid
+                        ? 'border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
+                        : 'border-red-500 focus:ring-1 focus:ring-red-500'
+                      }`}
+                  />
+
+                </label>
+              </div>
+
+              <Button className="w-full bg-primary text-white dark:text-slate-700 font-bold h-12 rounded-lg hover:bg-primary/90 transition-colors shadow-sm shadow-primary/20 mt-2">
+                Verify & Unlock Contact
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
 
 
-export default function SearchCar({ cookies }: { cookies: any }) {
+export default function SearchCar({ user_phone_number, is_verified }: { user_phone_number: any, is_verified: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryCarNumber = searchParams.get("crnm");
@@ -115,9 +121,9 @@ export default function SearchCar({ cookies }: { cookies: any }) {
         const data = await res.json();
 
         if (queryCarNumber === data?.vehi1) {
-          setOwnerDetail({ name: data?.name, carName: data?.vehi1_name, user_ph_num: cookies });
+          setOwnerDetail({ name: data?.name, carName: data?.vehi1_name, user_ph_num: user_phone_number, isVerified: is_verified });
         } else {
-          setOwnerDetail({ name: data?.name, carName: data?.vehi2_name, user_ph_num: cookies });
+          setOwnerDetail({ name: data?.name, carName: data?.vehi2_name, user_ph_num: user_phone_number, isVerified: is_verified });
         }
 
         // setMessage(JSON.stringify(data));
@@ -130,7 +136,7 @@ export default function SearchCar({ cookies }: { cookies: any }) {
     };
 
     fetchOwner();
-  }, [queryCarNumber, cookies]);
+  }, [queryCarNumber, user_phone_number]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
