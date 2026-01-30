@@ -3,16 +3,100 @@ import { useState, useEffect } from "react";
 import { Car, User, Lock, Mail, Phone, MessageSquare, Shield, EyeOff, MailCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
+function ShowWarning({ isLoggedin }: { isLoggedin: boolean }) {
+  const [open, setOpen] = useState(true);
 
-function ShowOwnerDetail({ name, carName, user_ph_num, isVerified }: { name: string, carName: string, user_ph_num: string, isVerified: boolean }) {
-  const [user_phnum, setPhnum] = useState(user_ph_num);
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "auto";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [open]);
 
-  const phoneRegex = /^\+[1-9]\d{1,14}$/
-  const isPhoneValid = user_phnum === '' || phoneRegex.test(user_phnum)
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      {/* Backdrop */}
+      <div
+        onClick={() => setOpen(false)}
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+      />
+
+      {/* Modal */}
+      <div className="relative w-full max-w-md animate-in zoom-in-95 rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900">
+
+        {/* Header */}
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            ⚠️ Important Notice
+          </h2>
+
+          <button
+            onClick={() => setOpen(false)}
+            className="rounded-full p-1 text-zinc-500 transition hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Content Box */}
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-300">
+          {isLoggedin ? (
+            <>
+              <p className="text-sm font-medium leading-relaxed">
+                Your phone number will be changed <span className="font-semibold">temporarily for 1 hour</span>.
+              </p>
+              <p className="mt-2 text-xs opacity-80 leading-relaxed">
+                After this period, your original phone number will be restored automatically.
+                You can update your phone number permanently from <span className="font-medium">Update Profile</span>.
+                During this 1-hour window, further changes are not allowed.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm font-medium leading-relaxed">
+                Your phone number will be changed <span className="font-semibold">temporarily for 1 hour</span>.
+              </p>
+              <p className="mt-2 text-xs opacity-80 leading-relaxed">
+                During this time, you won’t be able to modify your phone number again.
+              </p>
+            </>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="mt-6 flex justify-end gap-3">
+          <Link href="/verify-phone-unknown-user">
+            <Button className="rounded-lg bg-zinc-900 px-4 py-2 text-sm text-white transition hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200">
+              Okay, I understand
+            </Button>
+          </Link>
+
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+            className="rounded-lg px-4 py-2 text-sm"
+          >
+            Close
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ShowOwnerDetail({ name, carName, user_ph_num, isVerified, isLoggedin }: { name: string, carName: string, user_ph_num: string, isVerified: boolean, isLoggedin: boolean }) {
+  const router = useRouter();
+  const [showWarning, setShowWarning] = useState(false);
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mt-4">
+      {showWarning && (
+        <ShowWarning isLoggedin={isLoggedin} />
+      )}
       <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-wrap justify-between items-center gap-4">
         <div className="flex items-center gap-5">
           <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700">
@@ -38,10 +122,34 @@ function ShowOwnerDetail({ name, carName, user_ph_num, isVerified }: { name: str
       </div>
 
       {isVerified && (
-        <>
-          Call Section
-        </>
+        <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
+          <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+            Contact Owner
+          </h4>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+            {/* Email */}
+            <Button
+              variant="outline"
+              className="flex items-center gap-2 h-12 font-semibold"
+            >
+              <Mail size={18} />
+              Email
+            </Button>
+
+            {/* Call */}
+            <Button
+              className="flex items-center gap-2 h-12 font-bold bg-primary text-white dark:text-slate-800 hover:bg-primary/90"
+            >
+              <Phone size={18} />
+              Call
+            </Button>
+
+          </div>
+        </div>
       )}
+
       {!isVerified && (
         <div className="p-8 bg-primary/5 border-b border-slate-100 dark:border-slate-800">
           <div className="flex flex-col items-center max-w-lg mx-auto">
@@ -50,40 +158,11 @@ function ShowOwnerDetail({ name, carName, user_ph_num, isVerified }: { name: str
             </div>
             <h4 className="text-lg font-bold mb-2 text-center">Verify Ownership to Contact</h4>
             <p className="text-sm text-slate-600 dark:text-slate-400 mb-8 text-center">
-              For security reasons, please provide the following details to verify your authorization to contact this owner.
+              For security reasons, please verify your authorization to contact this owner.
             </p>
 
             <div className="w-full flex flex-col gap-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                <label className="flex flex-col gap-1.5">
-                  <span className="text-xs font-bold uppercase text-slate-500 tracking-wide">Car Number (Last 4)</span>
-                  <input
-                    className="w-full h-12 px-4 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-base font-semibold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-center tracking-widest"
-                    maxLength={4}
-                    placeholder="e.g. 9942"
-                    type="text"
-                  />
-                </label>
-
-                <label className="flex flex-col gap-1.5">
-                  <span className="text-xs font-bold uppercase text-slate-500 tracking-wide">Your Phone Number (E.164)</span>
-                  <input
-                    name="user_phnum"
-                    value={user_phnum ? user_phnum : ""}
-                    onChange={(e) => setPhnum(e.target.value.replace(/^\s+|\s+$/g, ''))}
-                    type="tel"
-                    placeholder="+918830123433"
-                    className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
-                    ${isPhoneValid
-                        ? 'border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
-                        : 'border-red-500 focus:ring-1 focus:ring-red-500'
-                      }`}
-                  />
-
-                </label>
-              </div>
-
-              <Button className="w-full bg-primary text-white dark:text-slate-700 font-bold h-12 rounded-lg hover:bg-primary/90 transition-colors shadow-sm shadow-primary/20 mt-2">
+              <Button onClick={() => setShowWarning((prev) => !prev)} className="w-full bg-primary text-white dark:text-slate-700 font-bold h-12 rounded-lg hover:bg-primary/90 transition-colors shadow-sm shadow-primary/20 mt-2">
                 Verify & Unlock Contact
               </Button>
             </div>
@@ -95,7 +174,7 @@ function ShowOwnerDetail({ name, carName, user_ph_num, isVerified }: { name: str
 }
 
 
-export default function SearchCar({ user_phone_number, is_verified }: { user_phone_number: any, is_verified: boolean }) {
+export default function SearchCar({ user_phone_number, is_verified, is_loggedin }: { user_phone_number: any, is_verified: boolean, is_loggedin: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryCarNumber = searchParams.get("crnm");
@@ -121,9 +200,9 @@ export default function SearchCar({ user_phone_number, is_verified }: { user_pho
         const data = await res.json();
 
         if (queryCarNumber === data?.vehi1) {
-          setOwnerDetail({ name: data?.name, carName: data?.vehi1_name, user_ph_num: user_phone_number, isVerified: is_verified });
+          setOwnerDetail({ name: data?.name, carName: data?.vehi1_name, user_ph_num: user_phone_number, isVerified: is_verified, isLoggedin: is_loggedin });
         } else {
-          setOwnerDetail({ name: data?.name, carName: data?.vehi2_name, user_ph_num: user_phone_number, isVerified: is_verified });
+          setOwnerDetail({ name: data?.name, carName: data?.vehi2_name, user_ph_num: user_phone_number, isVerified: is_verified, isLoggedin: is_loggedin });
         }
 
         // setMessage(JSON.stringify(data));
