@@ -21,16 +21,18 @@ export async function POST(req: Request) {
   const verifiedPhone =
     `${data.user_country_code}${data.user_phone_number}`
 
+  const ONE_HOUR = 60 * 60;
+
   cookie.set('temp_phone', verifiedPhone, {
     httpOnly: true,
     secure: true,
-    maxAge: 60 * 60 * 1000,
+    maxAge: ONE_HOUR,
   })
   if (!isVerified) {
     cookie.set('verified', 'true', {
       httpOnly: true,
       secure: true,
-      maxAge: 60 * 60 * 1000,
+      maxAge: ONE_HOUR,
     })
   }
 

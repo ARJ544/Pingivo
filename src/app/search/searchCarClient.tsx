@@ -222,7 +222,7 @@ export default function SearchCar({ user_phone_number, is_verified, is_loggedin,
   const searchParams = useSearchParams();
   const queryCarNumber = searchParams.get("crnm");
 
-  const [carName, setCarNumber] = useState(queryCarNumber? queryCarNumber : "");
+  const [carNumber, setCarNumber] = useState(queryCarNumber? queryCarNumber : "");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [ownerDetail, setOwnerDetail] = useState<any>(null);
@@ -263,12 +263,12 @@ export default function SearchCar({ user_phone_number, is_verified, is_loggedin,
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!carName.trim()) {
+    if (!carNumber.trim()) {
       setMessage("Please enter a car number");
       return;
     }
 
-    router.replace(`/search?crnm=${encodeURIComponent(carName)}`);
+    router.replace(`/search?crnm=${encodeURIComponent(carNumber)}`);
     setMessage('');
   };
   return (
@@ -297,7 +297,7 @@ export default function SearchCar({ user_phone_number, is_verified, is_loggedin,
                 />
 
                 <input
-                  value={carName}
+                  value={carNumber}
                   onChange={(e) => setCarNumber(e.target.value.toUpperCase())}
                   placeholder="e.g. ABC-1234"
                   className="

@@ -35,34 +35,34 @@ export async function getTempPhone() {
 export async function setAllCookie(user: Partial<UserCookie>) {
   const cookieStore = await cookies();
 
-  const maxAge = 60 * 60 * 24 * 15;
+  const FIFTEEN_DAYS = 60 * 60 * 24 * 15;
 
   cookieStore.set("loggedin", String(user.loggedin ?? false), {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge,
+    maxAge: FIFTEEN_DAYS
   });
   cookieStore.set("verified", String(user.verified ?? false), {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge,
+    maxAge: FIFTEEN_DAYS,
   });
 
-  if (user.name) cookieStore.set("name", user.name, { path: "/", maxAge });
-  if (user.email) cookieStore.set("email", user.email, { path: "/", maxAge });
-  if (user.password) cookieStore.set("password", user.password, { path: "/", maxAge });
-  if (user.phone_num) cookieStore.set("phone_num", user.phone_num, { path: "/", maxAge });
-  if (user.vehi1) cookieStore.set("vehi1", user.vehi1, { path: "/", maxAge });
-  if (user.vehi1_name) cookieStore.set("vehi1_name", user.vehi1_name, { path: "/", maxAge });
-  if (user.vehi2) cookieStore.set("vehi2", user.vehi2, { path: "/", maxAge });
-  if (user.vehi2_name) cookieStore.set("vehi2_name", user.vehi2_name, { path: "/", maxAge });
+  if (user.name) cookieStore.set("name", user.name, { path: "/", maxAge: FIFTEEN_DAYS });
+  if (user.email) cookieStore.set("email", user.email, { path: "/", maxAge: FIFTEEN_DAYS });
+  if (user.password) cookieStore.set("password", user.password, { path: "/", maxAge: FIFTEEN_DAYS });
+  if (user.phone_num) cookieStore.set("phone_num", user.phone_num, { path: "/", maxAge: FIFTEEN_DAYS });
+  if (user.vehi1) cookieStore.set("vehi1", user.vehi1, { path: "/", maxAge: FIFTEEN_DAYS });
+  if (user.vehi1_name) cookieStore.set("vehi1_name", user.vehi1_name, { path: "/", maxAge: FIFTEEN_DAYS });
+  if (user.vehi2) cookieStore.set("vehi2", user.vehi2, { path: "/", maxAge: FIFTEEN_DAYS });
+  if (user.vehi2_name) cookieStore.set("vehi2_name", user.vehi2_name, { path: "/", maxAge: FIFTEEN_DAYS });
 
   const totalVehicles = [user.vehi1, user.vehi2].filter(Boolean).length;
-  cookieStore.set("total_vehi", totalVehicles.toString(), { path: "/", maxAge });
+  cookieStore.set("total_vehi", totalVehicles.toString(), { path: "/", maxAge: FIFTEEN_DAYS });
 }
 
 export async function deleteAllCookie() {
