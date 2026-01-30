@@ -42,7 +42,7 @@ export default function Login() {
       setAllCookie(result.user);
 
       setMessage('✅ User Loggedin successfully!');
-      router.push("/home");
+      router.replace("/home");
     } catch (err: any) {
       setMessage(`Error: ${err.message}`);
     } finally {
