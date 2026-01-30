@@ -21,7 +21,7 @@ export default function Home() {
             <div className="flex flex-col gap-8">
               <div className="dark:bg-blue-800 inline-flex items-center gap-2 px-3 bg-blue-100 py-1 rounded-full text-xs font-bold uppercase tracking-wider w-fit">
                 <BadgeCheck className="h-4 w-4 text-primary" />
-                Trusted by 10,000+ Drivers
+                Privacy-First Vehicle Protection
               </div>
               <h1 className="text-5xl md:text-6xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">
                 Ping the Owner.
@@ -78,17 +78,17 @@ export default function Home() {
         <section className="py-12 border-y border-[#cfdde7] dark:border-slate-800">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="flex flex-col gap-1 p-6 rounded-xl bg-white dark:bg-slate-800/50 shadow-sm border border-[#cfdde7] dark:border-slate-700">
-              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Active Drivers</p>
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Reliability</p>
               <div className="flex items-center gap-3">
-                <p className="text-3xl font-bold tracking-tight text-primary">10k+</p>
-                <span className="bg-[#078838]/10 text-[#078838] px-2 py-0.5 rounded text-xs font-bold">+15% this month</span>
+                <p className="text-3xl font-bold tracking-tight">Secure</p>
+                <span className="bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded text-xs font-bold">24/7 Reachable</span>
               </div>
             </div>
             <div className="flex flex-col gap-1 p-6 rounded-xl bg-white dark:bg-slate-800/50 shadow-sm border border-[#cfdde7] dark:border-slate-700">
-              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Data Security</p>
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Privacy Shield</p>
               <div className="flex items-center gap-3">
-                <p className="text-3xl font-bold tracking-tight">AES-256</p>
-                <span className="bg-[#078838]/10 text-[#078838] px-2 py-0.5 rounded text-xs font-bold">Encrypted</span>
+                <p className="text-3xl font-bold tracking-tight">100% Private</p>
+                <span className="bg-[#078838]/10 text-[#078838] px-2 py-0.5 rounded text-xs font-bold">Anonymous</span>
               </div>
             </div>
             <div className="flex flex-col gap-1 p-6 rounded-xl bg-white dark:bg-slate-800/50 shadow-sm border border-[#cfdde7] dark:border-slate-700">
@@ -118,7 +118,7 @@ export default function Home() {
               <div className="flex flex-col gap-2">
                 <h3 className="text-xl font-bold">Privacy First</h3>
                 <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-                  Communicate anonymously without sharing your phone number. Get notified instantly via Email or SMS when something happens to your car.
+                  Communicate anonymously without sharing your phone number. Get notified instantly via Email when something happens to your car.
                 </p>
               </div>
             </div>
@@ -129,7 +129,7 @@ export default function Home() {
               <div className="flex flex-col gap-2">
                 <h3 className="text-xl font-bold">Instant Alerts</h3>
                 <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-                  Get notified immediately Email or SMS if something happens to your car, from parking issues to emergencies.
+                  Get notified immediately Email if something happens to your car, from parking issues to emergencies.
                 </p>
               </div>
             </div>

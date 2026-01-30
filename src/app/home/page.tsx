@@ -2,6 +2,10 @@ import Link from "next/link";
 import { ShieldCheck, PlusSquare, Search, QrCode, Edit3, Trash2, ArrowRight, EyeOff, ScanQrCode, BadgeCheck } from "lucide-react";
 import { IsLoggedIn, getAllCookie } from "@/app/actions";
 
+export const metadata = {
+  title: "Home",
+};
+
 export default async function HomePage() {
   const company_name = "ParkPing";
   const totalVehicle = (await getAllCookie()).total_vehi;

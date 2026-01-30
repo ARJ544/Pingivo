@@ -1,6 +1,10 @@
 import { getAllCookie, IsVerified, IsLoggedIn, getTempPhone } from "@/app/actions";
 import SearchCar from "@/app/search/searchCarClient";
 
+export const metadata = {
+  title: "Search a Car",
+};
+
 export default async function SearchPage() {
   const cookies = await getAllCookie();
   const isVerified = await IsVerified();

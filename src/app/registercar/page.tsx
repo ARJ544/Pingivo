@@ -2,6 +2,10 @@ import { IsLoggedIn, getAllCookie } from "../actions";
 import { redirect } from "next/navigation";
 import RegisterClient from "@/app/registercar/RegisterClient";
 
+export const metadata = {
+  title: "Register a Car",
+};
+
 export default async function RegisterPage() {
   const isLoggedIn = await IsLoggedIn();
   const totaleVehicle = (await getAllCookie()).total_vehi;
