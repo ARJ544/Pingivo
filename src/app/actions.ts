@@ -26,6 +26,11 @@ export async function IsVerified() {
   const verified = cookieStore.get('verified')
   return verified?.value === 'true'
 }
+export async function getTempPhone() {
+  const cookieStore = await cookies()
+  const temp_phone = cookieStore.get('temp_phone')
+  return temp_phone?.value
+}
 
 export async function setAllCookie(user: Partial<UserCookie>) {
   const cookieStore = await cookies();

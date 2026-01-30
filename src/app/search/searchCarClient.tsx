@@ -1,28 +1,24 @@
 'use client';
 import { useState, useEffect } from "react";
-import { Car, User, Lock, Mail, Phone, MessageSquare, Shield, EyeOff, MailCheck } from "lucide-react";
+import { Car, User, Lock, Mail, Phone, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-function ShowWarning({ isLoggedin }: { isLoggedin: boolean }) {
-  const [open, setOpen] = useState(true);
-
+function ShowWarning({ isLoggedin, carNum, onClose }: { isLoggedin: boolean, carNum: string, onClose: () => void }) {
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "auto";
+    document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [open]);
-
-  if (!open) return null;
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       {/* Backdrop */}
       <div
-        onClick={() => setOpen(false)}
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
       />
 
       {/* Modal */}
@@ -35,7 +31,7 @@ function ShowWarning({ isLoggedin }: { isLoggedin: boolean }) {
           </h2>
 
           <button
-            onClick={() => setOpen(false)}
+            onClick={onClose}
             className="rounded-full p-1 text-zinc-500 transition hover:bg-zinc-100 dark:hover:bg-zinc-800"
           >
             ✕
@@ -69,7 +65,7 @@ function ShowWarning({ isLoggedin }: { isLoggedin: boolean }) {
 
         {/* Footer */}
         <div className="mt-6 flex justify-end gap-3">
-          <Link href="/verify-phone-unknown-user">
+          <Link href={`/verify-phone-unknown-user?next=${encodeURIComponent(carNum)}`}>
             <Button className="rounded-lg bg-zinc-900 px-4 py-2 text-sm text-white transition hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200">
               Okay, I understand
             </Button>
@@ -77,7 +73,7 @@ function ShowWarning({ isLoggedin }: { isLoggedin: boolean }) {
 
           <Button
             variant="outline"
-            onClick={() => setOpen(false)}
+            onClick={(onClose)}
             className="rounded-lg px-4 py-2 text-sm"
           >
             Close
@@ -88,98 +84,145 @@ function ShowWarning({ isLoggedin }: { isLoggedin: boolean }) {
   );
 }
 
-function ShowOwnerDetail({ name, carName, user_ph_num, isVerified, isLoggedin }: { name: string, carName: string, user_ph_num: string, isVerified: boolean, isLoggedin: boolean }) {
-  const router = useRouter();
+function ShowOwnerDetail({ name, carName, car_num, user_ph_num, isVerified, isLoggedin, temp_phone_number }: { name: string, carName: string, car_num: string, user_ph_num: string, isVerified: boolean, isLoggedin: boolean, temp_phone_number: string | undefined }) {
   const [showWarning, setShowWarning] = useState(false);
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mt-4">
+    <>
       {showWarning && (
-        <ShowWarning isLoggedin={isLoggedin} />
+        <ShowWarning
+          isLoggedin={isLoggedin}
+          carNum={car_num}
+          onClose={() => setShowWarning(false)}
+        />
       )}
-      <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-wrap justify-between items-center gap-4">
-        <div className="flex items-center gap-5">
-          <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700">
-            <User size={36} />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold">{name}</h3>
-            <p className="text-sm text-slate-500 mb-1">
-              Owner Of <span className="font-semibold text-slate-700 dark:text-slate-300">{carName}</span>
-            </p>
-            <div className="flex items-center gap-1.5">
-              <Lock size={16} className="text-green-500" />
-              <span className="text-xs font-semibold text-green-600 dark:text-green-400">
-                Identity Verified
-              </span>
+      <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur shadow-sm hover:shadow-md transition-shadow duration-300">
+
+
+        {/* Header */}
+        <div className="p-6 flex flex-wrap items-center justify-between gap-6 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-5">
+            <div className="w-16 h-16 rounded-full bg-linear-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center border dark:border-slate-700 shadow-inner">
+              <User size={34} className="text-slate-500 dark:text-slate-300" />
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold tracking-tight">
+                {name}
+              </h3>
+
+              <p className="text-sm text-slate-500 mt-0.5">
+                Owner of{" "}
+                <span className="font-semibold text-slate-700 dark:text-slate-200">
+                  {carName}
+                </span>
+              </p>
+
+              <div className="mt-1 flex items-center gap-1.5">
+                <Lock size={15} className="text-emerald-500" />
+                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  Identity Verified
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="bg-slate-50 dark:bg-slate-800 px-5 py-3 rounded-lg flex flex-col items-end gap-1">
-          <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">Vehicle Status</span>
-          <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Registered & Active</span>
-        </div>
-      </div>
 
-      {isVerified && (
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
-          <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
-            Contact Owner
-          </h4>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-            {/* Email */}
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 h-12 font-semibold"
-            >
-              <Mail size={18} />
-              Email
-            </Button>
-
-            {/* Call */}
-            <Button
-              className="flex items-center gap-2 h-12 font-bold bg-primary text-white dark:text-slate-800 hover:bg-primary/90"
-            >
-              <Phone size={18} />
-              Call
-            </Button>
-
+          <div className="rounded-xl bg-slate-50 dark:bg-slate-800 px-5 py-3 text-right">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+              Vehicle Status
+            </p>
+            <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
+              Registered & Active
+            </p>
           </div>
         </div>
-      )}
 
-      {!isVerified && (
-        <div className="p-8 bg-primary/5 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex flex-col items-center max-w-lg mx-auto">
-            <div className="size-10 rounded-full bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-primary mb-3">
-              <Lock size={24} />
+        {/* Verified */}
+        {isVerified && (
+          <div className="p-6 bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+            <div className="mb-4 flex items-start justify-between">
+              <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                Contact Owner
+              </h4>
+
+              <div className="text-right">
+                <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  <Phone size={14} className="text-primary" />
+                  {temp_phone_number ?? user_ph_num}
+                </div>
+
+                {!temp_phone_number && (
+                  <Button
+                    onClick={() => setShowWarning(true)}
+                    className="-mt-5 bg-transparent hover:bg-transparent text-blue-600 inline-flex items-center gap-1 text-[11px] font-medium hover:underline"
+                  >
+                    <RefreshCcw size={11} />
+                    change
+                  </Button>
+                )}
+              </div>
             </div>
-            <h4 className="text-lg font-bold mb-2 text-center">Verify Ownership to Contact</h4>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-8 text-center">
-              For security reasons, please verify your authorization to contact this owner.
-            </p>
 
-            <div className="w-full flex flex-col gap-4">
-              <Button onClick={() => setShowWarning((prev) => !prev)} className="w-full bg-primary text-white dark:text-slate-700 font-bold h-12 rounded-lg hover:bg-primary/90 transition-colors shadow-sm shadow-primary/20 mt-2">
+            <div className="flex flex-wrap gap-4">
+              <Button
+                variant="outline"
+                className="h-12 px-6 font-semibold flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              >
+                <Mail size={18} />
+                Email
+              </Button>
+
+              <Button
+                className="h-12 px-6 font-bold flex items-center gap-2 bg-primary text-white dark:text-slate-800 hover:bg-primary/90 shadow-sm shadow-primary/30 transition"
+              >
+                <Phone size={18} />
+                Call
+              </Button>
+            </div>
+
+          </div>
+        )}
+
+
+        {/* Not Verified */}
+        {!isVerified && (
+          <div className="p-8 bg-linear-to-br from-primary/5 to-transparent border-b border-slate-100 dark:border-slate-800">
+            <div className="mx-auto max-w-md flex flex-col items-center text-center">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow">
+                <Lock size={22} className="text-primary" />
+              </div>
+
+              <h4 className="text-lg font-bold">
+                Verify Ownership to Continue
+              </h4>
+
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                For security and privacy reasons, ownership verification is required
+                before contacting the vehicle owner.
+              </p>
+
+              <Button
+                onClick={() => setShowWarning(true)}
+                className="mt-6 w-full h-12 rounded-xl bg-primary text-white dark:text-slate-800 font-bold hover:bg-primary/90 shadow-sm shadow-primary/25 transition-all"
+              >
                 Verify & Unlock Contact
               </Button>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
+
 }
 
 
-export default function SearchCar({ user_phone_number, is_verified, is_loggedin }: { user_phone_number: any, is_verified: boolean, is_loggedin: boolean }) {
+export default function SearchCar({ user_phone_number, is_verified, is_loggedin, temp_phone_number }: { user_phone_number: any, is_verified: boolean, is_loggedin: boolean, temp_phone_number: string | undefined }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryCarNumber = searchParams.get("crnm");
 
-  const [carName, setCarNumber] = useState(queryCarNumber ? queryCarNumber : "");
+  const [carName, setCarNumber] = useState(queryCarNumber? queryCarNumber : "");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [ownerDetail, setOwnerDetail] = useState<any>(null);
@@ -200,9 +243,9 @@ export default function SearchCar({ user_phone_number, is_verified, is_loggedin 
         const data = await res.json();
 
         if (queryCarNumber === data?.vehi1) {
-          setOwnerDetail({ name: data?.name, carName: data?.vehi1_name, user_ph_num: user_phone_number, isVerified: is_verified, isLoggedin: is_loggedin });
+          setOwnerDetail({ name: data?.name, carName: data?.vehi1_name, car_num: queryCarNumber, user_ph_num: user_phone_number, isVerified: is_verified, isLoggedin: is_loggedin, temp_phone_number: temp_phone_number });
         } else {
-          setOwnerDetail({ name: data?.name, carName: data?.vehi2_name, user_ph_num: user_phone_number, isVerified: is_verified, isLoggedin: is_loggedin });
+          setOwnerDetail({ name: data?.name, carName: data?.vehi2_name, car_num: queryCarNumber, user_ph_num: user_phone_number, isVerified: is_verified, isLoggedin: is_loggedin, temp_phone_number: temp_phone_number });
         }
 
         // setMessage(JSON.stringify(data));
@@ -225,7 +268,7 @@ export default function SearchCar({ user_phone_number, is_verified, is_loggedin 
       return;
     }
 
-    router.push(`/search?crnm=${encodeURIComponent(carName)}`);
+    router.replace(`/search?crnm=${encodeURIComponent(carName)}`);
     setMessage('');
   };
   return (
