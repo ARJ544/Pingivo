@@ -88,7 +88,7 @@ export default function RootLayout({
                 </div>
               </div>
               <div className="pt-8 border-t border-[#cfdde7] dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400 font-medium">
-                <p>© 2025 {company_name}. All rights reserved.</p>
+                <p>© 2026 {company_name}. All rights reserved.</p>
                 <div className="flex items-center gap-6">
                   <span>Designed for Modern Trust</span>
                   <MapPin className="h-3 w-3" />
