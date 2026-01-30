@@ -40,7 +40,7 @@ export default function RegisterClient() {
       setAllCookie(result.user);
 
       setMessage('✅ Vehicle Registered Successfully!');
-      router.push("/home");
+      router.replace("/home");
     } catch (err: any) {
       setMessage(`Error: ${err.message}`);
     } finally {

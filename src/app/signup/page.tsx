@@ -52,7 +52,7 @@ export default function Signup() {
         throw new Error(result.error || 'Something went wrong');
       }
 
-      router.push('/verify-phone');
+      router.replace('/verify-phone');
     } catch (err: any) {
       setMessage(err.message);
     } finally {
