@@ -52,19 +52,73 @@ export async function setAllCookie(user: Partial<UserCookie>) {
     path: "/",
     maxAge: FIFTEEN_DAYS,
   });
-  
-  if (user.id) cookieStore.set("id", user.id, { path: "/", maxAge: FIFTEEN_DAYS });
-  if (user.name) cookieStore.set("name", user.name, { path: "/", maxAge: FIFTEEN_DAYS });
-  // if (user.email) cookieStore.set("email", user.email, { path: "/", maxAge: FIFTEEN_DAYS });
-  // if (user.password) cookieStore.set("password", user.password, { path: "/", maxAge: FIFTEEN_DAYS });
-  if (user.phone_num) cookieStore.set("phone_num", user.phone_num, { path: "/", maxAge: FIFTEEN_DAYS });
-  if (user.vehi1) cookieStore.set("vehi1", user.vehi1, { path: "/", maxAge: FIFTEEN_DAYS });
-  if (user.vehi1_name) cookieStore.set("vehi1_name", user.vehi1_name, { path: "/", maxAge: FIFTEEN_DAYS });
-  if (user.vehi2) cookieStore.set("vehi2", user.vehi2, { path: "/", maxAge: FIFTEEN_DAYS });
-  if (user.vehi2_name) cookieStore.set("vehi2_name", user.vehi2_name, { path: "/", maxAge: FIFTEEN_DAYS });
+
+  if (user.id) cookieStore.set("id", user.id, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: FIFTEEN_DAYS,
+  });
+
+  if (user.name) cookieStore.set("name", user.name, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: FIFTEEN_DAYS,
+  });
+
+  if (user.phone_num) cookieStore.set("phone_num", user.phone_num, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: FIFTEEN_DAYS,
+  });
+
+  if (user.vehi1) cookieStore.set("vehi1", user.vehi1, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: FIFTEEN_DAYS,
+  });
+
+  if (user.vehi1_name) cookieStore.set("vehi1_name", user.vehi1_name, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: FIFTEEN_DAYS,
+  });
+
+  if (user.vehi2) cookieStore.set("vehi2", user.vehi2, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: FIFTEEN_DAYS,
+  });
+
+  if (user.vehi2_name) cookieStore.set("vehi2_name", user.vehi2_name, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: FIFTEEN_DAYS,
+  });
 
   const totalVehicles = [user.vehi1, user.vehi2].filter(Boolean).length;
-  cookieStore.set("total_vehi", totalVehicles.toString(), { path: "/", maxAge: FIFTEEN_DAYS });
+  cookieStore.set("total_vehi", totalVehicles.toString(), {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: FIFTEEN_DAYS,
+  });
+  // if (user.email) cookieStore.set("email", user.email, { path: "/", maxAge: FIFTEEN_DAYS });
+  // if (user.password) cookieStore.set("password", user.password, { path: "/", maxAge: FIFTEEN_DAYS });
 }
 
 export async function deleteAllCookie() {

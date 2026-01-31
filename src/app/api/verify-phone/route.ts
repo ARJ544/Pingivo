@@ -35,6 +35,8 @@ export async function POST(req: Request) {
   cookie.set('phone_verified', 'true', {
     httpOnly: true,
     secure: true,
+    sameSite: "lax",
+    path: "/",
     maxAge: 10 * 60,
   })
 

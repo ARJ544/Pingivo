@@ -26,12 +26,16 @@ export async function POST(req: Request) {
   cookie.set('temp_phone', verifiedPhone, {
     httpOnly: true,
     secure: true,
+    sameSite: "lax",
+    path: "/",
     maxAge: ONE_HOUR,
   })
   if (!isVerified) {
     cookie.set('verified', 'true', {
       httpOnly: true,
       secure: true,
+      sameSite: "lax",
+      path: "/",
       maxAge: ONE_HOUR,
     })
   }

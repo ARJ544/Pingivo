@@ -36,6 +36,8 @@ export async function POST(req: Request) {
     {
       httpOnly: true,
       secure: true,
+      sameSite: "lax",
+      path: "/",
       maxAge: 10 * 60 // 10 minutes
     }
   )
