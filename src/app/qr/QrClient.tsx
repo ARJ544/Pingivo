@@ -1,105 +1,127 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import QRDrobe from "@teonord/qrdrobe";
-import html2canvas from "html2canvas";
+import { useRef, useState } from "react";
 import jsPDF from "jspdf";
+import "svg2pdf.js";
+import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export default function GenerateQRClient() {
-  const [url, setUrl] = useState("");
-  const qrContainerRef = useRef<HTMLDivElement>(null);
-  const templateRef = useRef<HTMLDivElement>(null);
-  const qrInstanceRef = useRef<QRDrobe | null>(null);
+type Props = {
+  vehi1_num?: string;
+  vehi2_num?: string;
+};
 
-  // Generate / Update QR
-  const generateQR = async () => {
-    if (!qrContainerRef.current || !url) return;
+export default function GenerateQRClient({
+  vehi1_num,
+  vehi2_num,
+}: Props) {
+  const [selectedVehicle, setSelectedVehicle] = useState("");
+  const [downloading, setDownloading] = useState(false);
 
-    // Clear old QR
-    qrContainerRef.current.innerHTML = "";
+  const svgRef = useRef<SVGSVGElement>(null);
 
-    const qr = new QRDrobe({
-      data: url,
-      width: 200,
-      height: 200,
-      errorCorrectionLevel: "M",
-      foreground: "#000000",
-      background: "#ffffff",
-      dotsStyle: "rounded",
-      image: "/logo.png",
+  const downloadPDF = async () => {
+    if (!svgRef.current) return;
+
+    setDownloading(true);
+
+    const svg = svgRef.current;
+    const width = svg.viewBox.baseVal.width;
+    const height = svg.viewBox.baseVal.height;
+
+    const pdf = new jsPDF({
+      orientation: width > height ? "landscape" : "portrait",
+      unit: "pt",
+      format: [width, height],
     });
 
-    qrInstanceRef.current = qr;
-    await qr.append(qrContainerRef.current);
+    await pdf.svg(svg, {
+      x: 0,
+      y: 0,
+      width,
+      height,
+    });
+
+    pdf.save(`${selectedVehicle}-qr-template.pdf`);
+    setDownloading(false);
   };
 
-  // Download PNG
-  const downloadPNG = async () => {
-    if (!templateRef.current) return;
-
-    const canvas = await html2canvas(templateRef.current, { scale: 2 });
-    const link = document.createElement("a");
-    link.href = canvas.toDataURL("image/png");
-    link.download = "qr-template.png";
-    link.click();
-  };
-
-  // Download PDF
-  const downloadPDF = async () => {
-    if (!templateRef.current) return;
-
-    const canvas = await html2canvas(templateRef.current, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
-
-    const pdf = new jsPDF("portrait", "mm", "a4");
-    pdf.addImage(imgData, "PNG", 10, 10, 190, 0);
-    pdf.save("qr-template.pdf");
-  };
+  const qrValue = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/search?crnm=${selectedVehicle}`;
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-sm flex flex-col items-center gap-4">
-        <h2 className="text-xl font-semibold">QR Generator</h2>
+      <div className="w-full max-w-sm flex flex-col items-center gap-3">
 
-        {/* URL INPUT */}
-        <input
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="Enter URL"
-          className="w-full border rounded px-3 py-2"
-        />
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          ⚡ QR code is generated automatically after selection
+        </p>
 
-        <Button onClick={generateQR} className="w-full">
-          Generate QR
-        </Button>
+        {/* SELECT */}
+        <Select onValueChange={setSelectedVehicle}>
+          <SelectTrigger className="w-full rounded-xl">
+            <SelectValue placeholder="Select Vehicle" />
+          </SelectTrigger>
 
-        {/* TEMPLATE (Responsive) */}
-        <div
-          ref={templateRef}
-          className="relative w-full aspect-4/6 overflow-hidden rounded"
-          style={{
-            backgroundImage: "url('/template.png')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          {/* QR PLACEMENT */}
-          <div
-            ref={qrContainerRef}
-            className="absolute left-1/2 top-[54%] -translate-x-25 -translate-y-1/2"
-          />
-        </div>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Vehicle List</SelectLabel>
+
+              {vehi1_num && (
+                <SelectItem value={vehi1_num}>
+                  Vehicle 1 - {vehi1_num}
+                </SelectItem>
+              )}
+
+              {vehi2_num && (
+                <SelectItem value={vehi2_num}>
+                  Vehicle 2 - {vehi2_num}
+                </SelectItem>
+              )}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
 
         {/* DOWNLOAD */}
-        <div className="flex w-full gap-2">
-          <Button onClick={downloadPNG} className="flex-1">
-            PNG
-          </Button>
-          <Button onClick={downloadPDF} className="flex-1">
-            PDF
-          </Button>
-        </div>
+        <Button
+          onClick={downloadPDF}
+          disabled={!selectedVehicle || downloading}
+          className="w-full bg-green-600 text-white rounded-xl"
+        >
+          Download PDF
+        </Button>
+
+        {/* SVG TEMPLATE */}
+        <svg
+          ref={svgRef}
+          width="300"
+          height="400"
+          viewBox="0 0 600 900"
+        >
+          {/* Background */}
+          <image href="/template.png" width="600" height="900" />
+
+          {/* QR */}
+          {selectedVehicle && (
+            <g transform={`translate(155 340) scale(1)`}>
+              <QRCodeSVG
+                value={qrValue}
+                size={290}
+                level="M"
+                bgColor="#ffffff"
+                fgColor="#000000"
+              />
+            </g>
+          )}
+        </svg>
       </div>
     </div>
   );
