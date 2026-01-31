@@ -36,21 +36,21 @@ export async function getTempPhone() {
 export async function setAllCookie(user: Partial<UserCookie>) {
   const cookieStore = await cookies();
 
-  const FIFTEEN_DAYS = 60 * 60 * 24 * 15;
+  const SEVEN_DAYS = 60 * 60 * 24 * 7;
 
   cookieStore.set("loggedin", String(user.loggedin ?? false), {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: FIFTEEN_DAYS
+    maxAge: SEVEN_DAYS
   });
   cookieStore.set("verified", String(user.verified ?? false), {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: FIFTEEN_DAYS,
+    maxAge: SEVEN_DAYS,
   });
 
   if (user.id) cookieStore.set("id", user.id, {
@@ -58,7 +58,7 @@ export async function setAllCookie(user: Partial<UserCookie>) {
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: FIFTEEN_DAYS,
+    maxAge: SEVEN_DAYS,
   });
 
   if (user.name) cookieStore.set("name", user.name, {
@@ -66,7 +66,7 @@ export async function setAllCookie(user: Partial<UserCookie>) {
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: FIFTEEN_DAYS,
+    maxAge: SEVEN_DAYS,
   });
 
   if (user.phone_num) cookieStore.set("phone_num", user.phone_num, {
@@ -74,7 +74,7 @@ export async function setAllCookie(user: Partial<UserCookie>) {
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: FIFTEEN_DAYS,
+    maxAge: SEVEN_DAYS,
   });
 
   if (user.vehi1) cookieStore.set("vehi1", user.vehi1, {
@@ -82,7 +82,7 @@ export async function setAllCookie(user: Partial<UserCookie>) {
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: FIFTEEN_DAYS,
+    maxAge: SEVEN_DAYS,
   });
 
   if (user.vehi1_name) cookieStore.set("vehi1_name", user.vehi1_name, {
@@ -90,7 +90,7 @@ export async function setAllCookie(user: Partial<UserCookie>) {
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: FIFTEEN_DAYS,
+    maxAge: SEVEN_DAYS,
   });
 
   if (user.vehi2) cookieStore.set("vehi2", user.vehi2, {
@@ -98,7 +98,7 @@ export async function setAllCookie(user: Partial<UserCookie>) {
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: FIFTEEN_DAYS,
+    maxAge: SEVEN_DAYS,
   });
 
   if (user.vehi2_name) cookieStore.set("vehi2_name", user.vehi2_name, {
@@ -106,7 +106,7 @@ export async function setAllCookie(user: Partial<UserCookie>) {
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: FIFTEEN_DAYS,
+    maxAge: SEVEN_DAYS,
   });
 
   const totalVehicles = [user.vehi1, user.vehi2].filter(Boolean).length;
@@ -115,10 +115,10 @@ export async function setAllCookie(user: Partial<UserCookie>) {
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: FIFTEEN_DAYS,
+    maxAge: SEVEN_DAYS,
   });
-  // if (user.email) cookieStore.set("email", user.email, { path: "/", maxAge: FIFTEEN_DAYS });
-  // if (user.password) cookieStore.set("password", user.password, { path: "/", maxAge: FIFTEEN_DAYS });
+  // if (user.email) cookieStore.set("email", user.email, { path: "/", maxAge: SEVEN_DAYS });
+  // if (user.password) cookieStore.set("password", user.password, { path: "/", maxAge: SEVEN_DAYS });
 }
 
 export async function deleteAllCookie() {
