@@ -6,6 +6,12 @@ import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { setAllCookie } from '@/app/actions'
 
+function validateVehicleNumber(value: string) {
+  return value
+    .toUpperCase()
+    .replace(/\s+/g, '')
+    .replace(/[^A-Z0-9_-]/g, '');
+}
 
 export default function RegisterClient() {
   const router = useRouter();
@@ -16,6 +22,9 @@ export default function RegisterClient() {
   let [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const isPasswordValid = password === '' || password.length >= 8
+
+  const isVehicleValid = vehiNum.length >= 6 && vehiNum.length <= 15 && /^[A-Z0-9_-]+$/.test(vehiNum);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,12 +126,21 @@ export default function RegisterClient() {
               <input
                 name='vehicle'
                 value={vehiNum}
-                onChange={(e) => setvehiNum(e.target.value.toUpperCase())}
+                onChange={(e) => {
+                  const cleaned = validateVehicleNumber(e.target.value);
+                  setvehiNum(cleaned);
+                }}
                 type="text"
                 placeholder="ABC-1234"
+                maxLength={15}
                 className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition font-mono uppercase"
               />
             </div>
+            {vehiNum && !isVehicleValid && (
+              <p className="mt-1 text-xs text-red-500">
+                Only A-Z, 0-9, hyphen (-) and underscore (_) are allowed. No spaces. At least 6 characters. Maximum 15 characters.
+              </p>
+            )}
           </div>
 
           {/* Vehicle Name */}
@@ -151,7 +169,7 @@ export default function RegisterClient() {
           <div className="mt-6 flex flex-col gap-4">
             <Button
               type="submit"
-              disabled={password.length < 8 || vehiNum.length > 15 || !vehiName.trim() || !vehiNum.trim()}
+              disabled={loading || password.length < 8 || !isVehicleValid || !vehiName.trim() || !vehiNum.trim()}
               className="w-full bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 text-white font-bold py-4 rounded-lg shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2 group"
             >
               {loading ? "Registering" : "Register"}

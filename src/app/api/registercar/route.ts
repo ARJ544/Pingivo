@@ -12,9 +12,9 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { loggedin, email } = await getAllCookie();
+    const { loggedin, id } = await getAllCookie();
 
-    if (!loggedin || !email) {
+    if (!loggedin || !id) {
       return NextResponse.json({ error: 'Login first' }, { status: 401 });
     }
 
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     const { data: user, error: fetchError } = await supabase
       .from('users')
       .select('password, vehi1, vehi1_name, vehi2, vehi2_name')
-      .eq('email', email)
+      .eq('id', id)
       .single();
 
     if (fetchError) {
@@ -45,9 +45,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Wrong password' }, { status: 401 })
     }
 
-    let validVehiColumn = "vehi1";
+    let validVehiNumberColumn = "vehi1";
     if (user?.vehi1) {
-      validVehiColumn = "vehi2";
+      validVehiNumberColumn = "vehi2";
     }
     let validVehiNameColumn = "vehi1_name";
     if (user?.vehi1_name) {
@@ -56,6 +56,9 @@ export async function POST(request: Request) {
 
     if (user?.vehi1 && user?.vehi2) {
       return NextResponse.json({ error: 'Your slot is full 2/2' }, { status: 500 })
+    }
+    if (user?.vehi1_name && user?.vehi2_name) {
+      return NextResponse.json({ error: 'Your Name field is showing 2/2 (completely filled), but perhaps one slot is still available for adding a Vehicle Number.' }, { status: 500 })
     }
 
     const { data: existingVehicle } = await supabase
@@ -73,8 +76,8 @@ export async function POST(request: Request) {
 
     const { error: updateError } = await supabase
       .from('users')
-      .update({ [validVehiColumn]: vehiNum, [validVehiNameColumn]: vehiName })
-      .eq('email', email);
+      .update({ [validVehiNumberColumn]: vehiNum, [validVehiNameColumn]: vehiName })
+      .eq('id', id);
 
     if (updateError) {
       if (updateError.code === '23505') {
@@ -85,8 +88,8 @@ export async function POST(request: Request) {
 
     const { data: latestDetails, error: Error } = await supabase
       .from('users')
-      .select('name, email, phone_num, password, vehi1, vehi2, vehi1_name, vehi2_name, verified')
-      .eq('email', email)
+      .select('id, name, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, verified')
+      .eq('id', id)
       .maybeSingle()
 
     if (Error) {
@@ -102,9 +105,9 @@ export async function POST(request: Request) {
       message: 'Vehicle Registered successfully',
       user: {
         loggedin: true,
+        id: latestDetails.id,
         name: latestDetails.name,
-        email: latestDetails.email,
-        password: latestDetails.password,
+        // password: latestDetails.password,
         phone_num: latestDetails.phone_num,
         vehi1: latestDetails.vehi1,
         vehi1_name: latestDetails.vehi1_name,

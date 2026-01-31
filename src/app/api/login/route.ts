@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
     const { data: user, error: fetchError } = await supabase
       .from('users')
-      .select('name, email, phone_num, password, vehi1, vehi1_name, vehi2, vehi2_name, verified')
+      .select('id, name, phone_num, password, vehi1, vehi1_name, vehi2, vehi2_name, verified')
       .eq('email', email)
       .maybeSingle()
 
@@ -34,16 +34,17 @@ export async function POST(request: Request) {
     const passwordMatch = await bcrypt.compare(password, user.password)
 
     if (!passwordMatch) {
-      return NextResponse.json({ error: 'Wrong password' }, { status: 401 })
+      return NextResponse.json({ error: 'Email or Password Wrong' }, { status: 401 })
     }
 
     return NextResponse.json({
       message: 'Logged in successfully',
       user: {
         loggedin: true,
+        id: user.id,
         name: user.name,
-        email: user.email,
-        password: user.password,
+        // email: user.email,
+        // password: user.password,
         phone_num: user.phone_num,
         vehi1: user.vehi1,
         vehi1_name: user.vehi1_name,

@@ -4,9 +4,10 @@ import { cookies } from 'next/headers'
 
 type UserCookie = {
   loggedin: boolean,
+  id?: string,
   name?: string,
-  email?: string,
-  password?: string,
+  // email?: string,
+  // password?: string,
   phone_num?: string,
   total_vehi?: string,
   vehi1?: string,
@@ -51,10 +52,11 @@ export async function setAllCookie(user: Partial<UserCookie>) {
     path: "/",
     maxAge: FIFTEEN_DAYS,
   });
-
+  
+  if (user.id) cookieStore.set("id", user.id, { path: "/", maxAge: FIFTEEN_DAYS });
   if (user.name) cookieStore.set("name", user.name, { path: "/", maxAge: FIFTEEN_DAYS });
-  if (user.email) cookieStore.set("email", user.email, { path: "/", maxAge: FIFTEEN_DAYS });
-  if (user.password) cookieStore.set("password", user.password, { path: "/", maxAge: FIFTEEN_DAYS });
+  // if (user.email) cookieStore.set("email", user.email, { path: "/", maxAge: FIFTEEN_DAYS });
+  // if (user.password) cookieStore.set("password", user.password, { path: "/", maxAge: FIFTEEN_DAYS });
   if (user.phone_num) cookieStore.set("phone_num", user.phone_num, { path: "/", maxAge: FIFTEEN_DAYS });
   if (user.vehi1) cookieStore.set("vehi1", user.vehi1, { path: "/", maxAge: FIFTEEN_DAYS });
   if (user.vehi1_name) cookieStore.set("vehi1_name", user.vehi1_name, { path: "/", maxAge: FIFTEEN_DAYS });
@@ -82,9 +84,10 @@ export async function getAllCookie(): Promise<UserCookie> {
   return {
     loggedin,
     verified,
+    id: get('id'),
     name: get('name'),
-    email: get('email'),
-    password: get('password'),
+    // email: get('email'),
+    // password: get('password'),
     phone_num: get('phone_num'),
     total_vehi: get('total_vehi'),
     vehi1: get('vehi1'),

@@ -1,11 +1,19 @@
 'use client';
 import { useState, useEffect } from "react";
-import { Car, User, Lock, Mail, Phone, RefreshCcw } from "lucide-react";
+import { Car } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import ShowOwnerDetail from "@/app/search/ShowOwnerDetail";
 
-function ShowWarning({ isLoggedin, carNum, onClose }: { isLoggedin: boolean, carNum: string, onClose: () => void }) {
+function validateVehicleNumber(value: string) {
+  return value
+    .toUpperCase()
+    .replace(/\s+/g, '')
+    .replace(/[^A-Z0-9_-]/g, '');
+}
+
+export function ShowWarning({ isLoggedin, carNum, onClose }: { isLoggedin: boolean, carNum: string, onClose: () => void }) {
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -84,148 +92,16 @@ function ShowWarning({ isLoggedin, carNum, onClose }: { isLoggedin: boolean, car
   );
 }
 
-function ShowOwnerDetail({ name, carName, car_num, user_ph_num, isVerified, isLoggedin, temp_phone_number }: { name: string, carName: string, car_num: string, user_ph_num: string, isVerified: boolean, isLoggedin: boolean, temp_phone_number: string | undefined }) {
-  const [showWarning, setShowWarning] = useState(false);
-
-  return (
-    <>
-      {showWarning && (
-        <ShowWarning
-          isLoggedin={isLoggedin}
-          carNum={car_num}
-          onClose={() => setShowWarning(false)}
-        />
-      )}
-      <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur shadow-sm hover:shadow-md transition-shadow duration-300">
-
-
-        {/* Header */}
-        <div className="p-6 flex flex-wrap items-center justify-between gap-6 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-full bg-linear-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center border dark:border-slate-700 shadow-inner">
-              <User size={34} className="text-slate-500 dark:text-slate-300" />
-            </div>
-
-            <div>
-              <h3 className="text-xl font-bold tracking-tight">
-                {name}
-              </h3>
-
-              <p className="text-sm text-slate-500 mt-0.5">
-                Owner of{" "}
-                <span className="font-semibold text-slate-700 dark:text-slate-200">
-                  {carName}
-                </span>
-              </p>
-
-              <div className="mt-1 flex items-center gap-1.5">
-                <Lock size={15} className="text-emerald-500" />
-                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                  Identity Verified
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-xl bg-slate-50 dark:bg-slate-800 px-5 py-3 text-right">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-              Vehicle Status
-            </p>
-            <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
-              Registered & Active
-            </p>
-          </div>
-        </div>
-
-        {/* Verified */}
-        {isVerified && (
-          <div className="p-6 bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
-            <div className="mb-4 flex items-start justify-between">
-              <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Contact Owner
-              </h4>
-
-              <div className="text-right">
-                <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                  <Phone size={14} className="text-primary" />
-                  {temp_phone_number ?? user_ph_num}
-                </div>
-
-                {!temp_phone_number && (
-                  <Button
-                    onClick={() => setShowWarning(true)}
-                    className="-mt-5 bg-transparent hover:bg-transparent text-blue-600 inline-flex items-center gap-1 text-[11px] font-medium hover:underline"
-                  >
-                    <RefreshCcw size={11} />
-                    change
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-4">
-              <Button
-                variant="outline"
-                className="h-12 px-6 font-semibold flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-              >
-                <Mail size={18} />
-                Email
-              </Button>
-
-              <Button
-                className="h-12 px-6 font-bold flex items-center gap-2 bg-primary text-white dark:text-slate-800 hover:bg-primary/90 shadow-sm shadow-primary/30 transition"
-              >
-                <Phone size={18} />
-                Call
-              </Button>
-            </div>
-
-          </div>
-        )}
-
-
-        {/* Not Verified */}
-        {!isVerified && (
-          <div className="p-8 bg-linear-to-br from-primary/5 to-transparent border-b border-slate-100 dark:border-slate-800">
-            <div className="mx-auto max-w-md flex flex-col items-center text-center">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow">
-                <Lock size={22} className="text-primary" />
-              </div>
-
-              <h4 className="text-lg font-bold">
-                Verify Ownership to Continue
-              </h4>
-
-              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                For security and privacy reasons, ownership verification is required
-                before contacting the vehicle owner.
-              </p>
-
-              <Button
-                onClick={() => setShowWarning(true)}
-                className="mt-6 w-full h-12 rounded-xl bg-primary text-white dark:text-slate-800 font-bold hover:bg-primary/90 shadow-sm shadow-primary/25 transition-all"
-              >
-                Verify & Unlock Contact
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-    </>
-  );
-
-}
-
-
 export default function SearchCar({ user_phone_number, is_verified, is_loggedin, temp_phone_number }: { user_phone_number: any, is_verified: boolean, is_loggedin: boolean, temp_phone_number: string | undefined }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryCarNumber = searchParams.get("crnm");
 
-  const [carNumber, setCarNumber] = useState(queryCarNumber? queryCarNumber : "");
+  const [carNumber, setCarNumber] = useState(queryCarNumber ? queryCarNumber : "");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [ownerDetail, setOwnerDetail] = useState<any>(null);
+  const isVehicleValid = carNumber.length >= 6 && carNumber.length <= 15 && /^[A-Z0-9_-]+$/.test(carNumber);
 
   useEffect(() => {
     if (!queryCarNumber) return;
@@ -298,7 +174,11 @@ export default function SearchCar({ user_phone_number, is_verified, is_loggedin,
 
                 <input
                   value={carNumber}
-                  onChange={(e) => setCarNumber(e.target.value.toUpperCase())}
+                  onChange={(e) => {
+                    const cleaned = validateVehicleNumber(e.target.value);
+                    setCarNumber(cleaned);
+                  }}
+                  maxLength={15}
                   placeholder="e.g. ABC-1234"
                   className="
                     h-14 w-full rounded-lg border
@@ -312,11 +192,17 @@ export default function SearchCar({ user_phone_number, is_verified, is_loggedin,
                   "
                 />
               </div>
+              {carNumber && !isVehicleValid && (
+                <p className="mt-1 text-xs text-red-500">
+                  Only A-Z, 0-9, hyphen (-) and underscore (_) are allowed. No spaces. At least 6 characters. Maximum 15 characters.
+                </p>
+              )}
             </label>
 
             {/* Button */}
             <Button
               onClick={handleSubmit}
+              disabled={loading || !isVehicleValid || !carNumber.trim()}
               className="h-14 w-full min-w-35 md:w-auto rounded-lg bg-primary px-6 text-base font-bold text-white dark:text-slate-800 hover:bg-primary/90 focus:ring-2 focus:ring-primary/40 active:scale-95 transition-all"
             >
               {loading ? "Searching....." : "Search Vehicle"}

@@ -1,5 +1,5 @@
 import { getAllCookie, IsVerified, IsLoggedIn, getTempPhone } from "@/app/actions";
-import SearchCar from "@/app/search/searchCarClient";
+import SearchCar from "@/app/search/SearchCarClient";
 
 export const metadata = {
   title: "Search a Car",
