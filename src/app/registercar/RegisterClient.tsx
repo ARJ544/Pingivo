@@ -5,6 +5,7 @@ import { Lock, Eye, Car, ArrowRight, QrCode, UserX, ShieldCheck } from 'lucide-r
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { setAllCookie } from '@/app/actions'
+import Link from 'next/link'
 
 function validateVehicleNumber(value: string) {
   return value
@@ -69,6 +70,17 @@ export default function RegisterClient() {
           <p className="text-slate-500 dark:text-slate-400">
             Add a new vehicle.
           </p>
+          <div className="flex items-center justify-center gap-2 mt-3 rounded-md bg-linear-to-r from-amber-100 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/20 px-4 py-2.5 text-sm border border-amber-200 dark:border-amber-800/40">
+            <span className="font-medium text-amber-800 dark:text-amber-200">
+              Create your new QR code right after registering →
+            </span>
+            <Link
+              href="/qr"
+              className="text-amber-800 dark:text-amber-200 font-semibold underline underline-offset-4 hover:text-amber-600 dark:hover:text-amber-300 transition-colors"
+            >
+              QR
+            </Link>
+          </div>
         </div>
 
         {/* Form */}

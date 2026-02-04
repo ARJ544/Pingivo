@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { User, Mail, Lock, Phone, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -27,6 +27,16 @@ export default function SignupClient() {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+
+  const refreshedOnce = useRef(false);
+
+  useEffect(() => {
+    if (!refreshedOnce.current) {
+      refreshedOnce.current = true;
+      router.refresh();
+    }
+  }, [router]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

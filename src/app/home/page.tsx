@@ -94,7 +94,7 @@ export default async function HomePage() {
 
           <DangerCard
             icon={<Trash2 />}
-            title="Remove Vehicle"
+            title="Remove Vehicle or Account"
             desc="Delete a vehicle or your account."
             href="/delete-account-or-vehicle"
           />
