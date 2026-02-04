@@ -24,7 +24,7 @@ export default function GenerateQRClient({
   vehi1_num,
   vehi2_num,
 }: Props) {
-  const [selectedVehicle, setSelectedVehicle] = useState("");
+  const [selectedVehicle, setSelectedVehicle] = useState(vehi2_num ?? vehi1_num);
   const [downloading, setDownloading] = useState(false);
 
   const svgRef = useRef<SVGSVGElement>(null);
@@ -35,25 +35,27 @@ export default function GenerateQRClient({
     setDownloading(true);
 
     const svg = svgRef.current;
-    const width = svg.viewBox.baseVal.width;
-    const height = svg.viewBox.baseVal.height;
+    const PDF_WIDTH_CM = 9;
+    const PDF_HEIGHT_CM = 12;
 
     const pdf = new jsPDF({
-      orientation: width > height ? "landscape" : "portrait",
-      unit: "pt",
-      format: [width, height],
+      orientation: "portrait",
+      unit: "cm",
+      format: [PDF_WIDTH_CM, PDF_HEIGHT_CM],
+      compress: true,
     });
 
     await pdf.svg(svg, {
       x: 0,
       y: 0,
-      width,
-      height,
+      width: PDF_WIDTH_CM,
+      height: PDF_HEIGHT_CM,
     });
 
-    pdf.save(`${selectedVehicle}-qr-template.pdf`);
+    pdf.save(`${selectedVehicle}-qr-sticker.pdf`);
     setDownloading(false);
   };
+
 
   const qrValue = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/search?crnm=${selectedVehicle}`;
 
@@ -68,7 +70,7 @@ export default function GenerateQRClient({
         {/* SELECT */}
         <Select onValueChange={setSelectedVehicle}>
           <SelectTrigger className="w-full rounded-xl">
-            <SelectValue placeholder="Select Vehicle" />
+            <SelectValue placeholder={vehi2_num ?? vehi1_num} />
           </SelectTrigger>
 
           <SelectContent>
@@ -96,7 +98,7 @@ export default function GenerateQRClient({
           disabled={!selectedVehicle || downloading}
           className="w-full bg-green-600 text-white rounded-xl"
         >
-          Download PDF
+          Download Sticker
         </Button>
 
         {/* SVG TEMPLATE */}
@@ -107,7 +109,7 @@ export default function GenerateQRClient({
           viewBox="0 0 600 900"
         >
           {/* Background */}
-          <image href="/template.png" width="600" height="900" />
+          <image href="/template.jpg" width="600" height="900" />
 
           {/* QR */}
           {selectedVehicle && (

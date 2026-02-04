@@ -53,7 +53,7 @@ export default function Home() {
 
                 <div className="relative aspect-4/3 w-full">
                   <Image
-                    src="/pingownerpic3.png"
+                    src="/pingownerpic3.jpg"
                     alt="ParkPing Logo"
                     fill
                     className="object-cover"
