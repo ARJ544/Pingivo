@@ -74,10 +74,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const { error: updateError } = await supabase
+    const {data: updateData, error: updateError } = await supabase
       .from('users')
       .update({ [validVehiNumberColumn]: vehiNum, [validVehiNameColumn]: vehiName })
-      .eq('id', id);
+      .eq('id', id)
+      .select('id, name, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, verified')
+      .single();
 
     if (updateError) {
       if (updateError.code === '23505') {
@@ -86,18 +88,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: updateError.message }, { status: 400 })
     }
 
-    const { data: latestDetails, error: Error } = await supabase
-      .from('users')
-      .select('id, name, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, verified')
-      .eq('id', id)
-      .maybeSingle()
+    // const { data: latestDetails, error: Error } = await supabase
+    //   .from('users')
+    //   .select('id, name, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, verified')
+    //   .eq('id', id)
+    //   .maybeSingle()
 
-    if (Error) {
-      return NextResponse.json({ error: Error.message }, { status: 500 })
-    }
-    if (!latestDetails) {
-      return NextResponse.json({ error: 'No user found. Please sign up.' }, { status: 404 })
-    }
+    // if (Error) {
+    //   return NextResponse.json({ error: Error.message }, { status: 500 })
+    // }
+    // if (!latestDetails) {
+    //   return NextResponse.json({ error: 'No user found. Please sign up.' }, { status: 404 })
+    // }
 
     await deleteAllCookie();
 
@@ -105,14 +107,14 @@ export async function POST(request: Request) {
       message: 'Vehicle Registered successfully',
       user: {
         loggedin: true,
-        id: latestDetails.id,
-        name: latestDetails.name,
-        phone_num: latestDetails.phone_num,
-        vehi1: latestDetails.vehi1,
-        vehi1_name: latestDetails.vehi1_name,
-        vehi2: latestDetails.vehi2,
-        vehi2_name: latestDetails.vehi2_name,
-        verified: latestDetails.verified
+        id: updateData.id,
+        name: updateData.name,
+        phone_num: updateData.phone_num,
+        vehi1: updateData.vehi1,
+        vehi1_name: updateData.vehi1_name,
+        vehi2: updateData.vehi2,
+        vehi2_name: updateData.vehi2_name,
+        verified: updateData.verified
       }
     }, { status: 200 })
 
