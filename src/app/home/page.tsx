@@ -96,7 +96,7 @@ export default async function HomePage() {
             icon={<Trash2 />}
             title="Remove Vehicle"
             desc="Delete a vehicle or your account."
-            href="/deletecar"
+            href="/delete-account-or-vehicle"
           />
         </section>
 
