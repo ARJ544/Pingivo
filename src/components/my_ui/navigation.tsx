@@ -25,7 +25,7 @@ export async function Navigation() {
           className="flex items-center gap-1 transition hover:opacity-90"
         >
           <Image
-            src="/logo.jpg"
+            src="/logo.png"
             alt="ParkPing Logo"
             className="h-8 w-8 rounded-sm"
             height={32}
