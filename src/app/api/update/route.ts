@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import bcrypt from 'bcrypt'
 import { getAllCookie, deleteAllCookie } from '@/app/actions'
+import { cookies } from 'next/headers'
 
 export const runtime = 'nodejs'
 
@@ -18,15 +19,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Login first' }, { status: 401 });
     }
 
-    const { name, email, phone, password } = await request.json();
+    const { name, email, password } = await request.json();
     let newName = name
     let newEmail = email
-    let newPhone = phone
     let newPassword = await bcrypt.hash(password, 10)
 
     const { data: user, error: fetchError } = await supabase
       .from('users')
-      .select('name, email, phone_num, password')
+      .select('name, email, password')
       .eq('id', id)
       .single();
 
@@ -43,16 +43,13 @@ export async function POST(request: Request) {
     if (!newEmail) {
       newEmail = user.email
     }
-    if (!newPhone) {
-      newPhone = user.phone_num
-    }
     if (!newPassword) {
       newPassword = user.password
     }
 
     const { data: updateData, error: updateError } = await supabase
       .from('users')
-      .update({ name: newName, email: newEmail, phone_num: newPhone, password: newPassword })
+      .update({ name: newName, email: newEmail, password: newPassword })
       .eq('id', id)
       .select("id, name, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, verified")
       .maybeSingle();
