@@ -67,6 +67,13 @@ export default function GenerateQRClient({
           ⚡ QR code is generated automatically after selection
         </p>
 
+        <p className="text-xs text-gray-600 dark:text-gray-400">
+          <span className="font-medium text-amber-500">
+            Visit the shop
+          </span>
+          , download the PDF sticker, and place it on your vehicle.
+        </p>
+
         {/* SELECT */}
         <Select onValueChange={setSelectedVehicle}>
           <SelectTrigger className="w-full rounded-xl">
