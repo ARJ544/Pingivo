@@ -38,20 +38,24 @@ export async function setAllCookie(user: Partial<UserCookie>) {
 
   const SEVEN_DAYS = 60 * 60 * 24 * 7;
 
-  cookieStore.set("loggedin", String(user.loggedin ?? false), {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: SEVEN_DAYS
-  });
-  cookieStore.set("verified", String(user.verified ?? false), {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: SEVEN_DAYS,
-  });
+  if (!cookieStore.get("loggedin")) {
+    cookieStore.set("loggedin", String(user.loggedin ?? false), {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: SEVEN_DAYS
+    });
+  }
+  if (!cookieStore.get("verified")) {
+    cookieStore.set("verified", String(user.verified ?? false), {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: SEVEN_DAYS,
+    });
+  }
 
   if (user.id) cookieStore.set("id", user.id, {
     httpOnly: true,
