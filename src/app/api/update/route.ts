@@ -2,7 +2,6 @@ import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import bcrypt from 'bcrypt'
 import { getAllCookie, deleteAllCookie } from '@/app/actions'
-import { cookies } from 'next/headers'
 
 export const runtime = 'nodejs'
 
@@ -22,7 +21,7 @@ export async function POST(request: Request) {
     const { name, email, password } = await request.json();
     let newName = name
     let newEmail = email
-    let newPassword = await bcrypt.hash(password, 10)
+    let newPassword = password
 
     const { data: user, error: fetchError } = await supabase
       .from('users')
@@ -45,6 +44,8 @@ export async function POST(request: Request) {
     }
     if (!newPassword) {
       newPassword = user.password
+    } else {
+      newPassword = await bcrypt.hash(password, 10)
     }
 
     const { data: updateData, error: updateError } = await supabase
