@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     await deleteAllCookie();
 
     return NextResponse.json({
-      message: 'Vehicle Registered successfully',
+      message: 'Vehicle removed successfully',
       user: {
         loggedin: true,
         id: latestDetails.id,

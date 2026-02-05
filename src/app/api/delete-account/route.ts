@@ -7,7 +7,7 @@ const supabase = createClient(
   process.env.SUPABASE_ANON_KEY!
 )
 
-export async function POST(request: Request) {
+export async function DELETE() {
   try {
     const { loggedin, id } = await getAllCookie();
 

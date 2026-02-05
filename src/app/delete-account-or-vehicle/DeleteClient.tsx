@@ -86,7 +86,7 @@ export default function DeleteCarClient({
     setDeleting(true);
     try {
       const res = await fetch("/api/delete-account", {
-        method: "POST",
+        method: "DELETE",
       });
 
       if (!res.ok) {
