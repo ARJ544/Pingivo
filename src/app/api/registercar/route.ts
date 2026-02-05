@@ -88,19 +88,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: updateError.message }, { status: 400 })
     }
 
-    // const { data: latestDetails, error: Error } = await supabase
-    //   .from('users')
-    //   .select('id, name, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, verified')
-    //   .eq('id', id)
-    //   .maybeSingle()
-
-    // if (Error) {
-    //   return NextResponse.json({ error: Error.message }, { status: 500 })
-    // }
-    // if (!latestDetails) {
-    //   return NextResponse.json({ error: 'No user found. Please sign up.' }, { status: 404 })
-    // }
-
     await deleteAllCookie();
 
     return NextResponse.json({
