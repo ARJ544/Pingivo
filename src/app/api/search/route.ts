@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 const supabase = createClient(
@@ -20,7 +21,7 @@ export async function GET(request: Request) {
 
     const { data, error } = await supabase
       .from("users")
-      .select("name, vehi1, vehi1_name, vehi2, vehi2_name")
+      .select("name, email, phone_num, vehi1, vehi1_name, vehi2, vehi2_name")
       .or(`vehi1.eq.${carNumber},vehi2.eq.${carNumber}`)
       .maybeSingle();
 
@@ -38,7 +39,24 @@ export async function GET(request: Request) {
       );
     }
 
-    return NextResponse.json(data);
+    const cookie = await cookies()
+    cookie.set('owner_phone_num', data.phone_num, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 10 * 60,
+    })
+    cookie.set('owner_email', data.email, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 10 * 60,
+    })
+    const clientData = { name: data.name, vehi1: data.vehi1, vehi1_name: data.vehi1_name, vehi2: data.vehi2, vehi2_name: data.vehi2_name };
+
+    return NextResponse.json(clientData);
   } catch {
     return NextResponse.json(
       { error: "Internal Server Error" },

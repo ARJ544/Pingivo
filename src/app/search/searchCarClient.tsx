@@ -149,7 +149,7 @@ export default function SearchCar({ user_phone_number, is_verified, is_loggedin,
   };
   return (
     <main className="flex flex-1 justify-center px-4 py-12 bg-slate-50 dark:bg-slate-950 transition-colors">
-      <div className="layout-content-container flex w-full max-w-5xl flex-col gap-8">
+      <div className="layout-content-container flex w-full max-w-5xl flex-col gap-0.5">
         <div className="flex flex-col items-center text-center">
           <h1 className="pb-3 text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
             Find a Vehicle Owner
@@ -159,7 +159,7 @@ export default function SearchCar({ user_phone_number, is_verified, is_loggedin,
             Enter the license plate number to start a secure, anonymous conversation with the owner.
           </p>
 
-          <div className="flex w-full max-w-2xl flex-col gap-3 pt-8 md:flex-row md:items-end">
+          <div className="flex w-full max-w-2xl flex-col gap-3 pt-6 md:flex-row md:items-end">
             {/* Input */}
             <label className="flex w-full flex-1 flex-col">
               <span className="pb-2 text-left text-sm font-semibold text-slate-800 dark:text-slate-300">
