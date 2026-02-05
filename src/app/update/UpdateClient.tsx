@@ -9,14 +9,18 @@ import { setAllCookie } from '@/app/actions';
 export default function UpdateClient() {
   const router = useRouter();
 
+  // Main form state
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  const [phone, setPhone] = useState('');
+
   const [loading, setLoading] = useState(false);
+  const [phoneLoading, setPhoneLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [phoneMessage, setPhoneMessage] = useState('');
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const phoneRegex = /^\+[1-9]\d{1,14}$/;
@@ -24,16 +28,17 @@ export default function UpdateClient() {
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
   const isEmailValid = email === '' || emailRegex.test(email);
-  const isPhoneValid = phone === '' || phoneRegex.test(phone);
   const isPasswordValid =
     password === '' || strongPasswordRegex.test(password);
 
   const canSubmit =
     isEmailValid &&
-    isPhoneValid &&
     isPasswordValid &&
-    (name || email || phone || password) &&
+    (name || email || password) &&
     !loading;
+
+  const isPhoneValid = phoneRegex.test(phone);
+  const canSubmitPhone = isPhoneValid && !phoneLoading;
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,11 +46,10 @@ export default function UpdateClient() {
     setMessage('');
 
     try {
-
       const res = await fetch('/api/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, phone, password }),
+        body: JSON.stringify({ name, email, password }),
       });
 
       const result = await res.json();
@@ -54,7 +58,7 @@ export default function UpdateClient() {
         throw new Error(result?.error || 'Update failed');
       }
 
-      setAllCookie(result.user)
+      setAllCookie(result.user);
 
       router.refresh();
       router.replace("/home");
@@ -64,6 +68,33 @@ export default function UpdateClient() {
       setMessage(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePhoneUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPhoneLoading(true);
+    setPhoneMessage('');
+
+    try {
+      const res = await fetch('/api/update/phone/init', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result?.error || 'Phone update failed');
+      }
+
+      router.replace('/verify-update-profile-phone');
+      setPhone('');
+    } catch (err: any) {
+      setPhoneMessage(err.message);
+    } finally {
+      setPhoneLoading(false);
     }
   };
 
@@ -82,7 +113,7 @@ export default function UpdateClient() {
           </p>
         </div>
 
-        {/* Card */}
+        {/* Main Update Card */}
         <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
           <form onSubmit={handleUpdate} className="divide-y divide-slate-200 dark:divide-slate-800">
 
@@ -90,7 +121,7 @@ export default function UpdateClient() {
               label="Update Full Name"
               icon={<User size={18} />}
               value={name}
-              onChange={(v) => setName(v.replace(/\s{2,}/g, ' ').trim())}
+              onChange={(v) => setName(v.replace(/\s{2,}/g, ' '))}
               type="text"
               placeholder="New full name"
             />
@@ -103,16 +134,6 @@ export default function UpdateClient() {
               placeholder="name@example.com"
               type='email'
               error={!isEmailValid && 'Invalid email format'}
-            />
-
-            <Field
-              label="Update Phone (E.164)"
-              icon={<Phone size={18} />}
-              value={phone}
-              onChange={setPhone}
-              type='phone'
-              placeholder="+919876543210"
-              error={!isPhoneValid && 'Invalid phone number'}
             />
 
             {/* Password */}
@@ -162,10 +183,6 @@ export default function UpdateClient() {
 
             {/* Actions */}
             <div className="p-6 flex justify-end gap-4">
-              <Button type="reset" variant="ghost">
-                Discard
-              </Button>
-
               <Button
                 disabled={!canSubmit}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
@@ -174,6 +191,44 @@ export default function UpdateClient() {
                   <>
                     <Save size={18} />
                     Update
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </div>
+
+        {/* Phone Update Card */}
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+          <form onSubmit={handlePhoneUpdate} className="divide-y divide-slate-200 dark:divide-slate-800">
+
+            <Field
+              label="Update Phone (E.164)"
+              icon={<Phone size={18} />}
+              value={phone}
+              onChange={setPhone}
+              type='phone'
+              placeholder="+919876543210"
+              error={phone && !isPhoneValid && 'Invalid phone number'}
+            />
+
+            {phoneMessage && (
+              <p className="px-6 text-sm text-red-500">
+                {phoneMessage}
+              </p>
+            )}
+
+            {/* Actions */}
+            <div className="p-6 flex justify-end gap-4">
+
+              <Button
+                disabled={!canSubmitPhone}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                {phoneLoading ? 'Updating...' : (
+                  <>
+                    <Save size={18} />
+                    Update Phone
                   </>
                 )}
               </Button>
