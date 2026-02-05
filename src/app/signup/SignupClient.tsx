@@ -93,7 +93,7 @@ export default function SignupClient() {
               <input
                 name='user_name'
                 value={user_name}
-                onChange={(e) => setName(e.target.value.replace(/\s{2,}/g, ' ').trim())}
+                onChange={(e) => setName(e.target.value.replace(/\s{2,}/g, ' '))}
                 required
                 type="text"
                 placeholder="e.g., John Doe"
