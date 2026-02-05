@@ -93,7 +93,7 @@ export default function SignupClient() {
               <input
                 name='user_name'
                 value={user_name}
-                onChange={(e) => setName(e.target.value.replace(/\s{2,}/g, ' '))}
+                onChange={(e) => setName(e.target.value.replace(/\s{2,}/g, ' ').trim())}
                 required
                 type="text"
                 placeholder="e.g., John Doe"
@@ -112,7 +112,7 @@ export default function SignupClient() {
               <input
                 value={email}
                 name='email'
-                onChange={(e) => { setEmail(e.target.value) }}
+                onChange={(e) => { setEmail(e.target.value.trim()) }}
                 type="email"
                 placeholder="name@example.com"
                 className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
@@ -139,7 +139,7 @@ export default function SignupClient() {
               <input
                 name='phone'
                 value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/^\s+|\s+$/g, ''))}
+                onChange={(e) => setPhone(e.target.value.replace(/^\s+|\s+$/g, '').trim())}
                 type="tel"
                 placeholder="+919876543210"
                 className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
@@ -169,7 +169,7 @@ export default function SignupClient() {
                 name='password'
                 required
                 value={password}
-                onChange={(e) => setPassword(e.target.value.replace(/^\s+|\s+$/g, ''))}
+                onChange={(e) => setPassword(e.target.value.replace(/^\s+|\s+$/g, '').trim())}
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
                 className={`w-full pl-10 pr-12 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
