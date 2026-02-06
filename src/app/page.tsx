@@ -16,7 +16,7 @@ export default function Home() {
     <div className="dark:bg-background-dark font-display text-[#0d161b] dark:text-slate-50 transition-colors duration-300">
       <main className="max-w-300 mx-auto px-6">
         {/* Hero Section */}
-        <section className="py-16 md:py-24">
+        <section className="py-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="flex flex-col gap-8">
               <div className="dark:bg-blue-800 inline-flex items-center gap-2 px-3 bg-blue-100 py-1 rounded-full text-xs font-bold uppercase tracking-wider w-fit">
@@ -81,7 +81,7 @@ export default function Home() {
               <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Reliability</p>
               <div className="flex items-center gap-3">
                 <p className="text-3xl font-bold tracking-tight">Secure</p>
-                <span className="bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded text-xs font-bold">24/7 Reachable</span>
+                <span className="bg-indigo-100 dark:bg-indigo-300 text-indigo-600 px-2 py-0.5 rounded text-xs font-bold">24/7 Reachable</span>
               </div>
             </div>
             <div className="flex flex-col gap-1 p-6 rounded-xl bg-white dark:bg-slate-800/50 shadow-sm border border-[#cfdde7] dark:border-slate-700">

@@ -35,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${poppins.className}`}
+        className={`${poppins.className} selection:bg-teal-300 selection:text-teal-950`}
       >
         <ThemeProvider
           attribute="class"
@@ -45,7 +45,7 @@ export default function RootLayout({
         >
           <Navigation />
           {children}
-          <footer className=" bg-white dark:bg-black border-t border-[#cfdde7] dark:border-slate-800 py-16">
+          <footer className="bg-white dark:bg-black border-t border-white dark:border-slate-800 py-12">
             <div className="max-w-300 mx-auto px-6">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
                 <div className="flex flex-col gap-6 col-span-1 md:col-span-1">
