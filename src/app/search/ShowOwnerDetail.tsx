@@ -3,9 +3,12 @@ import { useState } from "react";
 import { User, Lock, Mail, Phone, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ShowWarning } from "@/app/search/SearchCarClient";
+import { MessageOwnerModal } from "@/components/my_ui/message-owner";
+
 
 export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, isVerified, isLoggedin, temp_phone_number }: { name: string, carName: string, car_num: string, user_ph_num: string, isVerified: boolean, isLoggedin: boolean, temp_phone_number: string | undefined }) {
   const [showWarning, setShowWarning] = useState(false);
+  const [messageOwnerOpen, setMessageOwnerOpen] = useState(false);
 
   return (
     <>
@@ -16,6 +19,14 @@ export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, i
           onClose={() => setShowWarning(false)}
         />
       )}
+      <MessageOwnerModal
+        open={messageOwnerOpen}
+        onOpenChange={setMessageOwnerOpen}
+        vehicleId={car_num}
+        onSubmit={(issue, msg) => {
+          console.log("Real submit:", { issue, msg });
+        }}
+      />
       <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur shadow-sm hover:shadow-md transition-shadow duration-300">
 
 
@@ -86,6 +97,7 @@ export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, i
             <div className="flex flex-wrap gap-4">
               <Button
                 variant="outline"
+                onClick={() => setMessageOwnerOpen(true)}
                 className="h-12 px-6 font-semibold flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
               >
                 <Mail size={18} />
