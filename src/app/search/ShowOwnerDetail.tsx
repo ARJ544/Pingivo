@@ -4,8 +4,9 @@ import { User, Lock, Mail, Phone, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ShowWarning } from "@/app/search/SearchCarClient";
 import { MessageOwnerModal } from "@/components/my_ui/message-owner";
+import Popup from "@/components/my_ui/CustomPopUp";
 
-interface PayloadType {
+type Payload = {
   subject: string,
   issueMessage: string,
   vehi_num: string
@@ -13,9 +14,34 @@ interface PayloadType {
 
 export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, isVerified, isLoggedin, temp_phone_number }: { name: string, carName: string, car_num: string, user_ph_num: string, isVerified: boolean, isLoggedin: boolean, temp_phone_number: string | undefined }) {
   const [showWarning, setShowWarning] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const [messageOwnerOpen, setMessageOwnerOpen] = useState(false);
-  const [payload, setPayload] = useState<PayloadType | null>(null);
+  const [errorOrSuccessMessage, setErrorOrSuccessMessage] = useState("");
 
+  const handleSendMail = async (payload: Payload) => {
+    setLoading(false);
+    try {
+      const res = await fetch('/api/message-owner', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || 'Something went wrong');
+      }
+      setErrorOrSuccessMessage(result.message);
+    } catch (err: any) {
+      setErrorOrSuccessMessage(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <>
       {showWarning && (
@@ -35,9 +61,7 @@ export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, i
             issueMessage: msg,
             vehi_num: car_num,
           };
-
-          setPayload(newPayload);
-          console.log("Real submit:", newPayload);
+          handleSendMail(newPayload);
         }}
       />
       <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur shadow-sm hover:shadow-md transition-shadow duration-300">
@@ -111,6 +135,7 @@ export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, i
               <Button
                 variant="outline"
                 onClick={() => setMessageOwnerOpen(true)}
+                disabled={loading}
                 className="h-12 px-6 font-semibold flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
               >
                 <Mail size={18} />
@@ -119,15 +144,29 @@ export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, i
 
               <Button
                 className="h-12 px-6 font-bold flex items-center gap-2 bg-primary text-white dark:text-slate-800 hover:bg-primary/90 shadow-sm shadow-primary/30 transition"
+                disabled={loading}
+                onClick={() => {
+                  setPopupMessage("Feature not Initialized Yet!!");
+                  setShowPopup(true);
+                }}
               >
                 <Phone size={18} />
                 Call
               </Button>
-            </div>
 
+              <Popup
+                message={popupMessage}
+                show={showPopup}
+                onClose={() => setShowPopup(false)}
+              />
+            </div>
+            <p
+              className={`text-lg mt-1 font-medium transition-colors duration-300 ${errorOrSuccessMessage.includes("error") ? "text-red-500 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}
+            >
+              {errorOrSuccessMessage}
+            </p>
           </div>
         )}
-
 
         {/* Not Verified */}
         {!isVerified && (

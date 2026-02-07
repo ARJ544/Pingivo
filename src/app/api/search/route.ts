@@ -54,6 +54,13 @@ export async function GET(request: Request) {
       path: "/",
       maxAge: 10 * 60,
     })
+    cookie.set('owner_name', data.name, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 10 * 60,
+    })
     const clientData = { name: data.name, vehi1: data.vehi1, vehi1_name: data.vehi1_name, vehi2: data.vehi2, vehi2_name: data.vehi2_name };
 
     return NextResponse.json(clientData);
