@@ -6,8 +6,8 @@ export const metadata = {
 };
 
 export default async function VerifyPhoneUnknownUserPage() {
-  const cookie = await cookies()
-  const updating = cookie.get('update_profile_phone_temp')
+  const cookie = await cookies();
+  const updating = cookie.get("update_profile_phone_temp");
 
-  return <VerifyUpdateProfilePhoneClient update_temp={updating?.value}/>;
+  return <VerifyUpdateProfilePhoneClient update_temp={updating?.value} />;
 }

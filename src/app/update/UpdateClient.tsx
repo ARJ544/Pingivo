@@ -1,41 +1,37 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { User, Mail, Phone, Lock, Eye, Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import { setAllCookie } from '@/app/actions';
+import { useState } from "react";
+import { User, Mail, Phone, Lock, Eye, Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { setAllCookie } from "@/app/actions";
 
 export default function UpdateClient() {
   const router = useRouter();
 
   // Main form state
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [phoneLoading, setPhoneLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [phoneMessage, setPhoneMessage] = useState('');
+  const [message, setMessage] = useState("");
+  const [phoneMessage, setPhoneMessage] = useState("");
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const phoneRegex = /^\+[1-9]\d{1,14}$/;
   const strongPasswordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
-  const isEmailValid = email === '' || emailRegex.test(email);
-  const isPasswordValid =
-    password === '' || strongPasswordRegex.test(password);
+  const isEmailValid = email === "" || emailRegex.test(email);
+  const isPasswordValid = password === "" || strongPasswordRegex.test(password);
 
   const canSubmit =
-    isEmailValid &&
-    isPasswordValid &&
-    (name || email || password) &&
-    !loading;
+    isEmailValid && isPasswordValid && (name || email || password) && !loading;
 
   const isPhoneValid = phoneRegex.test(phone);
   const canSubmitPhone = isPhoneValid && !phoneLoading;
@@ -43,27 +39,27 @@ export default function UpdateClient() {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
+    setMessage("");
 
     try {
-      const res = await fetch('/api/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
 
       const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(result?.error || 'Update failed');
+        throw new Error(result?.error || "Update failed");
       }
 
       setAllCookie(result.user);
 
       router.refresh();
       router.replace("/home");
-      setMessage('Profile updated successfully ✅');
-      setPassword('');
+      setMessage("Profile updated successfully ✅");
+      setPassword("");
     } catch (err: any) {
       setMessage(err.message);
     } finally {
@@ -74,23 +70,23 @@ export default function UpdateClient() {
   const handlePhoneUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setPhoneLoading(true);
-    setPhoneMessage('');
+    setPhoneMessage("");
 
     try {
-      const res = await fetch('/api/update/phone/init', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/update/phone/init", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone }),
       });
 
       const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(result?.error || 'Phone update failed');
+        throw new Error(result?.error || "Phone update failed");
       }
 
-      router.replace('/verify-update-profile-phone');
-      setPhone('');
+      router.replace("/verify-update-profile-phone");
+      setPhone("");
     } catch (err: any) {
       setPhoneMessage(err.message);
     } finally {
@@ -98,11 +94,9 @@ export default function UpdateClient() {
     }
   };
 
-
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-slate-950 py-10 px-4">
       <div className="mx-auto max-w-4xl space-y-8">
-
         {/* Header */}
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">
@@ -115,13 +109,15 @@ export default function UpdateClient() {
 
         {/* Main Update Card */}
         <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-          <form onSubmit={handleUpdate} className="divide-y divide-slate-200 dark:divide-slate-800">
-
+          <form
+            onSubmit={handleUpdate}
+            className="divide-y divide-slate-200 dark:divide-slate-800"
+          >
             <Field
               label="Update Full Name"
               icon={<User size={18} />}
               value={name}
-              onChange={(v) => setName(v.replace(/\s{2,}/g, ' '))}
+              onChange={(v) => setName(v.replace(/\s{2,}/g, " "))}
               type="text"
               placeholder="New full name"
             />
@@ -132,8 +128,8 @@ export default function UpdateClient() {
               value={email}
               onChange={(e) => setEmail(e.trim())}
               placeholder="name@example.com"
-              type='email'
-              error={!isEmailValid && 'Invalid email format'}
+              type="email"
+              error={!isEmailValid && "Invalid email format"}
             />
 
             {/* Password */}
@@ -143,18 +139,21 @@ export default function UpdateClient() {
               </label>
 
               <div className="relative mt-2">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <Lock
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  size={18}
+                />
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) =>
-                    setPassword(e.target.value.trim())
-                  }
+                  onChange={(e) => setPassword(e.target.value.trim())}
                   placeholder="••••••••"
                   className={`w-full pl-10 pr-12 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white
-                    ${isPasswordValid
-                      ? 'border-slate-200 dark:border-slate-700'
-                      : 'border-red-500'}
+                    ${
+                      isPasswordValid
+                        ? "border-slate-200 dark:border-slate-700"
+                        : "border-red-500"
+                    }
                   `}
                 />
                 <Button
@@ -170,16 +169,13 @@ export default function UpdateClient() {
 
               {!isPasswordValid && (
                 <p className="mt-2 text-xs text-red-500">
-                  Password must be strong (8+ chars, uppercase, lowercase, number, special char)
+                  Password must be strong (8+ chars, uppercase, lowercase,
+                  number, special char)
                 </p>
               )}
             </div>
 
-            {message && (
-              <p className="px-6 text-sm text-red-500">
-                {message}
-              </p>
-            )}
+            {message && <p className="px-6 text-sm text-red-500">{message}</p>}
 
             {/* Actions */}
             <div className="p-6 flex justify-end gap-4">
@@ -187,7 +183,9 @@ export default function UpdateClient() {
                 disabled={!canSubmit}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                {loading ? 'Updating...' : (
+                {loading ? (
+                  "Updating..."
+                ) : (
                   <>
                     <Save size={18} />
                     Update
@@ -200,32 +198,33 @@ export default function UpdateClient() {
 
         {/* Phone Update Card */}
         <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-          <form onSubmit={handlePhoneUpdate} className="divide-y divide-slate-200 dark:divide-slate-800">
-
+          <form
+            onSubmit={handlePhoneUpdate}
+            className="divide-y divide-slate-200 dark:divide-slate-800"
+          >
             <Field
               label="Update Phone (E.164)"
               icon={<Phone size={18} />}
               value={phone}
               onChange={setPhone}
-              type='phone'
+              type="phone"
               placeholder="+919876543210"
-              error={phone && !isPhoneValid && 'Invalid phone number'}
+              error={phone && !isPhoneValid && "Invalid phone number"}
             />
 
             {phoneMessage && (
-              <p className="px-6 text-sm text-red-500">
-                {phoneMessage}
-              </p>
+              <p className="px-6 text-sm text-red-500">{phoneMessage}</p>
             )}
 
             {/* Actions */}
             <div className="p-6 flex justify-end gap-4">
-
               <Button
                 disabled={!canSubmitPhone}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                {phoneLoading ? 'Updating...' : (
+                {phoneLoading ? (
+                  "Updating..."
+                ) : (
                   <>
                     <Save size={18} />
                     Update Phone
@@ -254,7 +253,7 @@ function Field({
   value: string;
   onChange: (v: string) => void;
   placeholder: string;
-  type: string,
+  type: string;
   error?: string | false;
 }) {
   return (
@@ -272,7 +271,7 @@ function Field({
           type={type}
           placeholder={placeholder}
           className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white
-            ${error ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'}
+            ${error ? "border-red-500" : "border-slate-200 dark:border-slate-700"}
           `}
         />
       </div>

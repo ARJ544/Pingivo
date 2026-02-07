@@ -65,9 +65,7 @@ export default function ProfileDropdown({
         <div className="space-y-2 px-2 py-1 text-sm">
           <div className="flex items-center justify-between rounded-md bg-muted px-2 py-1">
             <span className="font-medium text-foreground">Total Vehicles</span>
-            <span className="text-muted-foreground">
-              {totalVehicle} / 2
-            </span>
+            <span className="text-muted-foreground">{totalVehicle} / 2</span>
           </div>
 
           {vehicles.map((v) => (
@@ -77,9 +75,7 @@ export default function ProfileDropdown({
             >
               <Car className="h-4 w-4 text-muted-foreground" />
               <div className="flex flex-col">
-                <span className="font-medium text-foreground">
-                  {v.name}
-                </span>
+                <span className="font-medium text-foreground">{v.name}</span>
                 <span className="text-xs text-muted-foreground">
                   {v.number}
                 </span>

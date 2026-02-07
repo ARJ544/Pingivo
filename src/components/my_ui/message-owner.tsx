@@ -89,13 +89,19 @@ export function MessageOwnerModal({
                 <SelectValue placeholder="Select an issue..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Emergency/Another Issue">Emergency/Another Issue</SelectItem>
+                <SelectItem value="Emergency/Another Issue">
+                  Emergency/Another Issue
+                </SelectItem>
                 <SelectItem value="Blocking Road">Blocking Road</SelectItem>
                 <SelectItem value="Towing Risk">Towing Risk</SelectItem>
                 <SelectItem value="Lights On">Lights On</SelectItem>
-                <SelectItem value="Fire/Smoke Detected">Fire/Smoke Detected</SelectItem>
+                <SelectItem value="Fire/Smoke Detected">
+                  Fire/Smoke Detected
+                </SelectItem>
                 <SelectItem value="Window Open">Window Open</SelectItem>
-                <SelectItem value="Something Left in Car">Something Left in Car</SelectItem>
+                <SelectItem value="Something Left in Car">
+                  Something Left in Car
+                </SelectItem>
                 <SelectItem value="Fuel Leak">Fuel Leak</SelectItem>
                 <SelectItem value="Alarm Triggered">Alarm Triggered</SelectItem>
               </SelectContent>

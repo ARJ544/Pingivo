@@ -19,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogDescription
+  DialogDescription,
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
@@ -31,10 +31,7 @@ type Props = {
   vehi2_num?: string;
 };
 
-export default function DeleteCarClient({
-  vehi1_num,
-  vehi2_num,
-}: Props) {
+export default function DeleteCarClient({ vehi1_num, vehi2_num }: Props) {
   const router = useRouter();
 
   const [selectedVehicle, setSelectedVehicle] = useState("");
@@ -105,7 +102,6 @@ export default function DeleteCarClient({
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50">
       <main className="mx-auto max-w-225 px-6 py-10 space-y-14">
-
         {/* TITLE */}
         <section className="space-y-2">
           <h1 className="text-4xl font-black tracking-tight">
@@ -128,14 +124,21 @@ export default function DeleteCarClient({
               <SelectValue placeholder="Select a vehicle" />
             </SelectTrigger>
             <SelectContent>
-              {vehi1_num && <SelectItem value={vehi1_num}>{vehi1_num}</SelectItem>}
-              {vehi2_num && <SelectItem value={vehi2_num}>{vehi2_num}</SelectItem>}
+              {vehi1_num && (
+                <SelectItem value={vehi1_num}>{vehi1_num}</SelectItem>
+              )}
+              {vehi2_num && (
+                <SelectItem value={vehi2_num}>{vehi2_num}</SelectItem>
+              )}
             </SelectContent>
           </Select>
 
           <Dialog open={openVehicleDialog} onOpenChange={setOpenVehicleDialog}>
             <DialogTrigger asChild>
-              <Button variant="destructive" disabled={!selectedVehicle || deleting}>
+              <Button
+                variant="destructive"
+                disabled={!selectedVehicle || deleting}
+              >
                 Delete Vehicle
               </Button>
             </DialogTrigger>
@@ -152,8 +155,8 @@ export default function DeleteCarClient({
               </DialogHeader>
 
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                Type <span className="font-semibold">delete</span> to permanently
-                remove this vehicle.
+                Type <span className="font-semibold">delete</span> to
+                permanently remove this vehicle.
               </p>
 
               <Input
@@ -194,13 +197,15 @@ export default function DeleteCarClient({
             Delete everything? You are about to permanently remove your profile
             and vehicles. All associated QR codes will be deactivated.
             <br />
-            This action is irreversible. To use the platform again, you will need
-            to create a new account.
+            This action is irreversible. To use the platform again, you will
+            need to create a new account.
           </p>
 
           <Dialog open={openAccountDialog} onOpenChange={setOpenAccountDialog}>
             <DialogTrigger asChild>
-              <Button variant="destructive" disabled={deleting}>Delete Account</Button>
+              <Button variant="destructive" disabled={deleting}>
+                Delete Account
+              </Button>
             </DialogTrigger>
 
             <DialogContent>

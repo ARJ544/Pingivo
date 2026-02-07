@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useState, useEffect } from "react";
 import { Car } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,19 @@ import ShowOwnerDetail from "@/app/search/ShowOwnerDetail";
 function validateVehicleNumber(value: string) {
   return value
     .toUpperCase()
-    .replace(/\s+/g, '')
-    .replace(/[^A-Z0-9_-]/g, '');
+    .replace(/\s+/g, "")
+    .replace(/[^A-Z0-9_-]/g, "");
 }
 
-export function ShowWarning({ isLoggedin, carNum, onClose }: { isLoggedin: boolean, carNum: string, onClose: () => void }) {
+export function ShowWarning({
+  isLoggedin,
+  carNum,
+  onClose,
+}: {
+  isLoggedin: boolean;
+  carNum: string;
+  onClose: () => void;
+}) {
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -31,7 +39,6 @@ export function ShowWarning({ isLoggedin, carNum, onClose }: { isLoggedin: boole
 
       {/* Modal */}
       <div className="relative w-full max-w-md animate-in zoom-in-95 rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900">
-
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
@@ -51,21 +58,25 @@ export function ShowWarning({ isLoggedin, carNum, onClose }: { isLoggedin: boole
           {isLoggedin ? (
             <>
               <p className="text-sm font-medium leading-relaxed">
-                Your phone number will be changed <span className="font-semibold">temporarily for 1 hour</span>.
+                Your phone number will be changed{" "}
+                <span className="font-semibold">temporarily for 1 hour</span>.
               </p>
               <p className="mt-2 text-xs opacity-80 leading-relaxed">
-                After this period, your original phone number will be restored automatically.
-                You can update your phone number permanently from <span className="font-medium">Update Profile</span>.
-                During this 1-hour window, further changes are not allowed.
+                After this period, your original phone number will be restored
+                automatically. You can update your phone number permanently from{" "}
+                <span className="font-medium">Update Profile</span>. During this
+                1-hour window, further changes are not allowed.
               </p>
             </>
           ) : (
             <>
               <p className="text-sm font-medium leading-relaxed">
-                Your phone number will be changed <span className="font-semibold">temporarily for 1 hour</span>.
+                Your phone number will be changed{" "}
+                <span className="font-semibold">temporarily for 1 hour</span>.
               </p>
               <p className="mt-2 text-xs opacity-80 leading-relaxed">
-                During this time, you won’t be able to modify your phone number again.
+                During this time, you won’t be able to modify your phone number
+                again.
               </p>
             </>
           )}
@@ -73,7 +84,9 @@ export function ShowWarning({ isLoggedin, carNum, onClose }: { isLoggedin: boole
 
         {/* Footer */}
         <div className="mt-6 flex justify-end gap-3">
-          <Link href={`/verify-phone-unknown-user?next=${encodeURIComponent(carNum)}`}>
+          <Link
+            href={`/verify-phone-unknown-user?next=${encodeURIComponent(carNum)}`}
+          >
             <Button className="rounded-lg bg-zinc-900 px-4 py-2 text-sm text-white transition hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200">
               Okay, I understand
             </Button>
@@ -81,7 +94,7 @@ export function ShowWarning({ isLoggedin, carNum, onClose }: { isLoggedin: boole
 
           <Button
             variant="outline"
-            onClick={(onClose)}
+            onClick={onClose}
             className="rounded-lg px-4 py-2 text-sm"
           >
             Close
@@ -92,16 +105,31 @@ export function ShowWarning({ isLoggedin, carNum, onClose }: { isLoggedin: boole
   );
 }
 
-export default function SearchCar({ user_phone_number, is_verified, is_loggedin, temp_phone_number }: { user_phone_number: any, is_verified: boolean, is_loggedin: boolean, temp_phone_number: string | undefined }) {
+export default function SearchCar({
+  user_phone_number,
+  is_verified,
+  is_loggedin,
+  temp_phone_number,
+}: {
+  user_phone_number: any;
+  is_verified: boolean;
+  is_loggedin: boolean;
+  temp_phone_number: string | undefined;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryCarNumber = searchParams.get("crnm");
 
-  const [carNumber, setCarNumber] = useState(queryCarNumber ? queryCarNumber : "");
+  const [carNumber, setCarNumber] = useState(
+    queryCarNumber ? queryCarNumber : "",
+  );
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [ownerDetail, setOwnerDetail] = useState<any>(null);
-  const isVehicleValid = carNumber.length >= 6 && carNumber.length <= 15 && /^[A-Z0-9_-]+$/.test(carNumber);
+  const isVehicleValid =
+    carNumber.length >= 6 &&
+    carNumber.length <= 15 &&
+    /^[A-Z0-9_-]+$/.test(carNumber);
 
   useEffect(() => {
     if (!queryCarNumber) return;
@@ -119,9 +147,25 @@ export default function SearchCar({ user_phone_number, is_verified, is_loggedin,
         const data = await res.json();
 
         if (queryCarNumber === data?.vehi1) {
-          setOwnerDetail({ name: data?.name, carName: data?.vehi1_name, car_num: queryCarNumber, user_ph_num: user_phone_number, isVerified: is_verified, isLoggedin: is_loggedin, temp_phone_number: temp_phone_number });
+          setOwnerDetail({
+            name: data?.name,
+            carName: data?.vehi1_name,
+            car_num: queryCarNumber,
+            user_ph_num: user_phone_number,
+            isVerified: is_verified,
+            isLoggedin: is_loggedin,
+            temp_phone_number: temp_phone_number,
+          });
         } else {
-          setOwnerDetail({ name: data?.name, carName: data?.vehi2_name, car_num: queryCarNumber, user_ph_num: user_phone_number, isVerified: is_verified, isLoggedin: is_loggedin, temp_phone_number: temp_phone_number });
+          setOwnerDetail({
+            name: data?.name,
+            carName: data?.vehi2_name,
+            car_num: queryCarNumber,
+            user_ph_num: user_phone_number,
+            isVerified: is_verified,
+            isLoggedin: is_loggedin,
+            temp_phone_number: temp_phone_number,
+          });
         }
 
         // setMessage(JSON.stringify(data));
@@ -145,7 +189,7 @@ export default function SearchCar({ user_phone_number, is_verified, is_loggedin,
     }
 
     router.replace(`/search?crnm=${encodeURIComponent(carNumber)}`);
-    setMessage('');
+    setMessage("");
   };
   return (
     <main className="flex flex-1 justify-center px-4 py-12 bg-slate-50 dark:bg-slate-950 transition-colors">
@@ -156,7 +200,8 @@ export default function SearchCar({ user_phone_number, is_verified, is_loggedin,
           </h1>
 
           <p className="max-w-xl text-base leading-normal text-slate-600 dark:text-slate-400">
-            Enter the license plate number to start a secure, anonymous conversation with the owner.
+            Enter the license plate number to start a secure, anonymous
+            conversation with the owner.
           </p>
 
           <div className="flex w-full max-w-2xl flex-col gap-3 pt-6 md:flex-row md:items-end">
@@ -194,7 +239,8 @@ export default function SearchCar({ user_phone_number, is_verified, is_loggedin,
               </div>
               {carNumber && !isVehicleValid && (
                 <p className="mt-1 text-xs text-red-500">
-                  Only A-Z, 0-9, hyphen (-) and underscore (_) are allowed. No spaces. At least 6 characters. Maximum 15 characters.
+                  Only A-Z, 0-9, hyphen (-) and underscore (_) are allowed. No
+                  spaces. At least 6 characters. Maximum 15 characters.
                 </p>
               )}
             </label>
@@ -219,5 +265,4 @@ export default function SearchCar({ user_phone_number, is_verified, is_loggedin,
       </div>
     </main>
   );
-
 }

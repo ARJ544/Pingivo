@@ -1,35 +1,41 @@
-import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const cookie = await cookies();
-  const owner_email = cookie.get('owner_email')?.value
-  const receiver_name = cookie.get('owner_name')?.value
-  let sender_name = cookie.get('name')?.value
+  const owner_email = cookie.get("owner_email")?.value;
+  const receiver_name = cookie.get("owner_name")?.value;
+  let sender_name = cookie.get("name")?.value;
   let { subject, issueMessage, vehi_num } = await req.json();
 
   if (!owner_email || !receiver_name) {
-    return NextResponse.json({ error: 'Something went Wrong. Refresh Page and Try again' }, { status: 401 })
+    return NextResponse.json(
+      { error: "Something went Wrong. Refresh Page and Try again" },
+      { status: 401 },
+    );
   }
-  if (!sender_name) sender_name = "ParkPing"
-  if (!subject) return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
-  if (!vehi_num) return NextResponse.json({ error: 'Refresh Page' }, { status: 400 })
-  if (!issueMessage) issueMessage = "!! No Message Provided !!"
+  if (!sender_name) sender_name = "ParkPing";
+  if (!subject)
+    return NextResponse.json(
+      { error: "All fields are required" },
+      { status: 400 },
+    );
+  if (!vehi_num)
+    return NextResponse.json({ error: "Refresh Page" }, { status: 400 });
+  if (!issueMessage) issueMessage = "!! No Message Provided !!";
 
   const emailData = {
     sender: {
       name: `By ${sender_name} | ParkPing`,
-      email: process.env.DEVELOPER_EMAIL!
+      email: process.env.DEVELOPER_EMAIL!,
     },
-    to: [
-      { email: owner_email, name: receiver_name }
-    ],
+    to: [{ email: owner_email, name: receiver_name }],
     subject,
     templateId: 3,
     params: {
       VEHICLE_NUMBER: vehi_num,
-      EMERGENCY_MESSAGE: issueMessage
-    }
+      EMERGENCY_MESSAGE: issueMessage,
+    },
   };
 
   const BREVO_API_KEY = process.env.BREVO_API_KEY!;
@@ -37,21 +43,27 @@ export async function POST(req: Request) {
     const res = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
-        "Accept": "application/json",
+        Accept: "application/json",
         "Content-Type": "application/json",
-        "api-key": BREVO_API_KEY
+        "api-key": BREVO_API_KEY,
       },
-      body: JSON.stringify(emailData)
+      body: JSON.stringify(emailData),
     });
 
     const data = await res.json();
 
-    cookie.delete("owner_phone_num")
-    cookie.delete("owner_email")
-    cookie.delete("owner_name")
+    cookie.delete("owner_phone_num");
+    cookie.delete("owner_email");
+    cookie.delete("owner_name");
 
-    return NextResponse.json({ message: 'Email Sent Successfully', data }, { status: 200 });
+    return NextResponse.json(
+      { message: "Email Sent Successfully", data },
+      { status: 200 },
+    );
   } catch (error) {
-    return NextResponse.json({ error: 'Error sending email', details: error }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error sending email", details: error },
+      { status: 500 },
+    );
   }
 }

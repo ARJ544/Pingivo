@@ -1,5 +1,16 @@
 import Link from "next/link";
-import { ShieldCheck, PlusSquare, Search, QrCode, Edit3, Trash2, ArrowRight, EyeOff, ScanQrCode, BadgeCheck } from "lucide-react";
+import {
+  ShieldCheck,
+  PlusSquare,
+  Search,
+  QrCode,
+  Edit3,
+  Trash2,
+  ArrowRight,
+  EyeOff,
+  ScanQrCode,
+  BadgeCheck,
+} from "lucide-react";
 import { IsLoggedIn, getAllCookie } from "@/app/actions";
 
 export const metadata = {
@@ -9,12 +20,10 @@ export const metadata = {
 export default async function HomePage() {
   const company_name = "ParkPing";
   const totalVehicle = (await getAllCookie()).total_vehi;
-  const isLoggedIn = (await IsLoggedIn());
+  const isLoggedIn = await IsLoggedIn();
 
   return (
-    <main
-      className="min-h-screen bg-linear-to-br overflow-x-hidden  from-slate-50  via-blue-50/40  to-slate-100  dark:from-slate-950  dark:via-blue-950/30  dark:to-slate-900  text-slate-900  dark:text-slate-100 "
-    >
+    <main className="min-h-screen bg-linear-to-br overflow-x-hidden  from-slate-50  via-blue-50/40  to-slate-100  dark:from-slate-950  dark:via-blue-950/30  dark:to-slate-900  text-slate-900  dark:text-slate-100 ">
       <div className="max-w-7xl mx-auto px-4 py-5">
         {/* Header */}
         <header className="flex flex-col gap-4 mb-10">
@@ -30,15 +39,19 @@ export default async function HomePage() {
                 </p>
               </div>
             </div>
-            {isLoggedIn && (<div className="flex flex-col max-w-xs bg-white/50 dark:bg-slate-900/50 backdrop-blur p-4 rounded-xl shadow-sm border border-slate-200/40 dark:border-slate-800/40">
-              <div className="flex gap-5 items-center mb-2">
-                <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">Vehicles Used: {totalVehicle}/2</span>
-              </div>
+            {isLoggedIn && (
+              <div className="flex flex-col max-w-xs bg-white/50 dark:bg-slate-900/50 backdrop-blur p-4 rounded-xl shadow-sm border border-slate-200/40 dark:border-slate-800/40">
+                <div className="flex gap-5 items-center mb-2">
+                  <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">
+                    Vehicles Used: {totalVehicle}/2
+                  </span>
+                </div>
 
-              <span className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                {totalVehicle === "2" ? "All slots full" : "Slots available"}
-              </span>
-            </div>)}
+                <span className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                  {totalVehicle === "2" ? "All slots full" : "Slots available"}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="mt-4">
@@ -46,7 +59,8 @@ export default async function HomePage() {
               Safer Parking. Smarter Connections.
             </h2>
             <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
-              {company_name} lets vehicle owners stay anonymous while remaining reachable during parking issues, safety alerts, and emergencies.
+              {company_name} lets vehicle owners stay anonymous while remaining
+              reachable during parking issues, safety alerts, and emergencies.
             </p>
           </div>
         </header>
@@ -129,7 +143,7 @@ function ActionCard({
   desc,
   href,
   customText,
-  disabled
+  disabled,
 }: {
   icon: React.ReactNode;
   title: string;
@@ -159,9 +173,7 @@ function ActionCard({
       </div>
 
       <h4 className="font-bold text-lg mb-2 wrap-break-words">{title}</h4>
-      <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
-        {desc}
-      </p>
+      <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">{desc}</p>
 
       <span className="mt-auto flex items-center gap-1 text-blue-600 font-semibold text-sm">
         {customText}
@@ -203,9 +215,7 @@ function DangerCard({
       </div>
 
       <h4 className="font-bold text-lg mb-2">{title}</h4>
-      <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
-        {desc}
-      </p>
+      <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">{desc}</p>
 
       <span className="mt-auto flex items-center gap-1 text-red-500 font-semibold text-sm">
         Delete
@@ -234,4 +244,3 @@ function TipCard({
     </div>
   );
 }
-

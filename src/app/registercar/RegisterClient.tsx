@@ -1,40 +1,50 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Lock, Eye, Car, ArrowRight, QrCode, UserX, ShieldCheck } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation'
-import { setAllCookie } from '@/app/actions'
-import Link from 'next/link'
+import { useState } from "react";
+import {
+  Lock,
+  Eye,
+  Car,
+  ArrowRight,
+  QrCode,
+  UserX,
+  ShieldCheck,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { setAllCookie } from "@/app/actions";
+import Link from "next/link";
 
 function validateVehicleNumber(value: string) {
   return value
     .toUpperCase()
-    .replace(/\s+/g, '')
-    .replace(/[^A-Z0-9_-]/g, '');
+    .replace(/\s+/g, "")
+    .replace(/[^A-Z0-9_-]/g, "");
 }
 
 export default function RegisterClient() {
   const router = useRouter();
-  const [message, setMessage] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [vehiNum, setvehiNum] = useState('')
-  const [vehiName, setvehiName] = useState('')
-  let [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const isPasswordValid = password === '' || password.length >= 8
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [vehiNum, setvehiNum] = useState("");
+  const [vehiName, setvehiName] = useState("");
+  let [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const isPasswordValid = password === "" || password.length >= 8;
 
-  const isVehicleValid = vehiNum.length >= 6 && vehiNum.length <= 15 && /^[A-Z0-9_-]+$/.test(vehiNum);
-
+  const isVehicleValid =
+    vehiNum.length >= 6 &&
+    vehiNum.length <= 15 &&
+    /^[A-Z0-9_-]+$/.test(vehiNum);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch('/api/registercar', {
-        method: 'POST',
+      const res = await fetch("/api/registercar", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           password,
@@ -45,11 +55,11 @@ export default function RegisterClient() {
       const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(result.error || 'Something went wrong');
+        throw new Error(result.error || "Something went wrong");
       }
       setAllCookie(result.user);
 
-      setMessage('✅ Vehicle Registered Successfully!');
+      setMessage("✅ Vehicle Registered Successfully!");
       router.replace("/qr");
     } catch (err: any) {
       setMessage(`Error: ${err.message}`);
@@ -85,7 +95,6 @@ export default function RegisterClient() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-
           {/* Password */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold text-slate-900 dark:text-slate-100">
@@ -97,15 +106,18 @@ export default function RegisterClient() {
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
               />
               <input
-                name='password'
+                name="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value.replace(/^\s+|\s+$/g, ''))}
-                type={showPassword ? 'text' : 'password'}
+                onChange={(e) =>
+                  setPassword(e.target.value.replace(/^\s+|\s+$/g, ""))
+                }
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 className={`w-full pl-10 pr-12 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
-                  ${isPasswordValid
-                    ? 'border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
-                    : 'border-red-500 focus:ring-1 focus:ring-red-500'
+                  ${
+                    isPasswordValid
+                      ? "border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      : "border-red-500 focus:ring-1 focus:ring-red-500"
                   }`}
               />
               <Button
@@ -136,7 +148,7 @@ export default function RegisterClient() {
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
               />
               <input
-                name='vehicle'
+                name="vehicle"
                 value={vehiNum}
                 onChange={(e) => {
                   const cleaned = validateVehicleNumber(e.target.value);
@@ -150,7 +162,8 @@ export default function RegisterClient() {
             </div>
             {vehiNum && !isVehicleValid && (
               <p className="mt-1 text-xs text-red-500">
-                Only A-Z, 0-9, hyphen (-) and underscore (_) are allowed. No spaces. At least 6 characters. Maximum 15 characters.
+                Only A-Z, 0-9, hyphen (-) and underscore (_) are allowed. No
+                spaces. At least 6 characters. Maximum 15 characters.
               </p>
             )}
           </div>
@@ -166,7 +179,7 @@ export default function RegisterClient() {
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
               />
               <input
-                name='vehicle_name'
+                name="vehicle_name"
                 value={vehiName}
                 onChange={(e) => setvehiName(e.target.value.toUpperCase())}
                 type="text"
@@ -181,7 +194,13 @@ export default function RegisterClient() {
           <div className="mt-6 flex flex-col gap-4">
             <Button
               type="submit"
-              disabled={loading || password.length < 8 || !isVehicleValid || !vehiName.trim() || !vehiNum.trim()}
+              disabled={
+                loading ||
+                password.length < 8 ||
+                !isVehicleValid ||
+                !vehiName.trim() ||
+                !vehiNum.trim()
+              }
               className="w-full bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 text-white font-bold py-4 rounded-lg shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2 group"
             >
               {loading ? "Registering" : "Register"}
@@ -208,16 +227,10 @@ export default function RegisterClient() {
         </p>
       </div>
     </main>
-  )
+  );
 }
 
-function Feature({
-  icon,
-  label,
-}: {
-  icon: React.ReactNode
-  label: string
-}) {
+function Feature({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
     <div className="flex flex-col items-center">
       <div className="bg-white dark:bg-slate-900 p-3 rounded-full shadow-sm mb-2 text-blue-500">
@@ -227,5 +240,5 @@ function Feature({
         {label}
       </span>
     </div>
-  )
+  );
 }

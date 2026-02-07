@@ -1,32 +1,32 @@
-'use client'
+"use client";
 
-import { useEffect, useRef, useState } from 'react'
-import { User, Mail, Lock, Phone, Eye } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from "react";
+import { User, Mail, Lock, Phone, Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function SignupClient() {
   const router = useRouter();
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [user_name, setName] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [user_name, setName] = useState("");
+  const [password, setPassword] = useState("");
 
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
   const strongPasswordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
-  const isPasswordValid = password === '' || strongPasswordRegex.test(password)
+  const isPasswordValid = password === "" || strongPasswordRegex.test(password);
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  const phoneRegex = /^\+[1-9]\d{1,14}$/
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^\+[1-9]\d{1,14}$/;
 
-  const isEmailValid = email === '' || emailRegex.test(email)
-  const isPhoneValid = phone === '' || phoneRegex.test(phone)
+  const isEmailValid = email === "" || emailRegex.test(email);
+  const isPhoneValid = phone === "" || phoneRegex.test(phone);
 
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   const refreshedOnce = useRef(false);
 
@@ -37,17 +37,16 @@ export default function SignupClient() {
     }
   }, [router]);
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
 
     try {
-      const res = await fetch('/api/signup/init', {
-        method: 'POST',
+      const res = await fetch("/api/signup/init", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: user_name,
@@ -59,10 +58,10 @@ export default function SignupClient() {
       const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(result.error || 'Something went wrong');
+        throw new Error(result.error || "Something went wrong");
       }
 
-      router.replace('/verify-phone');
+      router.replace("/verify-phone");
     } catch (err: any) {
       setMessage(err.message);
     } finally {
@@ -73,7 +72,6 @@ export default function SignupClient() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50 dark:bg-slate-950">
       <div className="w-full max-w-140 bg-white dark:bg-slate-900 p-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl">
-
         <div className="flex flex-col gap-2 mb-8 text-center">
           <h1 className="text-slate-900 dark:text-white text-3xl font-black tracking-tight">
             Create Account
@@ -89,11 +87,16 @@ export default function SignupClient() {
               Full Name
             </label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <User
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={18}
+              />
               <input
-                name='user_name'
+                name="user_name"
                 value={user_name}
-                onChange={(e) => setName(e.target.value.replace(/\s{2,}/g, ' '))}
+                onChange={(e) =>
+                  setName(e.target.value.replace(/\s{2,}/g, " "))
+                }
                 required
                 type="text"
                 placeholder="e.g., John Doe"
@@ -108,17 +111,23 @@ export default function SignupClient() {
               Email Address
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <Mail
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={18}
+              />
               <input
                 value={email}
-                name='email'
-                onChange={(e) => { setEmail(e.target.value.trim()) }}
+                name="email"
+                onChange={(e) => {
+                  setEmail(e.target.value.trim());
+                }}
                 type="email"
                 placeholder="name@example.com"
                 className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
-                  ${isEmailValid
-                    ? 'border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
-                    : 'border-red-500 focus:ring-1 focus:ring-red-500'
+                  ${
+                    isEmailValid
+                      ? "border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      : "border-red-500 focus:ring-1 focus:ring-red-500"
                   }`}
               />
             </div>
@@ -135,23 +144,30 @@ export default function SignupClient() {
               Phone Number (E.164)
             </label>
             <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <Phone
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={18}
+              />
               <input
-                name='phone'
+                name="phone"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/^\s+|\s+$/g, '').trim())}
+                onChange={(e) =>
+                  setPhone(e.target.value.replace(/^\s+|\s+$/g, "").trim())
+                }
                 type="tel"
                 placeholder="+919876543210"
                 className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
-                  ${isPhoneValid
-                    ? 'border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
-                    : 'border-red-500 focus:ring-1 focus:ring-red-500'
+                  ${
+                    isPhoneValid
+                      ? "border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      : "border-red-500 focus:ring-1 focus:ring-red-500"
                   }`}
               />
             </div>
             {!isPhoneValid && (
               <p className="text-xs text-red-500">
-                Phone number must be in E.164 format (e.g. +919876543210, +14155555551, +442071234567)
+                Phone number must be in E.164 format (e.g. +919876543210,
+                +14155555551, +442071234567)
               </p>
             )}
           </div>
@@ -163,20 +179,26 @@ export default function SignupClient() {
             </label>
 
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <Lock
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={18}
+              />
 
               <input
-                name='password'
+                name="password"
                 required
                 value={password}
-                onChange={(e) => setPassword(e.target.value.replace(/^\s+|\s+$/g, '').trim())}
-                type={showPassword ? 'text' : 'password'}
+                onChange={(e) =>
+                  setPassword(e.target.value.replace(/^\s+|\s+$/g, "").trim())
+                }
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 className={`w-full pl-10 pr-12 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
-        ${isPasswordValid
-                    ? 'border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
-                    : 'border-red-500 focus:ring-1 focus:ring-red-500'
-                  }`}
+        ${
+          isPasswordValid
+            ? "border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            : "border-red-500 focus:ring-1 focus:ring-red-500"
+        }`}
               />
 
               <Button
@@ -204,14 +226,20 @@ export default function SignupClient() {
             )}
           </div>
 
-          {message && <p className='text-xl text-red-500'>{message}</p>}
+          {message && <p className="text-xl text-red-500">{message}</p>}
 
           {/* Submit */}
           <Button
-            disabled={!emailRegex.test(email) || !phoneRegex.test(phone) || user_name === " " || user_name === "" || loading}
+            disabled={
+              !emailRegex.test(email) ||
+              !phoneRegex.test(phone) ||
+              user_name === " " ||
+              user_name === "" ||
+              loading
+            }
             className="mt-4 w-full bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 text-white font-bold py-3.5 rounded-lg transition"
           >
-            {loading ? 'Signing UP...' : 'SignUp'}
+            {loading ? "Signing UP..." : "SignUp"}
           </Button>
 
           <div className="flex items-center justify-center gap-2 text-sm mt-2">
@@ -228,5 +256,5 @@ export default function SignupClient() {
         </form>
       </div>
     </div>
-  )
+  );
 }

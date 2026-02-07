@@ -18,7 +18,6 @@ export async function Navigation() {
   return (
     <nav className="sticky top-0 z-50 w-full rounded-b-sm backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
-
         {/* Logo */}
         <Link
           href="/"
@@ -44,14 +43,10 @@ export async function Navigation() {
           {!isLoggedIn && (
             <>
               <Link href="/login">
-                <Button className="rounded-full px-2">
-                  Login
-                </Button>
+                <Button className="rounded-full px-2">Login</Button>
               </Link>
               <Link href="/signup">
-                <Button className="rounded-full px-2">
-                  Sign Up
-                </Button>
+                <Button className="rounded-full px-2">Sign Up</Button>
               </Link>
             </>
           )}
@@ -70,7 +65,6 @@ export async function Navigation() {
               </span>
             </div>
           )}
-
         </div>
       </div>
     </nav>

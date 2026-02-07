@@ -8,20 +8,15 @@ const revision =
     encoding: "utf-8",
   }).stdout || crypto.randomUUID();
 
-export const {
-  dynamic,
-  dynamicParams,
-  revalidate,
-  generateStaticParams,
-  GET,
-} = createSerwistRoute({
-  swSrc: "src/app/sw.ts",
-  nextConfig,
-  additionalPrecacheEntries: [
-    {
-      url: "/~offline",
-      revision,
-    },
-  ],
-  useNativeEsbuild: true,
-});
+export const { dynamic, dynamicParams, revalidate, generateStaticParams, GET } =
+  createSerwistRoute({
+    swSrc: "src/app/sw.ts",
+    nextConfig,
+    additionalPrecacheEntries: [
+      {
+        url: "/~offline",
+        revision,
+      },
+    ],
+    useNativeEsbuild: true,
+  });

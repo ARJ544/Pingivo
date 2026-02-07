@@ -13,7 +13,5 @@ export default async function Update() {
     redirect("/login");
   }
 
-  return (
-    <UpdateClient />
-  );
+  return <UpdateClient />;
 }

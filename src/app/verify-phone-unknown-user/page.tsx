@@ -7,6 +7,6 @@ export const metadata = {
 
 export default async function VerifyPhoneUnknownUserPage() {
   const tempPhone = await getTempPhone();
-  
+
   return <VerifyPhoneUnknownUser temp_phone={tempPhone} />;
 }

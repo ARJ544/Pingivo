@@ -20,11 +20,10 @@ type Props = {
   vehi2_num?: string;
 };
 
-export default function GenerateQRClient({
-  vehi1_num,
-  vehi2_num,
-}: Props) {
-  const [selectedVehicle, setSelectedVehicle] = useState(vehi2_num ?? vehi1_num);
+export default function GenerateQRClient({ vehi1_num, vehi2_num }: Props) {
+  const [selectedVehicle, setSelectedVehicle] = useState(
+    vehi2_num ?? vehi1_num,
+  );
   const [downloading, setDownloading] = useState(false);
 
   const svgRef = useRef<SVGSVGElement>(null);
@@ -56,22 +55,18 @@ export default function GenerateQRClient({
     setDownloading(false);
   };
 
-
   const qrValue = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/search?crnm=${selectedVehicle}`;
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-sm flex flex-col items-center gap-3">
-
         <p className="text-xs text-gray-500 dark:text-gray-400">
           ⚡ QR code is generated automatically after selection
         </p>
 
         <p className="text-xs text-gray-600 dark:text-gray-400">
-          <span className="font-medium text-amber-500">
-            Visit the shop
-          </span>
-          , download the PDF sticker, and place it on your vehicle.
+          <span className="font-medium text-amber-500">Visit the shop</span>,
+          download the PDF sticker, and place it on your vehicle.
         </p>
 
         {/* SELECT */}
@@ -109,12 +104,7 @@ export default function GenerateQRClient({
         </Button>
 
         {/* SVG TEMPLATE */}
-        <svg
-          ref={svgRef}
-          width="300"
-          height="400"
-          viewBox="0 0 600 900"
-        >
+        <svg ref={svgRef} width="300" height="400" viewBox="0 0 600 900">
           {/* Background */}
           <image href="/template.jpg" width="600" height="900" />
 

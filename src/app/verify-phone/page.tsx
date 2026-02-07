@@ -7,7 +7,7 @@ export const metadata = {
 
 export default async function VerifyPhonePage() {
   const cookie = await cookies();
-  const signupTemp = cookie.get('signup_temp');
+  const signupTemp = cookie.get("signup_temp");
 
   return <VerifyPhone signup_temp={signupTemp?.name} />;
 }

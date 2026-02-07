@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
+  process.env.SUPABASE_ANON_KEY!,
 );
 
 export async function GET(request: Request) {
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     if (!carNumber) {
       return NextResponse.json(
         { error: "Car number is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -26,48 +26,48 @@ export async function GET(request: Request) {
       .maybeSingle();
 
     if (error) {
-      return NextResponse.json(
-        { error: "Database error" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Database error" }, { status: 500 });
     }
 
     if (!data) {
-      return NextResponse.json(
-        { error: "Vehicle not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Vehicle not found" }, { status: 404 });
     }
 
-    const cookie = await cookies()
-    cookie.set('owner_phone_num', data.phone_num, {
+    const cookie = await cookies();
+    cookie.set("owner_phone_num", data.phone_num, {
       httpOnly: true,
       secure: true,
       sameSite: "lax",
       path: "/",
       maxAge: 10 * 60,
-    })
-    cookie.set('owner_email', data.email, {
+    });
+    cookie.set("owner_email", data.email, {
       httpOnly: true,
       secure: true,
       sameSite: "lax",
       path: "/",
       maxAge: 10 * 60,
-    })
-    cookie.set('owner_name', data.name, {
+    });
+    cookie.set("owner_name", data.name, {
       httpOnly: true,
       secure: true,
       sameSite: "lax",
       path: "/",
       maxAge: 10 * 60,
-    })
-    const clientData = { name: data.name, vehi1: data.vehi1, vehi1_name: data.vehi1_name, vehi2: data.vehi2, vehi2_name: data.vehi2_name };
+    });
+    const clientData = {
+      name: data.name,
+      vehi1: data.vehi1,
+      vehi1_name: data.vehi1_name,
+      vehi2: data.vehi2,
+      vehi2_name: data.vehi2_name,
+    };
 
     return NextResponse.json(clientData);
   } catch {
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

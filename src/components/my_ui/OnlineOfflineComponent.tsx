@@ -44,9 +44,10 @@ export default function OnlineOfflineComponent() {
           shadow-2xl shadow-black/20
           backdrop-blur-xl bg-white/10 border border-white/20
           transition-all duration-300 ease-in-out
-          ${isOnline
-            ? "bg-linear-to-r from-emerald-600/80 to-teal-600/80 text-white border-emerald-400/30"
-            : "bg-linear-to-r from-rose-600/80 to-red-600/80 text-white border-rose-400/30"
+          ${
+            isOnline
+              ? "bg-linear-to-r from-emerald-600/80 to-teal-600/80 text-white border-emerald-400/30"
+              : "bg-linear-to-r from-rose-600/80 to-red-600/80 text-white border-rose-400/30"
           }
         `}
       >

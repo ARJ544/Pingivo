@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useState } from "react";
 import { User, Lock, Mail, Phone, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,12 +7,28 @@ import { MessageOwnerModal } from "@/components/my_ui/message-owner";
 import Popup from "@/components/my_ui/CustomPopUp";
 
 type Payload = {
-  subject: string,
-  issueMessage: string,
-  vehi_num: string
-}
+  subject: string;
+  issueMessage: string;
+  vehi_num: string;
+};
 
-export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, isVerified, isLoggedin, temp_phone_number }: { name: string, carName: string, car_num: string, user_ph_num: string, isVerified: boolean, isLoggedin: boolean, temp_phone_number: string | undefined }) {
+export default function ShowOwnerDetail({
+  name,
+  carName,
+  car_num,
+  user_ph_num,
+  isVerified,
+  isLoggedin,
+  temp_phone_number,
+}: {
+  name: string;
+  carName: string;
+  car_num: string;
+  user_ph_num: string;
+  isVerified: boolean;
+  isLoggedin: boolean;
+  temp_phone_number: string | undefined;
+}) {
   const [showWarning, setShowWarning] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
@@ -23,17 +39,17 @@ export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, i
   const handleSendMail = async (payload: Payload) => {
     setLoading(false);
     try {
-      const res = await fetch('/api/message-owner', {
-        method: 'POST',
+      const res = await fetch("/api/message-owner", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
       const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(result.error || 'Something went wrong');
+        throw new Error(result.error || "Something went wrong");
       }
       setErrorOrSuccessMessage(result.message);
     } catch (err: any) {
@@ -41,7 +57,7 @@ export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, i
     } finally {
       setLoading(false);
     }
-  }
+  };
   return (
     <>
       {showWarning && (
@@ -65,8 +81,6 @@ export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, i
         }}
       />
       <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur shadow-sm hover:shadow-md transition-shadow duration-300">
-
-
         {/* Header */}
         <div className="p-6 flex flex-wrap items-center justify-between gap-6 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-5">
@@ -75,9 +89,7 @@ export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, i
             </div>
 
             <div>
-              <h3 className="text-xl font-bold tracking-tight">
-                {name}
-              </h3>
+              <h3 className="text-xl font-bold tracking-tight">{name}</h3>
 
               <p className="text-sm text-slate-500 mt-0.5">
                 Owner of{" "}
@@ -181,8 +193,9 @@ export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, i
               </h4>
 
               <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                As you are not Logged In. For security and privacy reasons, ownership verification is required
-                before contacting the vehicle owner.
+                As you are not Logged In. For security and privacy reasons,
+                ownership verification is required before contacting the vehicle
+                owner.
               </p>
 
               <Button
@@ -197,5 +210,4 @@ export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, i
       </div>
     </>
   );
-
 }
