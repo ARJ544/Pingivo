@@ -19,7 +19,7 @@ export default function Home() {
         <section className="py-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="flex flex-col gap-8">
-              <div className="dark:bg-blue-800 inline-flex items-center gap-2 px-3 bg-blue-100 py-1 rounded-full text-xs font-bold uppercase tracking-wider w-fit">
+              <div className="dark:bg-blue-800 inline-flex items-center gap-2 px-3 bg-blue-200 py-1 rounded-full text-xs font-bold uppercase tracking-wider w-fit">
                 <BadgeCheck className="h-4 w-4 text-primary" />
                 Privacy-First Vehicle Protection
               </div>
