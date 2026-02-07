@@ -95,9 +95,8 @@ export default function RootLayout({
                   <div className="flex flex-col gap-6">
                     <h4 className="font-bold text-sm uppercase tracking-widest text-slate-400">Legal</h4>
                     <nav className="flex flex-col gap-3">
-                      <Link className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="#">Privacy Policy</Link>
-                      <Link className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="#">Terms of Service</Link>
-                      <Link className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="#">Cookie Settings</Link>
+                      <Link className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="/privacy-policy">Privacy Policy</Link>
+                      <Link className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="/terms-and-conditions">Terms of Service</Link>
                     </nav>
                   </div>
                 </div>
