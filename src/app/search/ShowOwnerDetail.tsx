@@ -5,10 +5,16 @@ import { Button } from "@/components/ui/button";
 import { ShowWarning } from "@/app/search/SearchCarClient";
 import { MessageOwnerModal } from "@/components/my_ui/message-owner";
 
+interface PayloadType {
+  subject: string,
+  issueMessage: string,
+  vehi_num: string
+}
 
 export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, isVerified, isLoggedin, temp_phone_number }: { name: string, carName: string, car_num: string, user_ph_num: string, isVerified: boolean, isLoggedin: boolean, temp_phone_number: string | undefined }) {
   const [showWarning, setShowWarning] = useState(false);
   const [messageOwnerOpen, setMessageOwnerOpen] = useState(false);
+  const [payload, setPayload] = useState<PayloadType | null>(null);
 
   return (
     <>
@@ -24,7 +30,14 @@ export default function ShowOwnerDetail({ name, carName, car_num, user_ph_num, i
         onOpenChange={setMessageOwnerOpen}
         vehicleId={car_num}
         onSubmit={(issue, msg) => {
-          console.log("Real submit:", { issue, msg });
+          const newPayload = {
+            subject: issue,
+            issueMessage: msg,
+            vehi_num: car_num,
+          };
+
+          setPayload(newPayload);
+          console.log("Real submit:", newPayload);
         }}
       />
       <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur shadow-sm hover:shadow-md transition-shadow duration-300">
