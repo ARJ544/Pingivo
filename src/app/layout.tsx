@@ -9,7 +9,7 @@ import {
   Mail,
   MapPin
 } from "lucide-react";
-
+import OnlineOfflineComponent from "@/components/my_ui/OnlineOfflineComponent";
 import Link from "next/link";
 
 
@@ -53,6 +53,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Navigation />
+            <OnlineOfflineComponent />
             {children}
             <footer className="bg-white dark:bg-black border-t border-white dark:border-slate-800 py-12">
               <div className="max-w-300 mx-auto px-6">
