@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { User, Lock, Mail, Phone, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ShowWarning } from "@/app/search/SearchCarClient";
+import { ShowWarning } from "@/app/search/searchCarClient";
 import { MessageOwnerModal } from "@/components/my_ui/message-owner";
 import Popup from "@/components/my_ui/CustomPopUp";
 
