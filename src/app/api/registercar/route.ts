@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
-import { NextResponse } from "next/server";
-import { getAllCookie, deleteAllCookie } from "@/app/actions";
 import bcrypt from "bcrypt";
+import { NextResponse } from "next/server";
+import { deleteAllCookie, getAllCookie } from "@/app/actions";
 
 export const runtime = "nodejs";
 
@@ -133,7 +133,7 @@ export async function POST(request: Request) {
       },
       { status: 200 },
     );
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

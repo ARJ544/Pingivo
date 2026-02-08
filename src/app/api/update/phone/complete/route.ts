@@ -1,6 +1,6 @@
+import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { setAllCookie } from "@/app/actions";
 
 const supabase = createClient(

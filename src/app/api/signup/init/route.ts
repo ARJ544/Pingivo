@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import bcrypt from "bcrypt";
 import { cookies } from "next/headers";
-import { createClient } from "@supabase/supabase-js";
+import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 

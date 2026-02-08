@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
-import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
+import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       },
       { status: 200 },
     );
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

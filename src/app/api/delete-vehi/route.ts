@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { getAllCookie, deleteAllCookie } from "@/app/actions";
+import { deleteAllCookie, getAllCookie } from "@/app/actions";
 
 export const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Login first" }, { status: 401 });
     }
 
-    let { selectedVehicle } = await request.json();
+    const { selectedVehicle } = await request.json();
 
     if (!selectedVehicle) {
       return NextResponse.json(
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: updateError.message }, { status: 400 });
     }
 
-    const { data: latestDetails, error: Error } = await supabase
+    const { data: latestDetails, error } = await supabase
       .from("users")
       .select(
         "id, name, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, verified",
@@ -71,8 +71,8 @@ export async function POST(request: Request) {
       .eq("id", id)
       .maybeSingle();
 
-    if (Error) {
-      return NextResponse.json({ error: Error.message }, { status: 500 });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
     if (!latestDetails) {
       return NextResponse.json(
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
       },
       { status: 200 },
     );
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },
