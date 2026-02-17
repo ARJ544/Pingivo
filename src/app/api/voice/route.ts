@@ -23,18 +23,18 @@ export async function POST() {
 
     const roomName = `conf_${mixed_num}_${Date.now()}`;
 
-    const webhookUrl = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/webhook?room=${roomName}`;
-
     await client.calls.create({
       to: caller,
       from: process.env.TWILIO_NUMBER!,
-      url: webhookUrl,
+      url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/webhook?room=${roomName}&role=A`,
+      timeout: 20,
     });
 
     await client.calls.create({
       to: callee,
       from: process.env.TWILIO_NUMBER!,
-      url: webhookUrl,
+      url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/webhook?room=${roomName}&role=B`,
+      timeout: 20,
     });
 
     return NextResponse.json({ success: true, message: "Call started" });
