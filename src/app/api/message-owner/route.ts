@@ -1,6 +1,16 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+function escapeHtml(str: string) {
+  return str.replace(/[&<>"']/g, (m) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  }[m]!));
+}
+
 export async function POST(req: Request) {
   const cookie = await cookies();
   const owner_email = cookie.get("owner_email")?.value;
@@ -22,19 +32,20 @@ export async function POST(req: Request) {
     );
   if (!vehi_num)
     return NextResponse.json({ error: "Refresh Page" }, { status: 400 });
-  if (!issueMessage) issueMessage = "!! No Message Provided !!";
+  
+  const safeMessage = escapeHtml(issueMessage || "!! No Message Provided !!");
 
   const emailData = {
     sender: {
-      name: `By ${sender_name} | ParkPing`,
+      name: `By ${sender_name} | ParkPing Safety Alerts`,
       email: process.env.DEVELOPER_EMAIL!,
     },
     to: [{ email: owner_email, name: receiver_name }],
-    subject,
+    subject: `[ParkPing Safety Alerts]: ${subject}`,
     templateId: 3,
     params: {
       VEHICLE_NUMBER: vehi_num,
-      EMERGENCY_MESSAGE: issueMessage,
+      EMERGENCY_MESSAGE: safeMessage,
     },
   };
 
