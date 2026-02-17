@@ -37,7 +37,7 @@ export default function ShowOwnerDetail({
   const [errorOrSuccessMessage, setErrorOrSuccessMessage] = useState("");
 
   const handleSendMail = async (payload: Payload) => {
-    setLoading(false);
+    setLoading(true);
     try {
       const res = await fetch("/api/message-owner", {
         method: "POST",
@@ -58,6 +58,29 @@ export default function ShowOwnerDetail({
       setLoading(false);
     }
   };
+  const handleCall = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/voice", {
+        method: "POST",
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || "Something went wrong");
+      }
+
+      setErrorOrSuccessMessage(
+        "Call initiated successfully! You should receive a call shortly. Please verify the last four digits (8181)."
+      );
+    } catch (err: any) {
+      setErrorOrSuccessMessage(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       {showWarning && (
@@ -157,10 +180,7 @@ export default function ShowOwnerDetail({
               <Button
                 className="h-12 px-6 font-bold flex items-center gap-2 bg-primary text-white dark:text-slate-800 hover:bg-primary/90 shadow-sm shadow-primary/30 transition"
                 disabled={loading}
-                onClick={() => {
-                  setPopupMessage("Feature not Initialized Yet!!");
-                  setShowPopup(true);
-                }}
+                onClick={() => { handleCall() }}
               >
                 <Phone size={18} />
                 Call
