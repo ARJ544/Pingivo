@@ -74,7 +74,7 @@ export default function ShowOwnerDetail({
       }
 
       setErrorOrSuccessMessage(
-        "Call initiated successfully! You should receive a call shortly. Please verify the last four digits (8181).",
+        "Call started for 60s. Incoming shortly - verify the last 4 digits (8181). Speak politely and confirm the owner's name."
       );
     } catch (err: any) {
       setErrorOrSuccessMessage(err.message);
