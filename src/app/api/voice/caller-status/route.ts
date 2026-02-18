@@ -3,7 +3,7 @@ import Twilio from "twilio";
 
 const client = Twilio(
   process.env.TWILIO_ACCOUNT_SID!,
-  process.env.TWILIO_AUTH_TOKEN!
+  process.env.TWILIO_AUTH_TOKEN!,
 );
 
 export async function POST(req: NextRequest) {
@@ -11,17 +11,25 @@ export async function POST(req: NextRequest) {
   const callStatus = formData.get("CallStatus");
   const { searchParams } = new URL(req.url);
   const room = searchParams.get("room");
-  const callee = searchParams.get("callee")
+  const callee = searchParams.get("callee");
 
-  if (!room ) {
+  if (!room) {
     return NextResponse.json({ error: "No room found for conference" });
   }
   if (!callee) {
-    return NextResponse.json({ error: "Missing callee number" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing callee number" },
+      { status: 400 },
+    );
   }
 
-  if (["completed", "no-answer", "busy", "failed"].includes(callStatus as string)) {
-    const conferences = await client.conferences.list({ friendlyName: room, status: "in-progress" });
+  if (
+    ["completed", "no-answer", "busy", "failed"].includes(callStatus as string)
+  ) {
+    const conferences = await client.conferences.list({
+      friendlyName: room,
+      status: "in-progress",
+    });
     for (const conf of conferences) {
       await client.conferences(conf.sid).update({ status: "completed" });
     }
@@ -38,7 +46,6 @@ export async function POST(req: NextRequest) {
       statusCallbackEvent: ["completed", "no-answer", "failed", "busy"],
     });
   }
-
 
   return NextResponse.json({ received: true });
 }

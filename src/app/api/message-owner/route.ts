@@ -2,13 +2,17 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 function escapeHtml(str: string) {
-  return str.replace(/[&<>"']/g, (m) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;",
-  }[m]!));
+  return str.replace(
+    /[&<>"']/g,
+    (m) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;",
+      })[m]!,
+  );
 }
 
 export async function POST(req: Request) {
@@ -32,7 +36,7 @@ export async function POST(req: Request) {
     );
   if (!vehi_num)
     return NextResponse.json({ error: "Refresh Page" }, { status: 400 });
-  
+
   const safeMessage = escapeHtml(issueMessage || "!! No Message Provided !!");
 
   const emailData = {

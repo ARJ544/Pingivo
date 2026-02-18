@@ -113,7 +113,7 @@ export default function SearchCar({
   temp_phone_number,
 }: {
   user_phone_number: any;
-  owner_phone_number: string;
+  owner_phone_number: string | undefined;
   is_verified: boolean;
   is_loggedin: boolean;
   temp_phone_number: string | undefined;

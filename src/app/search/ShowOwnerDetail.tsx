@@ -74,7 +74,7 @@ export default function ShowOwnerDetail({
       }
 
       setErrorOrSuccessMessage(
-        "Call initiated successfully! You should receive a call shortly. Please verify the last four digits (8181)."
+        "Call initiated successfully! You should receive a call shortly. Please verify the last four digits (8181).",
       );
     } catch (err: any) {
       setErrorOrSuccessMessage(err.message);
@@ -183,7 +183,9 @@ export default function ShowOwnerDetail({
                 <Button
                   className="h-12 px-6 font-bold flex items-center gap-2 bg-primary text-white dark:text-slate-800 hover:bg-primary/90 shadow-sm shadow-primary/30 transition"
                   disabled={loading}
-                  onClick={() => { handleCall() }}
+                  onClick={() => {
+                    handleCall();
+                  }}
                 >
                   <Phone size={18} />
                   Call
@@ -198,7 +200,9 @@ export default function ShowOwnerDetail({
             )}
             {user_ph_num === owner_ph_num && (
               <p
-                className={"text-lg font-medium transition-colors duration-300 "}
+                className={
+                  "text-lg font-medium transition-colors duration-300 "
+                }
               >
                 This is your Registered Car
               </p>

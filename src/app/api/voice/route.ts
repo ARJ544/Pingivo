@@ -4,25 +4,26 @@ import Twilio from "twilio";
 
 const client = Twilio(
   process.env.TWILIO_ACCOUNT_SID!,
-  process.env.TWILIO_AUTH_TOKEN!
+  process.env.TWILIO_AUTH_TOKEN!,
 );
 
 export async function POST() {
   const cookieStore = await cookies();
-  const caller = cookieStore.get("temp_phone")?.value ?? cookieStore.get("phone_num")?.value;
+  const caller =
+    cookieStore.get("temp_phone")?.value ?? cookieStore.get("phone_num")?.value;
   const callee = cookieStore.get("owner_phone_num")?.value;
 
   if (!caller || !callee) {
     return NextResponse.json(
       { error: "Caller and Callee are required. Refresh or Re-Login" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   if (caller === callee) {
     return NextResponse.json(
       { error: "Caller and Callee cannot be the same number" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -40,13 +41,12 @@ export async function POST() {
       statusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
       statusCallbackMethod: "POST",
       timeout: 20,
-
     });
   } catch (err: any) {
     console.error("Error while calling caller:", err);
     return NextResponse.json(
       { error: "Failed to call You", details: err.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 

@@ -3,7 +3,7 @@ import Twilio from "twilio";
 
 const client = Twilio(
   process.env.TWILIO_ACCOUNT_SID!,
-  process.env.TWILIO_AUTH_TOKEN!
+  process.env.TWILIO_AUTH_TOKEN!,
 );
 
 export async function POST(req: NextRequest) {
@@ -19,7 +19,10 @@ export async function POST(req: NextRequest) {
   console.log("callee callback:", status);
 
   if (status === "no-answer" || status === "failed" || status === "busy") {
-    const conferences = await client.conferences.list({ friendlyName: room, status: "in-progress" });
+    const conferences = await client.conferences.list({
+      friendlyName: room,
+      status: "in-progress",
+    });
 
     for (const conf of conferences) {
       await client.conferences(conf.sid).update({ status: "completed" });
