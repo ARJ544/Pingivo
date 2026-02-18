@@ -107,11 +107,13 @@ export function ShowWarning({
 
 export default function SearchCar({
   user_phone_number,
+  owner_phone_number,
   is_verified,
   is_loggedin,
   temp_phone_number,
 }: {
   user_phone_number: any;
+  owner_phone_number: string;
   is_verified: boolean;
   is_loggedin: boolean;
   temp_phone_number: string | undefined;
@@ -152,6 +154,7 @@ export default function SearchCar({
             carName: data?.vehi1_name,
             car_num: queryCarNumber,
             user_ph_num: user_phone_number,
+            owner_ph_num: owner_phone_number,
             isVerified: is_verified,
             isLoggedin: is_loggedin,
             temp_phone_number: temp_phone_number,
@@ -162,6 +165,7 @@ export default function SearchCar({
             carName: data?.vehi2_name,
             car_num: queryCarNumber,
             user_ph_num: user_phone_number,
+            owner_ph_num: owner_phone_number,
             isVerified: is_verified,
             isLoggedin: is_loggedin,
             temp_phone_number: temp_phone_number,
