@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 
   console.log("callee callback:", status);
 
-  if (status === "no-answer" || status === "failed" || status === "busy") {
+  if (status === "no-answer" || status === "failed" || status === "busy" || status === "canceled") {
     const conferences = await client.conferences.list({
       friendlyName: room,
       status: "in-progress",
