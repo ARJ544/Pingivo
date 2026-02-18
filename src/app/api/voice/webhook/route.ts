@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
   const isCallerA = role === "A";
 
-  response.dial({ timeLimit: 55 }).conference(
+  response.dial({ timeLimit: 57 }).conference(
     {
       startConferenceOnEnter: isCallerA ? false : true,
       waitUrl: "https://twimlets.com/holdmusic?Bucket=com.twilio.music.guitars",
