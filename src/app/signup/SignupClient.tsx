@@ -235,7 +235,8 @@ export default function SignupClient() {
               !phoneRegex.test(phone) ||
               user_name === " " ||
               user_name === "" ||
-              loading
+              loading ||
+              !isPasswordValid
             }
             className="mt-4 w-full bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 text-white font-bold py-3.5 rounded-lg transition"
           >
