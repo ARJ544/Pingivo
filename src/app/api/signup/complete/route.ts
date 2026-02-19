@@ -30,15 +30,18 @@ export async function POST() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { name, email, phone, password, unHashedPassword } = JSON.parse(signupCookie.value);
+  const { name, email, phone, password } = JSON.parse(signupCookie.value);
 
-  const { error: insertError } = await supabase.from("users").insert({
+  const { data: insertData, error: insertError } = await supabase.from("users").insert({
     name,
     email,
     phone_num: phone,
     password,
     verified: true,
-  });
+    secret_code: "",
+  }).select(
+    "id, created_at",
+  );
 
   if (insertError) {
     if (insertError.code === "23505") {
@@ -50,8 +53,20 @@ export async function POST() {
     return NextResponse.json({ error: insertError.message }, { status: 400 });
   }
 
-  const safeReceiver = escapeHtml(email);
+  const secretcode = `${(insertData[0].id as string).slice(-12)}${(insertData[0].created_at as string).slice(-13)}`;
+  const { error: updateSecretError } = await supabase
+    .from("users")
+    .update({ secret_code: secretcode })
+    .eq("id", insertData[0].id);
 
+  if (updateSecretError) {
+    return NextResponse.json(
+      { error: updateSecretError.message },
+      { status: 500 },
+    );
+  }
+
+  const safeReceiver = escapeHtml(email);
   const emailData = {
     sender: {
       name: `ParkPing Safety Alerts`,
@@ -64,8 +79,8 @@ export async function POST() {
       WHAT_DID: "Registred",
       NAME: escapeHtml(name),
       EMAIL: safeReceiver || "Your Email",
-      PASSWORD: unHashedPassword || "Failed to fetch",
-      WEBSITE_LINK: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/login`,
+      SECRET_CODE: secretcode,
+      WEBSITE_LINK: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/reset-password`,
     },
   };
 
