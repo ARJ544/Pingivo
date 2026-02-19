@@ -169,6 +169,17 @@ export default function LoginClient({ showActionPopup }: { showActionPopup: stri
           </div>
 
           {message && <p className="text-xl text-red-500">{message}</p>}
+          <div className="flex items-center justify-self-end gap-1 text-sm">
+            <span className="text-slate-500 dark:text-slate-400">
+              Forgot your password?
+            </span>
+            <Link
+              href="/reset-password"
+              className="text-blue-500 font-semibold hover:underline"
+            >
+              Reset
+            </Link>
+          </div>
 
           <Button
             type="submit"
