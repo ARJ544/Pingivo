@@ -32,7 +32,7 @@ export async function POST(req: Request) {
 
   cookie.set(
     "signup_temp",
-    JSON.stringify({ name, email, phone, password: hashedPassword }),
+    JSON.stringify({ name, email, phone, password: hashedPassword, unHashedPassword: password }),
     {
       httpOnly: true,
       secure: true,
