@@ -6,8 +6,6 @@ type UserCookie = {
   loggedin: boolean;
   id?: string;
   name?: string;
-  // email?: string,
-  // password?: string,
   phone_num?: string;
   total_vehi?: string;
   vehi1?: string;
@@ -31,6 +29,10 @@ export async function getTempPhone() {
   const cookieStore = await cookies();
   const temp_phone = cookieStore.get("temp_phone");
   return temp_phone?.value;
+}
+export async function deleteShowActionPopupCookie() {
+  const cookieStore = await cookies();
+  cookieStore.delete("show_action_popup");
 }
 
 export async function setAllCookie(user: Partial<UserCookie>) {

@@ -38,6 +38,13 @@ export async function POST() {
 
   cookie.delete("signup_temp");
   cookie.delete("phone_verified");
+  cookie.set("show_action_popup", "true", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 10 * 60,
+  });
   return NextResponse.json(
     { success: true, message: "User registered successfully" },
     { status: 201 },

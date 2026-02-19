@@ -5,9 +5,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { setAllCookie } from "@/app/actions";
+import { setAllCookie, deleteShowActionPopupCookie } from "@/app/actions";
 
-export default function LoginClient() {
+export default function LoginClient({ showActionPopup }: { showActionPopup: string | undefined }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,8 +50,40 @@ export default function LoginClient() {
     }
   };
 
+  const refreshPage = () => {
+    router.refresh();
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50 dark:bg-slate-950">
+    <div className="relative min-h-screen flex items-center justify-center px-4 bg-slate-50 dark:bg-slate-950">
+
+      {showActionPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-2xl">
+            <h2 className="text-xl font-black text-slate-900 dark:text-white mb-3">
+              Action Required
+            </h2>
+
+            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-5">
+              You are successfully registered.
+              We have sent a Success Email to your inbox.
+              <br /><br />
+              If you don't see it in your inbox, please check your <strong>Spam</strong> folder and mark the email as <strong>"Not Spam"</strong> to ensure future notifications reach your inbox.
+            </p>
+
+            <Button
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg"
+              onClick={() => {
+                deleteShowActionPopupCookie();
+                refreshPage();
+              }}
+            >
+              Okay
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-125 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl p-8">
         {/* Header */}
         <div className="flex flex-col gap-2 mb-8 text-center">
@@ -82,10 +114,9 @@ export default function LoginClient() {
                 type="email"
                 placeholder="name@example.com"
                 className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
-                  ${
-                    isEmailValid
-                      ? "border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                      : "border-red-500 focus:ring-1 focus:ring-red-500"
+                  ${isEmailValid
+                    ? "border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    : "border-red-500 focus:ring-1 focus:ring-red-500"
                   }`}
               />
             </div>
@@ -115,10 +146,9 @@ export default function LoginClient() {
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 className={`w-full pl-10 pr-12 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
-                  ${
-                    isPasswordValid
-                      ? "border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                      : "border-red-500 focus:ring-1 focus:ring-red-500"
+                  ${isPasswordValid
+                    ? "border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    : "border-red-500 focus:ring-1 focus:ring-red-500"
                   }`}
               />
               <Button
@@ -140,7 +170,6 @@ export default function LoginClient() {
 
           {message && <p className="text-xl text-red-500">{message}</p>}
 
-          {/* Login Button */}
           <Button
             type="submit"
             disabled={!emailRegex.test(email) || password.length < 8}
@@ -149,7 +178,6 @@ export default function LoginClient() {
             {loading ? "Logging IN..." : "Login"}
           </Button>
 
-          {/* Signup */}
           <div className="flex items-center justify-center gap-2 text-sm mt-2">
             <span className="text-slate-500 dark:text-slate-400">
               Don&apos;t have an account?
