@@ -27,7 +27,14 @@ export async function POST(req: NextRequest) {
   const response = new twiml.VoiceResponse();
 
   if (!room || !role || !["A", "B"].includes(role)) {
-    response.say("Invalid call details. The call will now end. Thank you.");
+    response.say(
+      {
+        voice: "Google.en-US-Chirp3-HD-Aoede",
+        language: "en-US",
+      },
+      "Invalid call details. The call will now end. Thank you."
+    );
+
     response.hangup();
     return new Response(response.toString(), {
       status: 200,

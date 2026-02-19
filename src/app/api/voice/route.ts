@@ -1,3 +1,4 @@
+import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import Twilio from "twilio";
@@ -5,6 +6,11 @@ import Twilio from "twilio";
 const client = Twilio(
   process.env.TWILIO_ACCOUNT_SID!,
   process.env.TWILIO_AUTH_TOKEN!,
+);
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_ANON_KEY!,
 );
 
 export async function POST() {
@@ -27,17 +33,35 @@ export async function POST() {
     );
   }
 
+  const { data, error } = await supabase
+    .from("calling_credits")
+    .select("credits_used")
+    .eq("phone_num", caller)
+    .maybeSingle()
+
+  if (error) {
+    return NextResponse.json({ error: "Database error" }, { status: 500 });
+  }
+
+  let creditsUsed = data?.credits_used ?? 0;
+  if (creditsUsed >= 3) {
+    return NextResponse.json(
+      {
+        error: "You've used all your free credits (3/3) for today. Next reset at 12:30 PM UTC"
+      },
+      { status: 400 }
+    );
+  }
+
   const mixedNum = `${caller.slice(-8)}${callee.slice(-8)}`;
   const roomName = `conf_${mixedNum}_${Date.now()}`;
 
-  let callToCaller;
-
   try {
-    callToCaller = await client.calls.create({
+    await client.calls.create({
       to: caller,
       from: process.env.TWILIO_NUMBER!,
       url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/webhook?room=${roomName}&role=A`,
-      statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/caller-status?room=${roomName}&callee=${callee}`,
+      statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/caller-status?room=${roomName}&callee=${callee}&caller=${caller}`,
       statusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
       statusCallbackMethod: "POST",
       timeout: 20,

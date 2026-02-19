@@ -12,13 +12,14 @@ export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const room = searchParams.get("room");
   const callee = searchParams.get("callee");
+  const caller = searchParams.get("caller");
 
   if (!room) {
     return NextResponse.json({ error: "No room found for conference" });
   }
-  if (!callee) {
+  if (!callee || !caller) {
     return NextResponse.json(
-      { error: "Missing callee number" },
+      { error: "Missing callee or caller number" },
       { status: 400 },
     );
   }
@@ -41,7 +42,9 @@ export async function POST(req: NextRequest) {
       from: process.env.TWILIO_NUMBER!,
       url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/webhook?room=${room}&role=B`,
       timeout: 20,
-      statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/callee-status?room=${room}`,
+      fallbackUrl: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/busy-message`,
+      fallbackMethod: "POST",
+      statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/callee-status?room=${room}&caller=${caller}`,
       statusCallbackMethod: "POST",
       statusCallbackEvent: ["completed", "no-answer", "failed", "busy"],
     });
