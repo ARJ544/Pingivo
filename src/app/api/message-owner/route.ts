@@ -38,17 +38,21 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Refresh Page" }, { status: 400 });
 
   const safeMessage = escapeHtml(issueMessage || "!! No Message Provided !!");
+  const safeSubject = escapeHtml(subject);
+  const safeVehicle = escapeHtml(vehi_num);
+  const safeSender = escapeHtml(sender_name);
+  const safeReceiver = escapeHtml(receiver_name);
 
   const emailData = {
     sender: {
-      name: `By ${sender_name} | ParkPing Safety Alerts`,
+      name: `By ${safeSender} | ParkPing Safety Alerts`,
       email: process.env.DEVELOPER_EMAIL!,
     },
-    to: [{ email: owner_email, name: receiver_name }],
-    subject: `[ParkPing Safety Alerts]: ${subject}`,
+    to: [{ email: owner_email, name: safeReceiver }],
+    subject: `[ParkPing Safety Alerts]: ${safeSubject}`,
     templateId: 3,
     params: {
-      VEHICLE_NUMBER: vehi_num,
+      VEHICLE_NUMBER: safeVehicle,
       EMERGENCY_MESSAGE: safeMessage,
     },
   };
