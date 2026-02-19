@@ -61,6 +61,8 @@ export async function POST() {
       to: caller,
       from: process.env.TWILIO_NUMBER!,
       url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/webhook?room=${roomName}&role=A`,
+      fallbackUrl: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/busy-message`,
+      fallbackMethod: "POST",
       statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/caller-status?room=${roomName}&callee=${callee}&caller=${caller}`,
       statusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
       statusCallbackMethod: "POST",
