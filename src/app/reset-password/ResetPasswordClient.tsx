@@ -20,7 +20,7 @@ export default function ResetPasswordClient() {
   const strongPasswordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
   const isPasswordValid = newPassword === "" || strongPasswordRegex.test(newPassword);
-  const isSecretCodeValid = secretCode.length === 0 || secretCode.length === 25;
+  const isSecretCodeValid = secretCode.length > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,11 +141,6 @@ export default function ResetPasswordClient() {
                   }`}
               />
             </div>
-            {!isSecretCodeValid && secretCode.length > 0 && (
-              <p className="text-xs text-red-500">
-                Secret code must be exactly 25 characters
-              </p>
-            )}
             <p className="text-xs text-slate-500 dark:text-slate-400">
               Your secret code was sent to your email address when you first registered.
             </p>

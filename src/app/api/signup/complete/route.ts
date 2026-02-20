@@ -40,7 +40,7 @@ export async function POST() {
     verified: true,
     secret_code: "",
   }).select(
-    "id, created_at",
+    "id",
   );
 
   if (insertError) {
@@ -53,7 +53,7 @@ export async function POST() {
     return NextResponse.json({ error: insertError.message }, { status: 400 });
   }
 
-  const secretcode = `${(insertData[0].id as string).slice(-12)}${(insertData[0].created_at as string).slice(-13)}`;
+  const secretcode = `${(insertData[0].id as string).slice(-12)}_${crypto.randomUUID()}`;
   const { error: updateSecretError } = await supabase
     .from("users")
     .update({ secret_code: secretcode })

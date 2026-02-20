@@ -71,6 +71,11 @@ export default function LoginClient({ showActionPopup }: { showActionPopup: stri
               If you don't see it in your inbox, please check your <strong>Spam</strong> folder and mark the email as <strong>"Not Spam"</strong> to ensure future notifications reach your inbox.
             </p>
 
+            <div className="mb-5 rounded-lg border border-yellow-300 bg-yellow-50 p-3 text-xs text-yellow-900 dark:border-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-200">
+              <strong>Important:</strong> If you entered the wrong email address, please log in to your account immediately and update your email.
+              The secret verification code was sent to the email you provided and is required to reset your password.
+            </div>
+
             <Button
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg"
               onClick={() => {
@@ -81,7 +86,7 @@ export default function LoginClient({ showActionPopup }: { showActionPopup: stri
               Okay
             </Button>
           </div>
-        </div>
+      </div>
       )}
 
       <div className="w-full max-w-125 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl p-8">
