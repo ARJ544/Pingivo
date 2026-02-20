@@ -9,8 +9,9 @@ export const metadata = {
 export default async function RegisterPage() {
   const isLoggedIn = await IsLoggedIn();
   const totaleVehicle = (await getAllCookie()).total_vehi;
+  const secure_validator = (await getAllCookie()).secure_validator;
 
-  if (!isLoggedIn) {
+  if (!isLoggedIn || !secure_validator) {
     redirect("/login");
   }
   if (totaleVehicle === "2") {

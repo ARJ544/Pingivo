@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { deleteAllCookie, getAllCookie } from "@/app/actions";
+import { deleteAllCookie, getAllCookie, setAllCookie } from "@/app/actions";
 
 export const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -9,7 +9,7 @@ export const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { loggedin, id } = await getAllCookie();
+    const { loggedin, id, phone_num, secure_validator } = await getAllCookie();
 
     if (!loggedin || !id) {
       return NextResponse.json({ error: "Login first" }, { status: 401 });
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
     const { data: user, error: fetchError } = await supabase
       .from("users")
-      .select("vehi1, vehi2")
+      .select("vehi1, vehi2, phone_num, created_at")
       .eq("id", id)
       .single();
 
@@ -36,6 +36,13 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json(
         { error: "User not found. Please sign up." },
+        { status: 404 },
+      );
+    }
+
+    if ((user.phone_num as string).slice(-4) != phone_num?.slice(-4) || (user.created_at as string) != secure_validator) {
+      return NextResponse.json(
+        { error: "Unauthorized access" },
         { status: 404 },
       );
     }
@@ -82,21 +89,21 @@ export async function POST(request: Request) {
     }
 
     await deleteAllCookie();
+    await setAllCookie({
+      loggedin: true,
+      id: latestDetails.id,
+      name: latestDetails.name,
+      phone_num: latestDetails.phone_num,
+      vehi1: latestDetails.vehi1,
+      vehi1_name: latestDetails.vehi1_name,
+      vehi2: latestDetails.vehi2,
+      vehi2_name: latestDetails.vehi2_name,
+      verified: latestDetails.verified,
+    });
 
     return NextResponse.json(
       {
         message: "Vehicle removed successfully",
-        user: {
-          loggedin: true,
-          id: latestDetails.id,
-          name: latestDetails.name,
-          phone_num: latestDetails.phone_num,
-          vehi1: latestDetails.vehi1,
-          vehi1_name: latestDetails.vehi1_name,
-          vehi2: latestDetails.vehi2,
-          vehi2_name: latestDetails.vehi2_name,
-          verified: latestDetails.verified,
-        },
       },
       { status: 200 },
     );

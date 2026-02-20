@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { setAllCookie } from "@/app/actions";
 import Link from "next/link";
 
 function validateVehicleNumber(value: string) {
@@ -57,10 +56,10 @@ export default function RegisterClient() {
       if (!res.ok) {
         throw new Error(result.error || "Something went wrong");
       }
-      setAllCookie(result.user);
 
       setMessage("✅ Vehicle Registered Successfully!");
       router.replace("/qr");
+      router.refresh();
     } catch (err: any) {
       setMessage(`Error: ${err.message}`);
     } finally {

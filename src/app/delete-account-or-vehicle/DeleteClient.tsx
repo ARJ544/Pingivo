@@ -24,7 +24,6 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { setAllCookie } from "@/app/actions";
 
 type Props = {
   vehi1_num?: string;
@@ -65,8 +64,6 @@ export default function DeleteCarClient({ vehi1_num, vehi2_num }: Props) {
       if (!res.ok) {
         throw new Error(result?.error || "Failed to delete vehicle");
       }
-
-      await setAllCookie(result.user);
 
       setMessage("Vehicle deleted successfully");
       router.replace("/home");

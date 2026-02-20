@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 
 type UserCookie = {
   loggedin: boolean;
+  secure_validator: string;
   id?: string;
   name?: string;
   phone_num?: string;
@@ -59,6 +60,14 @@ export async function setAllCookie(user: Partial<UserCookie>) {
     });
   }
 
+  if (user.secure_validator)
+    cookieStore.set("secure_validator", String(user.secure_validator), {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: SEVEN_DAYS,
+    });
   if (user.id)
     cookieStore.set("id", user.id, {
       httpOnly: true,
@@ -78,7 +87,7 @@ export async function setAllCookie(user: Partial<UserCookie>) {
     });
 
   if (user.phone_num)
-    cookieStore.set("phone_num", user.phone_num, {
+    cookieStore.set("phone_num", user.phone_num.slice(-4), {
       httpOnly: true,
       secure: true,
       sameSite: "lax",
@@ -151,6 +160,7 @@ export async function getAllCookie(): Promise<UserCookie> {
   return {
     loggedin,
     verified,
+    secure_validator: get("secure_validator") || "",
     id: get("id"),
     name: get("name"),
     // email: get('email'),

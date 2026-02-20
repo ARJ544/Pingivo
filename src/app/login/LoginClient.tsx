@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { setAllCookie, deleteShowActionPopupCookie } from "@/app/actions";
+import { deleteShowActionPopupCookie } from "@/app/actions";
 
 export default function LoginClient({ showActionPopup }: { showActionPopup: string | undefined }) {
   const router = useRouter();
@@ -39,10 +39,11 @@ export default function LoginClient({ showActionPopup }: { showActionPopup: stri
         throw new Error(result.error || "Something went wrong");
       }
 
-      setAllCookie(result.user);
+      // setAllCookie(result.user);
 
       setMessage("✅ User Loggedin successfully!");
       router.replace("/home");
+      router.refresh();
     } catch (err: any) {
       setMessage(`Error: ${err.message}`);
     } finally {

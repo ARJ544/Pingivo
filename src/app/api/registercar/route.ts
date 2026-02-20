@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
-import { deleteAllCookie, getAllCookie } from "@/app/actions";
+import { deleteAllCookie, getAllCookie, setAllCookie } from "@/app/actions";
 
 export const runtime = "nodejs";
 
@@ -12,7 +12,7 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { loggedin, id } = await getAllCookie();
+    const { loggedin, id, secure_validator } = await getAllCookie();
 
     if (!loggedin || !id) {
       return NextResponse.json({ error: "Login first" }, { status: 401 });
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
 
     const { data: user, error: fetchError } = await supabase
       .from("users")
-      .select("password, vehi1, vehi1_name, vehi2, vehi2_name")
+      .select("password, vehi1, created_at, vehi1_name, vehi2, vehi2_name")
       .eq("id", id)
       .single();
 
@@ -42,6 +42,13 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json(
         { error: "User not found. Please sign up." },
+        { status: 404 },
+      );
+    }
+
+    if (user.created_at != secure_validator) {
+      return NextResponse.json(
+        { error: "Unauthorized access" },
         { status: 404 },
       );
     }
@@ -97,7 +104,7 @@ export async function POST(request: Request) {
       })
       .eq("id", id)
       .select(
-        "id, name, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, verified",
+        "id, name, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, created_at, verified",
       )
       .single();
 
@@ -115,21 +122,22 @@ export async function POST(request: Request) {
     }
 
     await deleteAllCookie();
+    await setAllCookie({
+      loggedin: true,
+      id: updateData.id,
+      secure_validator: updateData.created_at,
+      name: updateData.name,
+      phone_num: updateData.phone_num,
+      vehi1: updateData.vehi1,
+      vehi1_name: updateData.vehi1_name,
+      vehi2: updateData.vehi2,
+      vehi2_name: updateData.vehi2_name,
+      verified: updateData.verified,
+    });
 
     return NextResponse.json(
       {
         message: "Vehicle Registered successfully",
-        user: {
-          loggedin: true,
-          id: updateData.id,
-          name: updateData.name,
-          phone_num: updateData.phone_num,
-          vehi1: updateData.vehi1,
-          vehi1_name: updateData.vehi1_name,
-          vehi2: updateData.vehi2,
-          vehi2_name: updateData.vehi2_name,
-          verified: updateData.verified,
-        },
       },
       { status: 200 },
     );

@@ -4,12 +4,10 @@ import { useState } from "react";
 import { User, Mail, Phone, Lock, Eye, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { setAllCookie } from "@/app/actions";
 
 export default function UpdateClient() {
   const router = useRouter();
 
-  // Main form state
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -53,8 +51,6 @@ export default function UpdateClient() {
       if (!res.ok) {
         throw new Error(result?.error || "Update failed");
       }
-
-      setAllCookie(result.user);
 
       router.refresh();
       router.replace("/home");

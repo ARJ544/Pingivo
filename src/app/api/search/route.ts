@@ -21,7 +21,7 @@ export async function GET(request: Request) {
 
     const { data, error } = await supabase
       .from("users")
-      .select("name, email, phone_num, vehi1, vehi1_name, vehi2, vehi2_name")
+      .select("id, name, vehi1, vehi1_name, vehi2, vehi2_name")
       .or(`vehi1.eq.${carNumber},vehi2.eq.${carNumber}`)
       .maybeSingle();
 
@@ -34,27 +34,14 @@ export async function GET(request: Request) {
     }
 
     const cookie = await cookies();
-    cookie.set("owner_phone_num", data.phone_num, {
+    cookie.set("receiver_id", data.id, {
       httpOnly: true,
       secure: true,
       sameSite: "lax",
       path: "/",
       maxAge: 10 * 60,
     });
-    cookie.set("owner_email", data.email, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 10 * 60,
-    });
-    cookie.set("owner_name", data.name, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 10 * 60,
-    });
+
     const clientData = {
       name: data.name,
       vehi1: data.vehi1,

@@ -17,7 +17,6 @@ export default function ShowOwnerDetail({
   carName,
   car_num,
   user_ph_num,
-  owner_ph_num,
   isVerified,
   isLoggedin,
   temp_phone_number,
@@ -26,7 +25,6 @@ export default function ShowOwnerDetail({
   carName: string;
   car_num: string;
   user_ph_num: string;
-  owner_ph_num: string;
   isVerified: boolean;
   isLoggedin: boolean;
   temp_phone_number: string | undefined;
@@ -153,7 +151,7 @@ export default function ShowOwnerDetail({
               <div className="text-right">
                 <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200">
                   <Phone size={14} className="text-primary" />
-                  {temp_phone_number ?? user_ph_num}
+                  ____{temp_phone_number ?? user_ph_num}
                 </div>
 
                 {!temp_phone_number && (
@@ -168,45 +166,34 @@ export default function ShowOwnerDetail({
               </div>
             </div>
 
-            {user_ph_num != owner_ph_num && (
-              <div className="flex flex-wrap gap-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setMessageOwnerOpen(true)}
-                  disabled={loading}
-                  className="h-12 px-6 font-semibold flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                >
-                  <Mail size={18} />
-                  Email
-                </Button>
-
-                <Button
-                  className="h-12 px-6 font-bold flex items-center gap-2 bg-primary text-white dark:text-slate-800 hover:bg-primary/90 shadow-sm shadow-primary/30 transition"
-                  disabled={loading}
-                  onClick={() => {
-                    handleCall();
-                  }}
-                >
-                  <Phone size={18} />
-                  Call
-                </Button>
-
-                <Popup
-                  message={popupMessage}
-                  show={showPopup}
-                  onClose={() => setShowPopup(false)}
-                />
-              </div>
-            )}
-            {user_ph_num === owner_ph_num && (
-              <p
-                className={
-                  "text-lg font-medium transition-colors duration-300 "
-                }
+            <div className="flex flex-wrap gap-4">
+              <Button
+                variant="outline"
+                onClick={() => setMessageOwnerOpen(true)}
+                disabled={loading}
+                className="h-12 px-6 font-semibold flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
               >
-                This is your Registered Car
-              </p>
-            )}
+                <Mail size={18} />
+                Email
+              </Button>
+
+              <Button
+                className="h-12 px-6 font-bold flex items-center gap-2 bg-primary text-white dark:text-slate-800 hover:bg-primary/90 shadow-sm shadow-primary/30 transition"
+                disabled={loading}
+                onClick={() => {
+                  handleCall();
+                }}
+              >
+                <Phone size={18} />
+                Call
+              </Button>
+
+              <Popup
+                message={popupMessage}
+                show={showPopup}
+                onClose={() => setShowPopup(false)}
+              />
+            </div>
 
             <p
               className={`text-lg mt-1 font-medium transition-colors duration-300 ${errorOrSuccessMessage.includes("error") ? "text-red-500 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}

@@ -2,6 +2,8 @@ import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import Twilio from "twilio";
+import { getAllCookie } from "@/app/actions";
+import { decryptPhone } from "@/lib/crypto";
 
 const client = Twilio(
   process.env.TWILIO_ACCOUNT_SID!,
@@ -14,10 +16,67 @@ const supabase = createClient(
 );
 
 export async function POST() {
+  const { phone_num, secure_validator } = await getAllCookie();
   const cookieStore = await cookies();
-  const caller =
-    cookieStore.get("temp_phone")?.value ?? cookieStore.get("phone_num")?.value;
-  const callee = cookieStore.get("owner_phone_num")?.value;
+  const caller_cookie_id = cookieStore.get("id")?.value;
+  const callee_cookie_id = cookieStore.get("receiver_id")?.value;
+  let caller;
+
+  const tempPhoneValue = cookieStore.get("temp_phone")?.value;
+
+  if(tempPhoneValue){
+    caller = await decryptPhone(tempPhoneValue);
+  } else {
+    if (!caller_cookie_id) {
+      return NextResponse.json({ error: "Login first" }, { status: 401 });
+    }
+    if (!callee_cookie_id) {
+      return NextResponse.json({ error: "Refresh the Page" }, { status: 401 });
+    }
+
+    const { data: callerData, error: callerFetchError } = await supabase
+      .from("users")
+      .select("phone_num, created_at")
+      .eq("id", caller_cookie_id)
+      .single();
+
+    if (callerFetchError) {
+      return NextResponse.json({ error: callerFetchError.message }, { status: 500 });
+    }
+    if (!callerData) {
+      return NextResponse.json(
+        { error: "User not found. Please sign up." },
+        { status: 404 },
+      );
+    }
+
+    if ((callerData.phone_num as string).slice(-4) != phone_num?.slice(-4) || (callerData.created_at as string) != secure_validator) {
+      return NextResponse.json(
+        { error: "Unauthorized access" },
+        { status: 404 },
+      );
+    }
+
+    caller = callerData.phone_num;
+  }
+
+  const { data: calleeData, error: calleeFetchError } = await supabase
+    .from("users")
+    .select("phone_num")
+    .eq("id", callee_cookie_id)
+    .single();
+
+  if (calleeFetchError) {
+    return NextResponse.json({ error: calleeFetchError.message }, { status: 500 });
+  }
+  if (!calleeData) {
+    return NextResponse.json(
+      { error: "User not found. Please Refresh the page." },
+      { status: 404 },
+    );
+  }
+  const callee = calleeData.phone_num;
+
 
   if (!caller || !callee) {
     return NextResponse.json(

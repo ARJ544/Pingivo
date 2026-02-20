@@ -10,7 +10,7 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { loggedin, id } = await getAllCookie();
+    const { loggedin, id, secure_validator } = await getAllCookie();
 
     if (!loggedin || !id) {
       return NextResponse.json({ error: "Login first" }, { status: 401 });
@@ -21,6 +21,25 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Please enter Phone Number" },
         { status: 401 },
+      );
+    }
+
+    const { data: user } = await supabase
+      .from("users")
+      .select("created_at")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Please Login again." },
+        { status: 409 },
+      );
+    }
+    if ((user.created_at as string) != secure_validator) {
+      return NextResponse.json(
+        { error: "Unauthorized Access" },
+        { status: 409 },
       );
     }
 
@@ -37,6 +56,15 @@ export async function POST(request: Request) {
       );
     }
 
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({ update_profile_phone_temp: phone })
+      .eq("id", id)
+
+    if (updateError) {
+      return NextResponse.json({ error: updateError.message }, { status: 500 });
+    }
+    
     const cookie = await cookies();
     cookie.set("update_profile_phone_temp", phone, {
       httpOnly: true,

@@ -25,23 +25,37 @@ function escapeHtml(str: string) {
 export async function POST() {
   const cookie = await cookies();
   const id = cookie.get("id")?.value;
+  const secure_validator = cookie.get("secure_validator")?.value;
   if (!id) {
     return NextResponse.json({ error: "Login first" }, { status: 401 });
   }
 
   const isPhoneVerified = cookie.get("phone_verified");
-  const updateTempPhoneCookie = cookie.get("update_profile_phone_temp");
+  const { data: user } = await supabase
+    .from("users")
+    .select("update_profile_phone_temp, created_at")
+    .eq("id", id)
+    .maybeSingle();
+
+  const updateTempPhoneCookie = user?.update_profile_phone_temp;
 
   if (!updateTempPhoneCookie || isPhoneVerified?.value !== "true") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized Access" }, { status: 401 });
+  }
+
+  if ((user.created_at as string) != secure_validator) {
+    return NextResponse.json(
+      { error: "Unauthorized access" },
+      { status: 404 },
+    );
   }
 
   const { data: updateData, error: updateError } = await supabase
     .from("users")
-    .update({ phone_num: updateTempPhoneCookie.value })
+    .update({ phone_num: updateTempPhoneCookie, update_profile_phone_temp: null })
     .eq("id", id)
     .select(
-      "id, name, email, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, secret_code, verified",
+      "id, name, email, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, secret_code, created_at, verified",
     )
     .single();
 
@@ -64,6 +78,7 @@ export async function POST() {
   const latestDetails = {
     loggedin: true,
     id: updateData.id,
+    secure_validator: updateData.created_at,
     name: updateData.name,
     phone_num: updateData.phone_num,
     vehi1: updateData.vehi1,
@@ -73,7 +88,7 @@ export async function POST() {
     verified: updateData.verified,
   };
 
-  setAllCookie(latestDetails);
+  await setAllCookie(latestDetails);
 
   cookie.delete("update_profile_phone_temp");
   cookie.delete("phone_verified");

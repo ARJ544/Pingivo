@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { getAllCookie, deleteAllCookie } from "@/app/actions";
+import { getAllCookie, deleteAllCookie, setAllCookie } from "@/app/actions";
 
 export const runtime = "nodejs";
 
@@ -26,7 +26,7 @@ function escapeHtml(str: string) {
 
 export async function POST(request: Request) {
   try {
-    const { loggedin, id } = await getAllCookie();
+    const { loggedin, id, phone_num, secure_validator } = await getAllCookie();
 
     if (!loggedin || !id) {
       return NextResponse.json({ error: "Login first" }, { status: 401 });
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
     const { data: user, error: fetchError } = await supabase
       .from("users")
-      .select("name, email, password")
+      .select("name, email, password, phone_num, created_at")
       .eq("id", id)
       .single();
 
@@ -49,6 +49,13 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json(
         { error: "User not found. Please sign up." },
+        { status: 404 },
+      );
+    }
+
+    if ((user.phone_num as string).slice(-4) != phone_num?.slice(-4) || (user.created_at as string) != secure_validator) {
+      return NextResponse.json(
+        { error: "Unauthorized access" },
         { status: 404 },
       );
     }
@@ -70,7 +77,7 @@ export async function POST(request: Request) {
       .update({ name: newName, email: newEmail, password: newPassword })
       .eq("id", id)
       .select(
-        "id, name, email, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, secret_code, verified",
+        "id, name, email, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, secret_code, created_at, verified",
       )
       .maybeSingle();
 
@@ -131,21 +138,22 @@ export async function POST(request: Request) {
     }
 
     await deleteAllCookie();
+    await setAllCookie({
+      loggedin: true,
+      id: updateData.id,
+      secure_validator: updateData.created_at,
+      name: updateData.name,
+      phone_num: updateData.phone_num,
+      vehi1: updateData.vehi1,
+      vehi1_name: updateData.vehi1_name,
+      vehi2: updateData.vehi2,
+      vehi2_name: updateData.vehi2_name,
+      verified: updateData.verified,
+    });
 
     return NextResponse.json(
       {
         message: "Updated successfully",
-        user: {
-          loggedin: true,
-          id: updateData.id,
-          name: updateData.name,
-          phone_num: updateData.phone_num,
-          vehi1: updateData.vehi1,
-          vehi1_name: updateData.vehi1_name,
-          vehi2: updateData.vehi2,
-          vehi2_name: updateData.vehi2_name,
-          verified: updateData.verified,
-        },
       },
       { status: 200 },
     );

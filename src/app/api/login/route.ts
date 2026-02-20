@@ -1,3 +1,4 @@
+import { setAllCookie } from "@/app/actions";
 import { createClient } from "@supabase/supabase-js";
 import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
     const { data: user, error: fetchError } = await supabase
       .from("users")
       .select(
-        "id, name, phone_num, password, vehi1, vehi1_name, vehi2, vehi2_name, verified",
+        "id, name, phone_num, password, vehi1, vehi1_name, vehi2, vehi2_name, created_at, verified",
       )
       .eq("email", email)
       .maybeSingle();
@@ -48,22 +49,22 @@ export async function POST(request: Request) {
       );
     }
 
+    await setAllCookie({
+      loggedin: true,
+      id: user.id,
+      secure_validator: user.created_at,
+      name: user.name,
+      phone_num: user.phone_num,
+      vehi1: user.vehi1,
+      vehi1_name: user.vehi1_name,
+      vehi2: user.vehi2,
+      vehi2_name: user.vehi2_name,
+      verified: user.verified,
+    })
+
     return NextResponse.json(
       {
         message: "Logged in successfully",
-        user: {
-          loggedin: true,
-          id: user.id,
-          name: user.name,
-          // email: user.email,
-          // password: user.password,
-          phone_num: user.phone_num,
-          vehi1: user.vehi1,
-          vehi1_name: user.vehi1_name,
-          vehi2: user.vehi2,
-          vehi2_name: user.vehi2_name,
-          verified: user.verified,
-        },
       },
       { status: 200 },
     );

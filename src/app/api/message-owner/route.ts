@@ -1,3 +1,4 @@
+import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -15,19 +16,44 @@ function escapeHtml(str: string) {
   );
 }
 
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_ANON_KEY!,
+);
+
 export async function POST(req: Request) {
   const cookie = await cookies();
-  const owner_email = cookie.get("owner_email")?.value;
-  const receiver_name = cookie.get("owner_name")?.value;
+  const receiver_id = cookie.get("receiver_id")?.value;
+
+  const { data: receiverData, error: fetchError } = await supabase
+    .from("users")
+    .select("name, email")
+    .eq("id", receiver_id)
+    .single();
+
+  if (fetchError) {
+    return NextResponse.json({ error: fetchError.message }, { status: 500 });
+  }
+  if (!receiverData) {
+    return NextResponse.json(
+      { error: "User not found. Please sign up." },
+      { status: 404 },
+    );
+  }
+
+  const receiver_name = receiverData.name;
+  let receiver_email = receiverData.email;
   let sender_name = cookie.get("name")?.value;
+
   let { subject, issueMessage, vehi_num } = await req.json();
 
-  if (!owner_email || !receiver_name) {
+  if (!receiver_email || !receiver_name || !receiver_id) {
     return NextResponse.json(
       { error: "Something went Wrong. Refresh Page and Try again" },
       { status: 401 },
     );
   }
+
   if (!sender_name) sender_name = "ParkPing";
   if (!subject)
     return NextResponse.json(
@@ -48,7 +74,7 @@ export async function POST(req: Request) {
       name: `By ${safeSender} | ParkPing Safety Alerts`,
       email: process.env.DEVELOPER_EMAIL!,
     },
-    to: [{ email: owner_email, name: safeReceiver }],
+    to: [{ email: receiver_email, name: safeReceiver }],
     subject: `[ParkPing Safety Alerts]: ${safeSubject}`,
     templateId: 3,
     params: {
@@ -56,6 +82,8 @@ export async function POST(req: Request) {
       EMERGENCY_MESSAGE: safeMessage,
     },
   };
+
+  cookie.delete("receiver_id");
 
   const BREVO_API_KEY = process.env.BREVO_API_KEY!;
   try {
@@ -71,9 +99,7 @@ export async function POST(req: Request) {
 
     const data = await res.json();
 
-    cookie.delete("owner_phone_num");
-    cookie.delete("owner_email");
-    cookie.delete("owner_name");
+    cookie.delete("receiver_id");
 
     return NextResponse.json(
       { message: "Email Sent Successfully", data },
