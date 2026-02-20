@@ -24,6 +24,10 @@ export async function POST() {
 
   const tempPhoneValue = cookieStore.get("temp_phone")?.value;
 
+  if (!callee_cookie_id){
+    return NextResponse.json({ error: "Failed to call, Please refresh the page." }, { status: 500 });
+  }
+
   if(tempPhoneValue){
     caller = await decryptPhone(tempPhoneValue);
   } else {
@@ -67,7 +71,7 @@ export async function POST() {
     .single();
 
   if (calleeFetchError) {
-    return NextResponse.json({ error: calleeFetchError.message }, { status: 500 });
+    return NextResponse.json({ error: `Error: ${calleeFetchError.message} || Refresh the Page` }, { status: 500 });
   }
   if (!calleeData) {
     return NextResponse.json(
