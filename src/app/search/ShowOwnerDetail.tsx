@@ -1,10 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User, Lock, Mail, Phone, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ShowWarning } from "@/app/search/searchCarClient";
 import { MessageOwnerModal } from "@/components/my_ui/message-owner";
 import Popup from "@/components/my_ui/CustomPopUp";
+import { decryptPhone } from "@/lib/crypto";
 
 type Payload = {
   subject: string;
@@ -35,6 +36,15 @@ export default function ShowOwnerDetail({
   const [loading, setLoading] = useState(false);
   const [messageOwnerOpen, setMessageOwnerOpen] = useState(false);
   const [errorOrSuccessMessage, setErrorOrSuccessMessage] = useState("");
+  const [decryptedPhone, setDecryptedPhone] = useState<string>("");
+
+  useEffect(() => {
+    if (temp_phone_number) {
+      decryptPhone(temp_phone_number)
+        .then((decrypted) => setDecryptedPhone(decrypted))
+        .catch(() => setDecryptedPhone(user_ph_num));
+    }
+  }, [temp_phone_number, user_ph_num]);
 
   const handleSendMail = async (payload: Payload) => {
     setLoading(true);
@@ -151,7 +161,10 @@ export default function ShowOwnerDetail({
               <div className="text-right">
                 <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200">
                   <Phone size={14} className="text-primary" />
-                  ____{temp_phone_number ?? user_ph_num}
+                  ____
+                  {temp_phone_number
+                    ? decryptedPhone.slice(-4) ?? user_ph_num.slice(-4)
+                    : user_ph_num.slice(-4)}
                 </div>
 
                 {!temp_phone_number && (
