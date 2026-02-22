@@ -37,6 +37,9 @@ export default function ShowOwnerDetail({
   const [messageOwnerOpen, setMessageOwnerOpen] = useState(false);
   const [errorOrSuccessMessage, setErrorOrSuccessMessage] = useState("");
   const [decryptedPhone, setDecryptedPhone] = useState<string>("");
+  const [callCredits, setCallCredits] = useState(3);
+  const [usedCallCredits, setUsedCallCredits] = useState(0);
+  const [creditsLoading, setCreditsLoading] = useState(true);
 
   useEffect(() => {
     if (temp_phone_number) {
@@ -45,6 +48,28 @@ export default function ShowOwnerDetail({
         .catch(() => setDecryptedPhone(user_ph_num));
     }
   }, [temp_phone_number, user_ph_num]);
+
+  useEffect(() => {
+    const fetchCallCredits = async () => {
+      try {
+        setCreditsLoading(true);
+        const res = await fetch("/api/get-call-credits");
+        const result = await res.json();
+        if (result.success) {
+          setCallCredits(result.callCredits);
+          setUsedCallCredits(result.creditsUsed);
+        } else {
+          setCallCredits(3);
+        }
+      } catch (err) {
+        setCallCredits(3);
+      } finally {
+        setCreditsLoading(false);
+      }
+    };
+
+    fetchCallCredits();
+  }, []);
 
   const handleSendMail = async (payload: Payload) => {
     setLoading(true);
@@ -192,7 +217,7 @@ export default function ShowOwnerDetail({
 
               <Button
                 className="h-12 px-6 font-bold flex items-center gap-2 bg-primary text-white dark:text-slate-800 hover:bg-primary/90 shadow-sm shadow-primary/30 transition"
-                disabled={loading}
+                disabled={loading || callCredits <= 0 || creditsLoading}
                 onClick={() => {
                   handleCall();
                 }}
@@ -200,9 +225,16 @@ export default function ShowOwnerDetail({
                 <Phone size={18} />
                 Call
               </Button>
-              <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                You have <span className="font-semibold text-slate-700 dark:text-slate-200">only 3 call credits per day</span>.
-                Please use them wisely.
+              <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">
+                <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">
+                  Today's Credits: {" "}
+                  <span className="ml-1 font-semibold text-slate-800 dark:text-slate-100">
+                    {callCredits} left · {usedCallCredits} used · 3 total
+                  </span>
+                </p>
+                <span className="text-xs text-slate-600 dark:text-slate-300">
+                  You will be charged 1 credit when you answer the call.
+                </span>
               </p>
 
               <Popup
@@ -233,7 +265,7 @@ export default function ShowOwnerDetail({
               </h4>
 
               <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                As you are not Logged In. For security and privacy reasons,
+                As you are not Logged In or Session expired. For security and privacy reasons,
                 ownership verification is required before contacting the vehicle
                 owner.
               </p>
