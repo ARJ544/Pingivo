@@ -23,16 +23,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No room found for conference" });
   }
 
-  if (status === "no-answer" || status === "failed" || status === "busy" || status === "canceled") {
-    const conferences = await client.conferences.list({
-      friendlyName: room,
-      status: "in-progress",
-    });
-
-    for (const conf of conferences) {
-      await client.conferences(conf.sid).update({ status: "completed" });
-    }
-  } else if (status === "completed") {
+  if (status === "completed" || status === "in-progress" || status === "answered") {
     if (!caller) {
       return NextResponse.json({ error: "Caller number missing" }, { status: 400 });
     }
@@ -66,6 +57,15 @@ export async function POST(req: NextRequest) {
       }
     }
 
+  } else {
+    const conferences = await client.conferences.list({
+      friendlyName: room,
+      status: "in-progress",
+    });
+
+    for (const conf of conferences) {
+      await client.conferences(conf.sid).update({ status: "completed" });
+    }
   }
 
   return NextResponse.json({ success: true });

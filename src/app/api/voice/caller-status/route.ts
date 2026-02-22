@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
       fallbackMethod: "POST",
       statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/callee-status?room=${room}&caller=${caller}`,
       statusCallbackMethod: "POST",
-      statusCallbackEvent: ["completed", "no-answer", "failed", "busy"],
+      statusCallbackEvent: ["completed", "no-answer", "failed", "busy", "initiated", "ringing", "answered", "completed"],
     });
   }
 

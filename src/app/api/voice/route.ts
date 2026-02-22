@@ -34,9 +34,6 @@ export async function POST() {
     if (!caller_cookie_id) {
       return NextResponse.json({ error: "Login first" }, { status: 401 });
     }
-    if (!callee_cookie_id) {
-      return NextResponse.json({ error: "Refresh the Page" }, { status: 401 });
-    }
 
     const { data: callerData, error: callerFetchError } = await supabase
       .from("users")
