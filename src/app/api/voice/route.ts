@@ -24,11 +24,11 @@ export async function POST() {
 
   const tempPhoneValue = cookieStore.get("temp_phone")?.value;
 
-  if (!callee_cookie_id){
+  if (!callee_cookie_id) {
     return NextResponse.json({ error: "Failed to call, Please refresh the page." }, { status: 500 });
   }
 
-  if(tempPhoneValue){
+  if (tempPhoneValue) {
     caller = await decryptPhone(tempPhoneValue);
   } else {
     if (!caller_cookie_id) {
