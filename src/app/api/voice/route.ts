@@ -107,7 +107,7 @@ export async function POST() {
   if (creditsUsed >= 3) {
     return NextResponse.json(
       {
-        error: "You've used all your free credits (3/3) for today. Next reset at 12:30 PM UTC"
+        error: "You've used all your free credits (3/3) for today. Next reset at 00:00 UTC"
       },
       { status: 400 }
     );
