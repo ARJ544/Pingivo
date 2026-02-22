@@ -225,7 +225,7 @@ export default function ShowOwnerDetail({
                 <Phone size={18} />
                 Call
               </Button>
-              <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">
+              <div className="flex flex-col">
                 <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">
                   Today's Credits: {" "}
                   <span className="ml-1 font-semibold text-slate-800 dark:text-slate-100">
@@ -235,7 +235,7 @@ export default function ShowOwnerDetail({
                 <span className="text-xs text-slate-600 dark:text-slate-300">
                   You will be charged 1 credit when you answer the call.
                 </span>
-              </p>
+              </div>
 
               <Popup
                 message={popupMessage}
