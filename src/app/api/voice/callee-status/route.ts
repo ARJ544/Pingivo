@@ -15,9 +15,6 @@ const supabase = createClient(
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const status = formData.get("CallStatus") as string | null;
-  console.log(`calleeCallStatus: ${status}`)
-  const callDuration = parseInt(formData.get("CallDuration") as string || "0", 10);
-  console.log(`calleeCallDuration: ${callDuration}`)
   const { searchParams } = new URL(req.url);
   const room = searchParams.get("room");
   const caller = searchParams.get("caller");
@@ -31,7 +28,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No call status found" }, { status: 400 });
   }
 
-  if (status === "completed" && callDuration > 0) {
+  if (status === "completed" || status === "in-progress" || status === "answered") {
     if (!caller) {
       return NextResponse.json({ error: "Caller number missing" }, { status: 400 });
     }

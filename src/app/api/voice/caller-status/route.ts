@@ -9,9 +9,7 @@ const client = Twilio(
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const callerCallSid = formData.get("CallSid") as string;
-  console.log(`callerSid: ${callerCallSid}`)
   const callStatus = formData.get("CallStatus");
-  console.log(`callerCallStatus: ${callStatus}`)
   const { searchParams } = new URL(req.url);
   const room = searchParams.get("room");
   const callee = searchParams.get("callee");
@@ -38,7 +36,7 @@ export async function POST(req: NextRequest) {
       timeout: 20,
       statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/callee-status?room=${room}&caller=${caller}&callerCallSid=${callerCallSid}`,
       statusCallbackMethod: "POST",
-      statusCallbackEvent: ["no-answer", "busy", "failed", "completed"],
+      statusCallbackEvent: ["no-answer", "busy", "failed", "completed", "in-progress", "answered"],
     });
   }
 
