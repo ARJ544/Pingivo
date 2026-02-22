@@ -54,12 +54,21 @@ export default function ShowOwnerDetail({
       try {
         setCreditsLoading(true);
         const res = await fetch("/api/get-call-credits");
+
+        if (!res.ok) {
+          setCallCredits(0);
+          setUsedCallCredits(0);
+          return;
+        }
+
         const result = await res.json();
+
         if (result.success) {
           setCallCredits(result.callCredits);
           setUsedCallCredits(result.creditsUsed);
         } else {
-          setCallCredits(3);
+          setCallCredits(0);
+          setUsedCallCredits(0);
         }
       } catch (err) {
         setCallCredits(3);
@@ -70,6 +79,25 @@ export default function ShowOwnerDetail({
 
     fetchCallCredits();
   }, []);
+
+  const getResetTimeInLocalZone = () => {
+    const now = new Date();
+    const utcMidnightToday = new Date(Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      0, 0, 0
+    ));
+
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+      timeZoneName: 'longGeneric',
+    });
+
+    return formatter.format(utcMidnightToday);
+  };
 
   const handleSendMail = async (payload: Payload) => {
     setLoading(true);
@@ -225,16 +253,19 @@ export default function ShowOwnerDetail({
                 <Phone size={18} />
                 Call
               </Button>
-              <div className="flex flex-col">
-                <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">
-                  Today's Credits: {" "}
-                  <span className="ml-1 font-semibold text-slate-800 dark:text-slate-100">
+              <div className="flex flex-col gap-1">
+                <p className="text-xs text-slate-600 dark:text-slate-400">
+                  Today's Credits:{" "}
+                  <span className="font-semibold text-slate-800 dark:text-slate-100">
                     {callCredits} left · {usedCallCredits} used · 3 total
                   </span>
                 </p>
-                <span className="text-xs text-slate-600 dark:text-slate-300">
-                  1 credit will be deducted only if the receiver answers the call.
-                </span>
+
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  • 1 credit will be used only if the receiver answers the call
+                  <br />
+                  • Resets every day at 00:00 UTC <span className="text-[15px]">||</span> <span className="font-medium">({getResetTimeInLocalZone()})</span>
+                </p>
               </div>
 
               <Popup
