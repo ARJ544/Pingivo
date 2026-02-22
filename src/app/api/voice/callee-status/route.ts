@@ -14,16 +14,24 @@ const supabase = createClient(
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
-  const status = formData.get("CallStatus");
+  const status = formData.get("CallStatus") as string | null;
+  console.log(`calleeCallStatus: ${status}`)
+  const callDuration = parseInt(formData.get("CallDuration") as string || "0", 10);
+  console.log(`calleeCallDuration: ${callDuration}`)
   const { searchParams } = new URL(req.url);
   const room = searchParams.get("room");
   const caller = searchParams.get("caller");
+  const callerCallSid = searchParams.get("callerCallSid");
 
   if (!room) {
     return NextResponse.json({ error: "No room found for conference" });
   }
 
-  if (status === "completed" || status === "in-progress" || status === "answered") {
+  if (!status) {
+    return NextResponse.json({ error: "No call status found" }, { status: 400 });
+  }
+
+  if (status === "completed" && callDuration > 0) {
     if (!caller) {
       return NextResponse.json({ error: "Caller number missing" }, { status: 400 });
     }
@@ -57,12 +65,23 @@ export async function POST(req: NextRequest) {
       }
     }
 
-  } else {
+  } else if (["no-answer", "busy", "failed"].includes(status)) {
+    if (callerCallSid) {
+      try {
+        await client.calls(callerCallSid).update({
+          url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/busy-message`,
+          method: "POST",
+        });
+
+      } catch (e) {
+        console.error("Failed to redirect caller call:", e);
+      }
+    }
+
     const conferences = await client.conferences.list({
       friendlyName: room,
       status: "in-progress",
     });
-
     for (const conf of conferences) {
       await client.conferences(conf.sid).update({ status: "completed" });
     }

@@ -8,33 +8,27 @@ const client = Twilio(
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
+  const callerCallSid = formData.get("CallSid") as string;
+  console.log(`callerSid: ${callerCallSid}`)
   const callStatus = formData.get("CallStatus");
+  console.log(`callerCallStatus: ${callStatus}`)
   const { searchParams } = new URL(req.url);
   const room = searchParams.get("room");
   const callee = searchParams.get("callee");
   const caller = searchParams.get("caller");
 
-  if (!room) {
-    return NextResponse.json({ error: "No room found for conference" });
-  }
-  if (!callee || !caller) {
-    return NextResponse.json(
-      { error: "Missing callee or caller number" },
-      { status: 400 },
-    );
+  if (!room || !callee || !caller) {
+    return NextResponse.json({ error: "Missing params" }, { status: 400 });
   }
 
-  if (
-    ["completed", "no-answer", "busy", "failed"].includes(callStatus as string)
-  ) {
-    const conferences = await client.conferences.list({
-      friendlyName: room,
-      status: "in-progress",
-    });
-    for (const conf of conferences) {
-      await client.conferences(conf.sid).update({ status: "completed" });
-    }
+  if (["no-answer", "busy", "failed"].includes(callStatus as string)) {
+    return NextResponse.json({ received: true });
   }
+
+  if (callStatus === "completed") {
+    return NextResponse.json({ received: true });
+  }
+  
 
   if (callStatus === "in-progress" || callStatus === "answered") {
     await client.calls.create({
@@ -42,11 +36,9 @@ export async function POST(req: NextRequest) {
       from: process.env.TWILIO_NUMBER!,
       url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/webhook?room=${room}&role=B`,
       timeout: 20,
-      fallbackUrl: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/busy-message`,
-      fallbackMethod: "POST",
-      statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/callee-status?room=${room}&caller=${caller}`,
+      statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/callee-status?room=${room}&caller=${caller}&callerCallSid=${callerCallSid}`,
       statusCallbackMethod: "POST",
-      statusCallbackEvent: ["completed", "no-answer", "failed", "busy", "initiated", "ringing", "answered", "completed"],
+      statusCallbackEvent: ["no-answer", "busy", "failed", "completed"],
     });
   }
 
