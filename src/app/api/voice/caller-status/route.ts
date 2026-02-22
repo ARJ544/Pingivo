@@ -10,7 +10,6 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const callerCallSid = formData.get("CallSid") as string;
   const callStatus = formData.get("CallStatus");
-  console.log(`callerCallStatus: ${callStatus}`)
   const { searchParams } = new URL(req.url);
   const room = searchParams.get("room");
   const callee = searchParams.get("callee");

@@ -15,7 +15,6 @@ const supabase = createClient(
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const status = formData.get("CallStatus") as string | null;
-  console.log(`calleeCallStatus: ${status}`)
   const { searchParams } = new URL(req.url);
   const room = searchParams.get("room");
   const caller = searchParams.get("caller");

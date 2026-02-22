@@ -233,7 +233,7 @@ export default function ShowOwnerDetail({
                   </span>
                 </p>
                 <span className="text-xs text-slate-600 dark:text-slate-300">
-                  You will be charged 1 credit when you answer the call.
+                  1 credit will be deducted only if the receiver answers the call.
                 </span>
               </div>
 
