@@ -54,7 +54,6 @@ export async function decryptPhone(data: string) {
     key,
     encrypted
   )
-  console.log(`decoder.decode(decrypted): ${decoder.decode(decrypted)} `)
 
   return decoder.decode(decrypted)
 }

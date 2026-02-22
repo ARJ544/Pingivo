@@ -200,6 +200,10 @@ export default function ShowOwnerDetail({
                 <Phone size={18} />
                 Call
               </Button>
+              <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                You have <span className="font-semibold text-slate-700 dark:text-slate-200">only 3 call credits per day</span>.
+                Please use them wisely.
+              </p>
 
               <Popup
                 message={popupMessage}
