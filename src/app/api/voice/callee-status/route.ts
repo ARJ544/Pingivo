@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No call status found" }, { status: 400 });
   }
 
-  if (["no-answer", "busy", "failed"].includes(status)) {
+  if (status === "no-answer" || status === "busy" || status === "failed") {
     if (callerCallSid) {
       try {
         await client.calls(callerCallSid).update({
