@@ -9,6 +9,7 @@ const client = Twilio(
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const status = formData.get("CallStatus") as string | null;
+  console.log(`callee status: ${status}`);
   const { searchParams } = new URL(req.url);
   const room = searchParams.get("room");
   const callerCallSid = searchParams.get("callerCallSid");

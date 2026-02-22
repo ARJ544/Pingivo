@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const callerCallSid = formData.get("CallSid") as string;
   const callStatus = formData.get("CallStatus");
+  console.log(`caller status: ${callStatus}`);
   const { searchParams } = new URL(req.url);
   const room = searchParams.get("room");
   const callee = searchParams.get("callee");
@@ -38,9 +39,9 @@ export async function POST(req: NextRequest) {
     await client.calls.create({
       to: callee,
       from: process.env.TWILIO_NUMBER!,
-      url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/webhook?room=${room}&role=B`,
+      url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/webhook?room=${encodeURIComponent(room)}&role=B`,
       timeout: 20,
-      statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/callee-status?room=${room}&callerCallSid=${callerCallSid}`,
+      statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/callee-status?room=${encodeURIComponent(room)}&callerCallSid=${encodeURIComponent(callerCallSid)}`,
       statusCallbackMethod: "POST",
       statusCallbackEvent: ["no-answer", "busy", "failed", "completed", "in-progress", "answered"],
     });

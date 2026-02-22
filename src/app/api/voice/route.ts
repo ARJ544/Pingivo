@@ -113,15 +113,15 @@ export async function POST() {
     );
   }
 
-  const mixedNum = `${caller.slice(-8)}${callee.slice(-8)}`;
+  const mixedNum = `${caller.slice(-5)}${callee.slice(-5)}`;
   const roomName = `conf_${mixedNum}_${Date.now()}`;
 
   try {
     await client.calls.create({
       to: caller,
       from: process.env.TWILIO_NUMBER!,
-      url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/webhook?room=${roomName}&role=A`,
-      statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/caller-status?room=${roomName}&callee=${callee}&caller=${caller}`,
+      url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/webhook?room=${encodeURIComponent(roomName)}&role=A`,
+      statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/caller-status?room=${encodeURIComponent(roomName)}&callee=${encodeURIComponent(callee)}&caller=${encodeURIComponent(caller)}`,
       statusCallbackEvent: ["in-progress", "completed", "answered",],
       statusCallbackMethod: "POST",
       timeout: 20,
