@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       to: callee,
       from: process.env.TWILIO_NUMBER!,
       url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/webhook?room=${encodeURIComponent(room)}&role=B`,
-      timeout: 20,
+      timeout: 25,
       statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/callee-status?room=${encodeURIComponent(room)}&caller=${encodeURIComponent(caller)}&callerCallSid=${encodeURIComponent(callerCallSid)}`,
       statusCallbackMethod: "POST",
       statusCallbackEvent: ["no-answer", "busy", "failed", "completed", "in-progress"],
