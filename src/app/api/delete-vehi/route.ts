@@ -73,7 +73,7 @@ export async function POST(request: Request) {
     const { data: latestDetails, error } = await supabase
       .from("users")
       .select(
-        "id, name, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, verified",
+        "id, name, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, created_at, verified",
       )
       .eq("id", id)
       .maybeSingle();
@@ -92,6 +92,7 @@ export async function POST(request: Request) {
     await setAllCookie({
       loggedin: true,
       id: latestDetails.id,
+      secure_validator: latestDetails.created_at,
       name: latestDetails.name,
       phone_num: latestDetails.phone_num,
       vehi1: latestDetails.vehi1,
