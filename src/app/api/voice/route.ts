@@ -124,7 +124,7 @@ export async function POST() {
       statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/caller-status?room=${encodeURIComponent(roomName)}&callee=${encodeURIComponent(callee)}&caller=${encodeURIComponent(caller)}`,
       statusCallbackEvent: ["in-progress", "completed", "answered",],
       statusCallbackMethod: "POST",
-      timeout: 20,
+      timeout: 25,
     });
   } catch (err: any) {
     console.error("Error while calling caller:", err);
