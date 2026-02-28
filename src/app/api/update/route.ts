@@ -1,83 +1,37 @@
-import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { getAllCookie, deleteAllCookie, setAllCookie } from "@/app/actions";
+import { deleteAllCookie, setAllCookie } from "@/app/actions";
+import {
+  authenticateUser,
+  escapeHtml,
+  sendBrevoEmail,
+  supabase,
+} from "@/lib/api-helpers";
 
 export const runtime = "nodejs";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!,
-);
-
-function escapeHtml(str: string) {
-  return str.replace(
-    /[&<>"']/g,
-    (m) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;",
-      })[m]!,
-  );
-}
-
 export async function POST(request: Request) {
   try {
-    const { loggedin, id, phone_num, secure_validator } = await getAllCookie();
-
-    if (!loggedin || !id) {
-      return NextResponse.json({ error: "Login first" }, { status: 401 });
+    const authResult = await authenticateUser(true);
+    if (!authResult.success) {
+      return authResult.response;
     }
 
+    const userId = authResult.user.id;
     const { name, email, password } = await request.json();
-    let newName = name;
-    let newEmail = email;
-    let newPassword = password;
 
-    const { data: user, error: fetchError } = await supabase
-      .from("users")
-      .select("name, email, password, phone_num, created_at")
-      .eq("id", id)
-      .single();
-
-    if (fetchError) {
-      return NextResponse.json({ error: fetchError.message }, { status: 500 });
-    }
-    if (!user) {
-      return NextResponse.json(
-        { error: "User not found. Please sign up." },
-        { status: 404 },
-      );
-    }
-
-    if ((user.phone_num as string).slice(-4) != phone_num?.slice(-4) || (user.created_at as string) != secure_validator) {
-      return NextResponse.json(
-        { error: "Unauthorized access" },
-        { status: 404 },
-      );
-    }
-
-    if (!newName) {
-      newName = user.name;
-    }
-    if (!newEmail) {
-      newEmail = user.email;
-    }
-    if (!newPassword) {
-      newPassword = user.password;
-    } else {
-      newPassword = await bcrypt.hash(password, 10);
-    }
+    let newName = name || authResult.user.name;
+    let newEmail = email || authResult.user.email;
+    let newPassword = password
+      ? await bcrypt.hash(password, 10)
+      : authResult.user.password;
 
     const { data: updateData, error: updateError } = await supabase
       .from("users")
       .update({ name: newName, email: newEmail, password: newPassword })
-      .eq("id", id)
+      .eq("id", userId)
       .select(
-        "id, name, email, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, secret_code, created_at, verified",
+        "id, name, email, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, secret_code, created_at, verified"
       )
       .maybeSingle();
 
@@ -85,7 +39,7 @@ export async function POST(request: Request) {
       if (updateError.code === "23505") {
         return NextResponse.json(
           { error: "Email or phone already exists" },
-          { status: 409 },
+          { status: 409 }
         );
       }
       return NextResponse.json({ error: updateError.message }, { status: 400 });
@@ -94,46 +48,37 @@ export async function POST(request: Request) {
     if (!updateData) {
       return NextResponse.json(
         { error: "No user found. Please sign up." },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
-    const safeReceiver = escapeHtml(updateData.email);
-    const secretcode = updateData.secret_code;
-    
-    const emailData = {
+    const emailResult = await sendBrevoEmail({
       sender: {
-        name: `ParkPing Safety Alerts`,
+        name: "ParkPing Safety Alerts",
         email: process.env.DEVELOPER_EMAIL!,
       },
-      to: [{ email: safeReceiver, name: escapeHtml(updateData.name) }],
+      to: [
+        { email: updateData.email, name: escapeHtml(updateData.name) },
+      ],
       subject: "Account Updated on ParkPing",
       templateId: 5,
       params: {
         WHAT_DID: "Updated",
         NAME: escapeHtml(updateData.name),
-        EMAIL: safeReceiver || "Your Email",
-        SECRET_CODE: secretcode || "Failed to fetch",
+        EMAIL: updateData.email || "Your Email",
+        SECRET_CODE: updateData.secret_code || "Failed to fetch",
         WEBSITE_LINK: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/reset-password`,
       },
-    };
+    });
 
-    const BREVO_API_KEY = process.env.BREVO_API_KEY!;
-    try {
-      const res = await fetch("https://api.brevo.com/v3/smtp/email", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "api-key": BREVO_API_KEY,
-        },
-        body: JSON.stringify(emailData),
-      });
-
-    } catch (error) {
+    if (!emailResult.success) {
       return NextResponse.json(
-        { error: "Your Account details was updated but we failed to send you an email!", details: error },
-        { status: 500 },
+        {
+          error:
+            "Your Account details was updated but we failed to send you an email!",
+          details: emailResult.error,
+        },
+        { status: 500 }
       );
     }
 
@@ -155,12 +100,12 @@ export async function POST(request: Request) {
       {
         message: "Updated successfully",
       },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

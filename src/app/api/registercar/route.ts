@@ -1,85 +1,63 @@
-import { createClient } from "@supabase/supabase-js";
-import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
-import { deleteAllCookie, getAllCookie, setAllCookie } from "@/app/actions";
+import { deleteAllCookie, setAllCookie } from "@/app/actions";
+import {
+  authenticateUser,
+  verifyPassword,
+  supabase,
+} from "@/lib/api-helpers";
 
 export const runtime = "nodejs";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!,
-);
-
 export async function POST(request: Request) {
   try {
-    const { loggedin, id, secure_validator } = await getAllCookie();
-
-    if (!loggedin || !id) {
-      return NextResponse.json({ error: "Login first" }, { status: 401 });
+    const authResult = await authenticateUser(true);
+    if (!authResult.success) {
+      return authResult.response;
     }
 
+    const userId = authResult.user.id;
     let { password, vehiNum, vehiName } = await request.json();
 
     if (!password || !vehiNum || !vehiName) {
       return NextResponse.json(
         { error: "All fields are required" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     vehiNum = vehiNum.toUpperCase().trim();
     vehiName = vehiName.toUpperCase().trim();
 
-    const { data: user, error: fetchError } = await supabase
-      .from("users")
-      .select("password, vehi1, created_at, vehi1_name, vehi2, vehi2_name")
-      .eq("id", id)
-      .single();
-
-    if (fetchError) {
-      return NextResponse.json({ error: fetchError.message }, { status: 500 });
-    }
-    if (!user) {
-      return NextResponse.json(
-        { error: "User not found. Please sign up." },
-        { status: 404 },
-      );
-    }
-
-    if (user.created_at != secure_validator) {
-      return NextResponse.json(
-        { error: "Unauthorized access" },
-        { status: 404 },
-      );
-    }
-
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const passwordMatch = await verifyPassword(
+      password,
+      authResult.user.password
+    );
     if (!passwordMatch) {
       return NextResponse.json({ error: "Wrong password" }, { status: 401 });
     }
 
     let validVehiNumberColumn = "vehi1";
-    if (user?.vehi1) {
+    if (authResult.user.vehi1) {
       validVehiNumberColumn = "vehi2";
     }
     let validVehiNameColumn = "vehi1_name";
-    if (user?.vehi1_name) {
+    if (authResult.user.vehi1_name) {
       validVehiNameColumn = "vehi2_name";
     }
 
-    if (user?.vehi1 && user?.vehi2) {
+    if (authResult.user.vehi1 && authResult.user.vehi2) {
       return NextResponse.json(
         { error: "Your slot is full 2/2" },
-        { status: 500 },
+        { status: 500 }
       );
     }
-    if (user?.vehi1_name && user?.vehi2_name) {
+    if (authResult.user.vehi1_name && authResult.user.vehi2_name) {
       return NextResponse.json(
         {
           error:
             "Your Name field is showing 2/2 (completely filled), but perhaps one slot is still available for adding a Vehicle Number.",
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -92,7 +70,7 @@ export async function POST(request: Request) {
     if (existingVehicle) {
       return NextResponse.json(
         { error: "Vehicle number already registered" },
-        { status: 409 },
+        { status: 409 }
       );
     }
 
@@ -102,9 +80,9 @@ export async function POST(request: Request) {
         [validVehiNumberColumn]: vehiNum,
         [validVehiNameColumn]: vehiName,
       })
-      .eq("id", id)
+      .eq("id", userId)
       .select(
-        "id, name, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, created_at, verified",
+        "id, name, phone_num, vehi1, vehi2, vehi1_name, vehi2_name, created_at, verified"
       )
       .single();
 
@@ -115,7 +93,7 @@ export async function POST(request: Request) {
             error:
               "This car number already exists. If it was not added by you, Please contact me.",
           },
-          { status: 409 },
+          { status: 409 }
         );
       }
       return NextResponse.json({ error: updateError.message }, { status: 400 });
@@ -139,12 +117,12 @@ export async function POST(request: Request) {
       {
         message: "Vehicle Registered successfully",
       },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (_error) {
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
