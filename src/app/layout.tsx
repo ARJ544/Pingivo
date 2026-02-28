@@ -8,6 +8,7 @@ import { Github, Mail, MapPin } from "lucide-react";
 import OnlineOfflineComponent from "@/components/my_ui/OnlineOfflineComponent";
 import Link from "next/link";
 import { RouteChangeHandler } from "@/components/RouteChangeHandler";
+import { Suspense } from "react";
 
 const poppins = Poppins({
   weight: "400",
@@ -47,7 +48,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <RouteChangeHandler />
+            <Suspense fallback={null}>
+              <RouteChangeHandler />
+            </Suspense>
             <Navigation />
             <OnlineOfflineComponent />
             {children}
