@@ -29,6 +29,7 @@ export default function RegisterClient() {
   const [vehiName, setvehiName] = useState("");
   let [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const isPasswordValid = password === "" || password.length >= 8;
 
   const isVehicleValid =
@@ -58,8 +59,7 @@ export default function RegisterClient() {
       }
 
       setMessage("✅ Vehicle Registered Successfully!");
-      router.replace("/qr");
-      router.refresh();
+      setShowSuccessPopup(true);
     } catch (err: any) {
       setMessage(`Error: ${err.message}`);
     } finally {
@@ -67,8 +67,82 @@ export default function RegisterClient() {
     }
   };
 
+  const handleOkay = () => {
+    setShowSuccessPopup(false);
+    router.replace("/qr");
+    router.refresh();
+  };
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 px-4">
+
+      {showSuccessPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-8 text-center transition-all duration-300 scale-100">
+
+            {/* Success Icon */}
+            <div className="mb-6">
+              <div className="mx-auto flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 shadow-inner">
+                <svg
+                  className="w-8 h-8 text-green-600 dark:text-green-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* Title */}
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+              Registration Successful 🎉
+            </h2>
+
+            {/* Message */}
+            <p className="text-slate-600 dark:text-slate-400 mb-6">
+              Your vehicle has been successfully registered.
+            </p>
+
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6 text-left">
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3">
+                During emergency you may receive:
+              </p>
+
+              <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                <p>
+                  📞 A call from{" "}
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    +1 (828) 761-8181
+                  </span>{" "}
+                  or an International Call
+                </p>
+
+                <p>
+                  📧 An email from{" "}
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    parkping1
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            {/* Button */}
+            <Button
+              onClick={handleOkay}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-blue-500/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Continue
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Card */}
       <div className="w-full max-w-150 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl p-8 mb-12">
         {/* Header */}
