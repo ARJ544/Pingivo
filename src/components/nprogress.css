@@ -1,0 +1,48 @@
+/* NProgress Styles */
+
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: linear-gradient(
+    to right,
+    #14b8a6,
+    #06b6d4,
+    #0ea5e9
+  );
+  position: fixed;
+  z-index: 1031;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  box-shadow: 0 0 10px rgba(20, 184, 166, 0.7);
+}
+
+#nprogress .peg {
+  box-shadow: 
+    0 0 15px rgba(20, 184, 166, 0.8),
+    0 0 8px rgba(6, 182, 212, 0.7);
+}
+
+#nprogress .spinner {
+  display: none;
+}
+
+/* Fade out animation */
+#nprogress.done {
+  animation: hideBar 0.3s ease-out;
+}
+
+@keyframes hideBar {
+  0% {
+    opacity: 1;
+  }
+  99% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
