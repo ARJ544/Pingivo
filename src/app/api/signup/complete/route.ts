@@ -21,6 +21,12 @@ function escapeHtml(str: string) {
   );
 }
 
+function generateSecretCode() {
+  const bytes = crypto.getRandomValues(new Uint8Array(14));
+  const chars = [...bytes].map(b => (b % 36).toString(36)).join("");
+  return chars.slice(0, 7) + "-" + chars.slice(7);
+}
+
 export async function POST() {
   const cookie = await cookies();
   const signupCookie = cookie.get("signup_temp");
@@ -53,7 +59,8 @@ export async function POST() {
     return NextResponse.json({ error: insertError.message }, { status: 400 });
   }
 
-  const secretcode = `${(insertData[0].id as string).slice(-12)}_${crypto.randomUUID()}`;
+  const secretcode = generateSecretCode();
+
   const { error: updateSecretError } = await supabase
     .from("users")
     .update({ secret_code: secretcode })
@@ -76,7 +83,7 @@ export async function POST() {
     subject: "Account Registered Successfully on ParkPing",
     templateId: 4,
     params: {
-      WHAT_DID: "Registred",
+      WHAT_DID: "Registered",
       NAME: escapeHtml(name),
       EMAIL: safeReceiver || "Your Email",
       SECRET_CODE: secretcode,
