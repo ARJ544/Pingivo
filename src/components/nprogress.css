@@ -5,10 +5,10 @@
       transparent 10px,
       rgba(255, 255, 255, 0.15) 10px,
       rgba(255, 255, 255, 0.15) 20px),
-    linear-gradient(90deg,
-      #ff0080,
-      #7928ca,
-      #2afadf);
+      linear-gradient(90deg,
+          #ff0080,
+          #7928ca,
+          #01209b);
   position: fixed;
   z-index: 1031;
   top: 0;
