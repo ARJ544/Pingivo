@@ -1,6 +1,7 @@
 import { IsLoggedIn, getAllCookie } from "@/app/actions";
 import { redirect } from "next/navigation";
 import GenerateQRClient from "@/app/qr/QrClient";
+import { getFinderIdById } from "@/lib/api-helpers";
 
 export const metadata = {
   title: "Generate QR",
@@ -8,12 +9,15 @@ export const metadata = {
 
 export default async function GenerateQR() {
   const isLoggedIn = await IsLoggedIn();
-  const vehi1_num = (await getAllCookie()).vehi1;
-  const vehi2_num = (await getAllCookie()).vehi2;
-  const secure_validator = (await getAllCookie()).secure_validator;
+  let { id, secure_validator } = await getAllCookie();
+  if(!id){
+    id = "";
+  }
+  const finder_id = (await getFinderIdById(id)).user;
 
-  if (!isLoggedIn || !secure_validator) {
+  if (!isLoggedIn || !secure_validator || !finder_id) {
     redirect("/login");
   }
-  return <GenerateQRClient vehi1_num={vehi1_num} vehi2_num={vehi2_num} />;
+
+  return <GenerateQRClient finder_id={finder_id} />;
 }

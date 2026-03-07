@@ -24,7 +24,7 @@ export async function POST(req: Request) {
   }
 
   const { data: user } = await supabase
-    .from("users")
+    .from("simplified_users")
     .select("update_profile_phone_temp, created_at")
     .eq("id", id)
     .maybeSingle();

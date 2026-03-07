@@ -5,27 +5,15 @@ import jsPDF from "jspdf";
 import "svg2pdf.js";
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Copy, Download } from "lucide-react";
 
 type Props = {
-  vehi1_num?: string;
-  vehi2_num?: string;
+  finder_id: string;
 };
 
-export default function GenerateQRClient({ vehi1_num, vehi2_num }: Props) {
-  const [selectedVehicle, setSelectedVehicle] = useState(
-    vehi2_num ?? vehi1_num,
-  );
+export default function GenerateQRClient({ finder_id }: Props) {
   const [downloading, setDownloading] = useState(false);
-
+  const [copied, setCopied] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
 
   const downloadPDF = async () => {
@@ -35,7 +23,7 @@ export default function GenerateQRClient({ vehi1_num, vehi2_num }: Props) {
 
     const svg = svgRef.current;
     const PDF_WIDTH_CM = 9;
-    const PDF_HEIGHT_CM = 12;
+    const PDF_HEIGHT_CM = 13;
 
     const pdf = new jsPDF({
       orientation: "portrait",
@@ -51,66 +39,60 @@ export default function GenerateQRClient({ vehi1_num, vehi2_num }: Props) {
       height: PDF_HEIGHT_CM,
     });
 
-    pdf.save(`${selectedVehicle}-qr-sticker.pdf`);
+    pdf.save(`parkping-qr-${finder_id}.pdf`);
     setDownloading(false);
   };
 
-  const qrValue = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/search?crnm=${selectedVehicle}`;
+  const qrValue = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/search?finder_id=${finder_id}`;
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(finder_id);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-sm flex flex-col items-center gap-3">
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          ⚡ QR code is generated automatically after selection
-        </p>
+    <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50 dark:bg-slate-950">
+      <div className="w-full max-w-sm flex flex-col items-center gap-6">
+        {/* Header */}
+        <div className="flex flex-col gap-2 text-center">
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white">
+            Your QR Code
+          </h1>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Display this on your vehicle windshield
+          </p>
+        </div>
 
-        <p className="text-xs text-gray-600 dark:text-gray-400">
-          <span className="font-medium text-amber-500">Visit the shop</span>,
-          download the PDF sticker, and place it on your vehicle.
-        </p>
+        {/* Finder ID Display */}
+        <div className="w-full bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-4">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Your Finder ID</p>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={finder_id}
+              readOnly
+              className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-mono text-sm"
+            />
+            <Button
+              onClick={copyToClipboard}
+              size="sm"
+              variant="outline"
+              className="gap-2"
+            >
+              <Copy size={16} />
+              {copied ? "Copied!" : "Copy"}
+            </Button>
+          </div>
+        </div>
 
-        {/* SELECT */}
-        <Select onValueChange={setSelectedVehicle}>
-          <SelectTrigger className="w-full rounded-xl">
-            <SelectValue placeholder={vehi2_num ?? vehi1_num} />
-          </SelectTrigger>
-
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Vehicle List</SelectLabel>
-
-              {vehi1_num && (
-                <SelectItem value={vehi1_num}>
-                  Vehicle 1 - {vehi1_num}
-                </SelectItem>
-              )}
-
-              {vehi2_num && (
-                <SelectItem value={vehi2_num}>
-                  Vehicle 2 - {vehi2_num}
-                </SelectItem>
-              )}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-
-        {/* DOWNLOAD */}
-        <Button
-          onClick={downloadPDF}
-          disabled={!selectedVehicle || downloading}
-          className="w-full bg-green-600 text-white rounded-xl"
-        >
-          Download Sticker
-        </Button>
-
-        {/* SVG TEMPLATE */}
+        {/* QR Code Preview */}
         <svg ref={svgRef} width="300" height="400" viewBox="0 0 600 900">
-          {/* Background */}
-          <image href="/template.jpg" width="600" height="900" />
+          <image href="/template.png" width="600" height="900" />
 
-          {/* QR */}
-          {selectedVehicle && (
-            <g transform={`translate(155 340) scale(1)`}>
+          {/* QR Code */}
+          {finder_id && (
+            <g transform="translate(155 340) scale(1)">
               <QRCodeSVG
                 value={qrValue}
                 size={290}
@@ -120,7 +102,29 @@ export default function GenerateQRClient({ vehi1_num, vehi2_num }: Props) {
               />
             </g>
           )}
+
+          {/* Finder ID at bottom */}
+          <text x="300" y="50" fontSize="11" fontWeight="bold" textAnchor="middle" fill="#000">
+            ID: {finder_id}
+          </text>
         </svg>
+
+        {/* Download Button */}
+        <Button
+          onClick={downloadPDF}
+          disabled={downloading}
+          className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg flex gap-2 items-center justify-center"
+        >
+          <Download size={18} />
+          {downloading ? "Generating..." : "Download Sticker (PDF)"}
+        </Button>
+
+        {/* Info */}
+        <div className="w-full rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 p-4 text-sm">
+          <p className="text-blue-900 dark:text-blue-300">
+            <strong>💡 Tip:</strong> Print and place this QR code on your windshield so others can quickly reach you in case of parking issues.
+          </p>
+        </div>
       </div>
     </div>
   );

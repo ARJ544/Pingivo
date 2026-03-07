@@ -37,11 +37,11 @@ export async function authenticateUser(
   requireLogin: boolean = true,
 ): Promise<{ success: false; response: NextResponse } | { success: true; user: AuthenticatedUser }> {
   try {
-    const { id, phone_num, secure_validator, loggedin } = await (
+    const { id, phone_num, secure_validator } = await (
       await import("@/app/actions")
     ).getAllCookie();
 
-    if (requireLogin && (!loggedin || !id)) {
+    if (requireLogin && (!id || !secure_validator)) {
       return {
         success: false,
         response: NextResponse.json({ error: "Login first" }, { status: 401 }),
@@ -60,7 +60,7 @@ export async function authenticateUser(
 
     // Fetch user from database
     const { data: user, error } = await supabase
-      .from("users")
+      .from("simplified_users")
       .select("*")
       .eq("id", id)
       .single();
@@ -143,7 +143,7 @@ export async function getCaller(
     }
 
     const { data: userData, error } = await supabase
-      .from("users")
+      .from("simplified_users")
       .select("phone_num")
       .eq("id", userIdToUse)
       .single();
@@ -290,7 +290,7 @@ export async function sendBrevoEmail(
 export async function getUserById(userId: string) {
   try {
     const { data: user, error } = await supabase
-      .from("users")
+      .from("simplified_users")
       .select("*")
       .eq("id", userId)
       .single();
@@ -306,33 +306,32 @@ export async function getUserById(userId: string) {
 }
 
 /**
- * Fetches user by vehicle number
+ * Fetches user by phone number
  */
-export async function getUserByVehicle(carNumber: string) {
+export async function getFinderIdById(id: string) {
   try {
     const { data, error } = await supabase
-      .from("users")
-      .select("id, name, vehi1, vehi1_name, vehi2, vehi2_name")
-      .or(`vehi1.eq.${carNumber},vehi2.eq.${carNumber}`)
+      .from("simplified_users")
+      .select("finder_id")
+      .eq("id", id)
       .maybeSingle();
 
     if (error) {
       return { success: false, error };
     }
 
-    return { success: true, user: data };
+    return { success: true, user: data?.finder_id };
   } catch (error) {
     return { success: false, error };
   }
 }
-
 /**
  * Fetches user by phone number
  */
 export async function getUserByPhone(phoneNum: string) {
   try {
     const { data, error } = await supabase
-      .from("users")
+      .from("simplified_users")
       .select("*")
       .eq("phone_num", phoneNum)
       .maybeSingle();

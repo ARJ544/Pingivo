@@ -1,16 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { User, Mail, Lock, Phone, Eye } from "lucide-react";
+import { Lock, Phone, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function SignupClient() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [user_name, setName] = useState("");
   const [password, setPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
@@ -19,10 +17,8 @@ export default function SignupClient() {
 
   const isPasswordValid = password === "" || strongPasswordRegex.test(password);
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const phoneRegex = /^\+[1-9]\d{1,14}$/;
 
-  const isEmailValid = email === "" || emailRegex.test(email);
   const isPhoneValid = phone === "" || phoneRegex.test(phone);
 
   const [loading, setLoading] = useState(false);
@@ -49,8 +45,6 @@ export default function SignupClient() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: user_name,
-          email,
           phone,
           password,
         }),
@@ -71,73 +65,17 @@ export default function SignupClient() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50 dark:bg-slate-950">
-      <div className="w-full max-w-140 bg-white dark:bg-slate-900 p-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl">
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 p-8 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl">
         <div className="flex flex-col gap-2 mb-8 text-center">
           <h1 className="text-slate-900 dark:text-white text-3xl font-black tracking-tight">
             Create Account
           </h1>
           <p className="text-slate-500 dark:text-slate-400">
-            Create your account and secure your vehicle
+            Enter your phone number and password
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-              Full Name
-            </label>
-            <div className="relative">
-              <User
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                size={18}
-              />
-              <input
-                name="user_name"
-                value={user_name}
-                onChange={(e) =>
-                  setName(e.target.value.replace(/\s{2,}/g, " "))
-                }
-                required
-                type="text"
-                placeholder="e.g., John Doe"
-                className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
-              />
-            </div>
-          </div>
-
-          {/* Email */}
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-              Email Address
-            </label>
-            <div className="relative">
-              <Mail
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                size={18}
-              />
-              <input
-                value={email}
-                name="email"
-                onChange={(e) => {
-                  setEmail(e.target.value.trim());
-                }}
-                type="email"
-                placeholder="name@example.com"
-                className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
-                  ${
-                    isEmailValid
-                      ? "border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                      : "border-red-500 focus:ring-1 focus:ring-red-500"
-                  }`}
-              />
-            </div>
-            {!isEmailValid && (
-              <p className="text-xs text-red-500">
-                Please enter a valid email address
-              </p>
-            )}
-          </div>
-
           {/* Phone */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold text-slate-900 dark:text-slate-100">
@@ -156,6 +94,7 @@ export default function SignupClient() {
                 }
                 type="tel"
                 placeholder="+919876543210"
+                required
                 className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
                   ${
                     isPhoneValid
@@ -231,10 +170,7 @@ export default function SignupClient() {
           {/* Submit */}
           <Button
             disabled={
-              !emailRegex.test(email) ||
               !phoneRegex.test(phone) ||
-              user_name === " " ||
-              user_name === "" ||
               loading ||
               !isPasswordValid
             }
@@ -258,4 +194,4 @@ export default function SignupClient() {
       </div>
     </div>
   );
-}
+}       

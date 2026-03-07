@@ -42,7 +42,7 @@ export default function VerifyPhoneUnknownUser({
       if (!userObj?.user_json_url) {
         setMessage("Phone verification failed. Please try again.");
         setTimeout(
-          () => router.replace(`/search?crnm=${encodeURIComponent(carNumber)}`),
+          () => router.replace(`/search?finder_id=${encodeURIComponent(carNumber)}`),
           2000,
         );
         return;
@@ -59,13 +59,13 @@ export default function VerifyPhoneUnknownUser({
 
         setMessage("Phone verified successfully! Redirecting...");
         setTimeout(
-          () => router.replace(`/search?crnm=${encodeURIComponent(carNumber)}`),
+          () => router.replace(`/search?finder_id=${encodeURIComponent(carNumber)}`),
           1500,
         );
       } catch {
         setMessage("Something went wrong. Please try again.");
         setTimeout(
-          () => router.replace(`/search?crnm=${encodeURIComponent(carNumber)}`),
+          () => router.replace(`/search?finder_id=${encodeURIComponent(carNumber)}`),
           2000,
         );
       } finally {

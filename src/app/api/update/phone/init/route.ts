@@ -10,9 +10,9 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { loggedin, id, secure_validator } = await getAllCookie();
+    const { id, secure_validator } = await getAllCookie();
 
-    if (!loggedin || !id) {
+    if (!id || !secure_validator) {
       return NextResponse.json({ error: "Login first" }, { status: 401 });
     }
 
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     }
 
     const { data: user } = await supabase
-      .from("users")
+      .from("simplified_users")
       .select("created_at")
       .eq("id", id)
       .maybeSingle();
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     }
 
     const { data: existingUser } = await supabase
-      .from("users")
+      .from("simplified_users")
       .select("id")
       .eq("phone_num", phone)
       .maybeSingle();
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     }
 
     const { error: updateError } = await supabase
-      .from("users")
+      .from("simplified_users")
       .update({ update_profile_phone_temp: phone })
       .eq("id", id)
 

@@ -1,30 +1,40 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { getUserByVehicle } from "@/lib/api-helpers";
+import { supabase } from "@/lib/api-helpers";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const carNumber = searchParams.get("crnm")?.toUpperCase();
+    const finderId = searchParams.get("finder_id");
 
-    if (!carNumber) {
+    if (!finderId) {
       return NextResponse.json(
-        { error: "Car number is required" },
+        { error: "Finder ID is required" },
         { status: 400 }
       );
     }
 
-    const userResult = await getUserByVehicle(carNumber);
-    if (!userResult.success) {
-      return NextResponse.json({ error: "Database error" }, { status: 500 });
+    const { data: user, error } = await supabase
+      .from("simplified_users")
+      .select("finder_id")
+      .eq("finder_id", finderId)
+      .maybeSingle();
+
+    if (error) {
+      return NextResponse.json(
+        { error: "Database error" },
+        { status: 500 }
+      );
     }
 
-    if (!userResult.user) {
-      return NextResponse.json({ error: "Vehicle not found" }, { status: 404 });
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     const cookie = await cookies();
-    cookie.set("receiver_id", userResult.user.id, {
+
+
+    cookie.set("receiver_finder_id", user.finder_id, {
       httpOnly: true,
       secure: true,
       sameSite: "lax",
@@ -32,15 +42,10 @@ export async function GET(request: Request) {
       maxAge: 10 * 60,
     });
 
-    const clientData = {
-      name: userResult.user.name,
-      vehi1: userResult.user.vehi1,
-      vehi1_name: userResult.user.vehi1_name,
-      vehi2: userResult.user.vehi2,
-      vehi2_name: userResult.user.vehi2_name,
-    };
-
-    return NextResponse.json(clientData);
+    return NextResponse.json({ 
+      success: true,
+      finder_id: user.finder_id 
+    });
   } catch {
     return NextResponse.json(
       { error: "Internal Server Error" },

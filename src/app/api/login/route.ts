@@ -12,21 +12,19 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json();
+    const { phone_num, password } = await request.json();
 
-    if (!email || !password) {
+    if (!phone_num || !password) {
       return NextResponse.json(
-        { error: "All fields are required" },
+        { error: "Phone number and password are required" },
         { status: 400 },
       );
     }
 
     const { data: user, error: fetchError } = await supabase
-      .from("users")
-      .select(
-        "id, name, phone_num, password, vehi1, vehi1_name, vehi2, vehi2_name, created_at, verified",
-      )
-      .eq("email", email)
+      .from("simplified_users")
+      .select("id, phone_num, password, created_at, finder_id, secret_code")
+      .eq("phone_num", phone_num)
       .maybeSingle();
 
     if (fetchError) {
@@ -35,7 +33,7 @@ export async function POST(request: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { error: "No user found. Please sign up." },
+        { error: "Phone number not found. Please sign up." },
         { status: 404 },
       );
     }
@@ -44,7 +42,7 @@ export async function POST(request: Request) {
 
     if (!passwordMatch) {
       return NextResponse.json(
-        { error: "Email or Password Wrong" },
+        { error: "Invalid phone number or password" },
         { status: 401 },
       );
     }
@@ -53,14 +51,10 @@ export async function POST(request: Request) {
       loggedin: true,
       id: user.id,
       secure_validator: user.created_at,
-      name: user.name,
       phone_num: user.phone_num,
-      vehi1: user.vehi1,
-      vehi1_name: user.vehi1_name,
-      vehi2: user.vehi2,
-      vehi2_name: user.vehi2_name,
-      verified: user.verified,
-    })
+      finder_id: user.finder_id,
+      verified: true,
+    });
 
     return NextResponse.json(
       {

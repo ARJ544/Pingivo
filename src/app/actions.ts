@@ -6,31 +6,31 @@ type UserCookie = {
   loggedin: boolean;
   secure_validator: string;
   id?: string;
-  name?: string;
   phone_num?: string;
+  finder_id?: string;
   total_vehi?: string;
-  vehi1?: string;
-  vehi1_name?: string;
-  vehi2?: string;
-  vehi2_name?: string;
   verified: boolean;
 };
 
 export async function IsLoggedIn() {
   const cookieStore = await cookies();
-  const loggedin = cookieStore.get("loggedin");
-  return loggedin?.value === "true";
+  const id = cookieStore.get("id");
+  const secure_validator = cookieStore.get("secure_validator");
+  return Boolean(id && secure_validator);
 }
+
 export async function IsVerified() {
   const cookieStore = await cookies();
   const verified = cookieStore.get("verified");
   return verified?.value === "true";
 }
+
 export async function getTempPhone() {
   const cookieStore = await cookies();
   const temp_phone = cookieStore.get("temp_phone");
   return temp_phone?.value;
 }
+
 export async function deleteShowActionPopupCookie() {
   const cookieStore = await cookies();
   cookieStore.delete("show_action_popup");
@@ -41,22 +41,6 @@ export async function setAllCookie(user: Partial<UserCookie>) {
 
   const SEVEN_DAYS = 60 * 60 * 24 * 7;
 
-  cookieStore.set("loggedin", String(user.loggedin ?? false), {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: SEVEN_DAYS,
-  });
-
-  cookieStore.set("verified", String(user.verified ?? false), {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: SEVEN_DAYS,
-  });
-
   if (user.secure_validator)
     cookieStore.set("secure_validator", String(user.secure_validator), {
       httpOnly: true,
@@ -65,17 +49,9 @@ export async function setAllCookie(user: Partial<UserCookie>) {
       path: "/",
       maxAge: SEVEN_DAYS,
     });
+  
   if (user.id)
     cookieStore.set("id", user.id, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: SEVEN_DAYS,
-    });
-
-  if (user.name)
-    cookieStore.set("name", user.name, {
       httpOnly: true,
       secure: true,
       sameSite: "lax",
@@ -92,8 +68,8 @@ export async function setAllCookie(user: Partial<UserCookie>) {
       maxAge: SEVEN_DAYS,
     });
 
-  if (user.vehi1)
-    cookieStore.set("vehi1", user.vehi1, {
+  if (user.finder_id)
+    cookieStore.set("finder_id", user.finder_id, {
       httpOnly: true,
       secure: true,
       sameSite: "lax",
@@ -101,43 +77,21 @@ export async function setAllCookie(user: Partial<UserCookie>) {
       maxAge: SEVEN_DAYS,
     });
 
-  if (user.vehi1_name)
-    cookieStore.set("vehi1_name", user.vehi1_name, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: SEVEN_DAYS,
-    });
-
-  if (user.vehi2)
-    cookieStore.set("vehi2", user.vehi2, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: SEVEN_DAYS,
-    });
-
-  if (user.vehi2_name)
-    cookieStore.set("vehi2_name", user.vehi2_name, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: SEVEN_DAYS,
-    });
-
-  const totalVehicles = [user.vehi1, user.vehi2].filter(Boolean).length;
-  cookieStore.set("total_vehi", totalVehicles.toString(), {
+  cookieStore.set("loggedin", String(user.loggedin ?? (Boolean(user.id && user.secure_validator))), {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
     path: "/",
     maxAge: SEVEN_DAYS,
   });
-  // if (user.email) cookieStore.set("email", user.email, { path: "/", maxAge: SEVEN_DAYS });
-  // if (user.password) cookieStore.set("password", user.password, { path: "/", maxAge: SEVEN_DAYS });
+
+  cookieStore.set("verified", String(user.verified ?? false), {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: SEVEN_DAYS,
+  });
 }
 
 export async function deleteAllCookie() {
@@ -151,7 +105,7 @@ export async function getAllCookie(): Promise<UserCookie> {
   const cookieStore = await cookies();
   const get = (name: string) => cookieStore.get(name)?.value;
 
-  const loggedin = get("loggedin") === "true";
+  const loggedin = Boolean(get("id") && get("secure_validator"));
   const verified = get("verified") === "true";
 
   return {
@@ -159,14 +113,8 @@ export async function getAllCookie(): Promise<UserCookie> {
     verified,
     secure_validator: get("secure_validator") || "",
     id: get("id"),
-    name: get("name"),
-    // email: get('email'),
-    // password: get('password'),
     phone_num: get("phone_num"),
+    finder_id: get("finder_id"),
     total_vehi: get("total_vehi"),
-    vehi1: get("vehi1"),
-    vehi1_name: get("vehi1_name"),
-    vehi2: get("vehi2"),
-    vehi2_name: get("vehi2_name"),
   };
 }

@@ -43,7 +43,7 @@ export default function UpdateClient() {
       const res = await fetch("/api/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ password }),
       });
 
       const result = await res.json();
@@ -109,24 +109,6 @@ export default function UpdateClient() {
             onSubmit={handleUpdate}
             className="divide-y divide-slate-200 dark:divide-slate-800"
           >
-            <Field
-              label="Update Full Name"
-              icon={<User size={18} />}
-              value={name}
-              onChange={(v) => setName(v.replace(/\s{2,}/g, " "))}
-              type="text"
-              placeholder="New full name"
-            />
-
-            <Field
-              label="Update Email"
-              icon={<Mail size={18} />}
-              value={email}
-              onChange={(e) => setEmail(e.trim())}
-              placeholder="name@example.com"
-              type="email"
-              error={!isEmailValid && "Invalid email format"}
-            />
 
             {/* Password */}
             <div className="p-6">
@@ -145,10 +127,9 @@ export default function UpdateClient() {
                   onChange={(e) => setPassword(e.target.value.trim())}
                   placeholder="••••••••"
                   className={`w-full pl-10 pr-12 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white
-                    ${
-                      isPasswordValid
-                        ? "border-slate-200 dark:border-slate-700"
-                        : "border-red-500"
+                    ${isPasswordValid
+                      ? "border-slate-200 dark:border-slate-700"
+                      : "border-red-500"
                     }
                   `}
                 />

@@ -11,9 +11,9 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { email, secretcode, newPassword } = await request.json();
+    const { phone_num, secretcode, newPassword } = await request.json();
 
-    if (!email || !secretcode || !newPassword) {
+    if (!phone_num || !secretcode || !newPassword) {
       return NextResponse.json(
         { error: "All fields are required" },
         { status: 400 },
@@ -21,9 +21,9 @@ export async function POST(request: Request) {
     }
 
     const { data: user, error: fetchError } = await supabase
-      .from("users")
+      .from("simplified_users")
       .select("id, secret_code")
-      .eq("email", email)
+      .eq("phone_num", phone_num)
       .maybeSingle();
 
     if (fetchError) {
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { error: "No user found with this email" },
+        { error: "No user found with this phone number" },
         { status: 404 },
       );
     }
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     const { error: updateError } = await supabase
-      .from("users")
+      .from("simplified_users")
       .update({ password: hashedPassword })
       .eq("id", user.id);
 

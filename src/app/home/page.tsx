@@ -19,7 +19,6 @@ export const metadata = {
 
 export default async function HomePage() {
   const company_name = "ParkPing";
-  const totalVehicle = (await getAllCookie()).total_vehi;
   const isLoggedIn = await IsLoggedIn();
 
   return (
@@ -39,19 +38,6 @@ export default async function HomePage() {
                 </p>
               </div>
             </div>
-            {isLoggedIn && (
-              <div className="flex flex-col max-w-xs bg-white/50 dark:bg-slate-900/50 backdrop-blur p-4 rounded-xl shadow-sm border border-slate-200/40 dark:border-slate-800/40">
-                <div className="flex gap-5 items-center mb-2">
-                  <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">
-                    Vehicles Used: {totalVehicle}/2
-                  </span>
-                </div>
-
-                <span className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                  {totalVehicle === "2" ? "All slots full" : "Slots available"}
-                </span>
-              </div>
-            )}
           </div>
 
           <div className="mt-4">
@@ -72,16 +58,7 @@ export default async function HomePage() {
         </div>
 
         {/* Action Cards */}
-        <section className="min-w-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-          <ActionCard
-            icon={<PlusSquare />}
-            title="Register Vehicle"
-            desc="Add your vehicle and allow others to contact you safely."
-            href="/registercar"
-            customText={totalVehicle === "2" ? "Slot full 2/2" : "Register"}
-            disabled={totalVehicle === "2"}
-          />
-
+        <section className="min-w-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <ActionCard
             icon={<Search />}
             title="Search Owner"
@@ -108,9 +85,9 @@ export default async function HomePage() {
 
           <DangerCard
             icon={<Trash2 />}
-            title="Remove Vehicle or Account"
-            desc="Delete a vehicle or your account."
-            href="/delete-account-or-vehicle"
+            title="Delete Account"
+            desc="Permanently delete your account."
+            href="/delete-account"
           />
         </section>
 
