@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { User, Lock, Mail, Phone, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ShowWarning } from "@/app/search/searchCarClient";
 import { MessageOwnerModal } from "@/components/my_ui/message-owner";
 import Popup from "@/components/my_ui/CustomPopUp";
 import { decryptPhone } from "@/lib/crypto";
@@ -135,7 +134,7 @@ export default function ShowOwnerDetail({
       }
 
       setErrorOrSuccessMessage(
-        "Call started for 60s. Incoming shortly - verify the last 4 digits (8181). Speak politely and confirm the owner's name."
+        "Call started for 60s. Incoming shortly - verify the last 4 digits (8181)."
       );
     } catch (err: any) {
       setErrorOrSuccessMessage(err.message);
@@ -146,13 +145,6 @@ export default function ShowOwnerDetail({
 
   return (
     <>
-      {showWarning && (
-        <ShowWarning
-          isLoggedin={isLoggedin}
-          carNum={car_num}
-          onClose={() => setShowWarning(false)}
-        />
-      )}
       <MessageOwnerModal
         open={messageOwnerOpen}
         onOpenChange={setMessageOwnerOpen}

@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 type UserCookie = {
   loggedin: boolean;
@@ -31,9 +32,9 @@ export async function getTempPhone() {
   return temp_phone?.value;
 }
 
-export async function deleteShowActionPopupCookie() {
+export async function deleteShowSecretCode() {
   const cookieStore = await cookies();
-  cookieStore.delete("show_action_popup");
+  cookieStore.delete("show_secret_code");
 }
 
 export async function setAllCookie(user: Partial<UserCookie>) {
@@ -99,6 +100,7 @@ export async function deleteAllCookie() {
   cookieStore.getAll().forEach((cookie) => {
     cookieStore.delete(cookie.name);
   });
+  redirect('/login')
 }
 
 export async function getAllCookie(): Promise<UserCookie> {

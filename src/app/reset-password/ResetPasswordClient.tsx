@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Lock, Eye, Key } from "lucide-react";
+import { Mail, Lock, Eye, Key, Phone } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -8,15 +8,15 @@ import { useRouter } from "next/navigation";
 
 export default function ResetPasswordClient() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [phone_num, setPhoneNum] = useState("");
   const [secretCode, setSecretCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const isEmailValid = email === "" || emailRegex.test(email);
+  const phoneRegex = /^\+[1-9]\d{1,14}$/;
+  const isEmailValid = phone_num === "" || phoneRegex.test(phone_num);
   const strongPasswordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
   const isPasswordValid = newPassword === "" || strongPasswordRegex.test(newPassword);
@@ -34,7 +34,7 @@ export default function ResetPasswordClient() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email,
+          phone_num,
           secretcode: secretCode,
           newPassword,
         }),
@@ -65,7 +65,7 @@ export default function ResetPasswordClient() {
             Reset Password
           </h1>
           <p className="text-slate-500 dark:text-slate-400">
-            Enter your email and secret code to reset your password
+            Enter your phone number and secret code to reset your password
           </p>
         </div>
 
@@ -84,23 +84,22 @@ export default function ResetPasswordClient() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          {/* Email */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-              Email Address
+              Phone Number (E.164)
             </label>
             <div className="relative">
-              <Mail
+              <Phone
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                 size={18}
               />
               <input
-                value={email}
+                value={phone_num}
                 onChange={(e) => {
-                  setEmail(e.target.value.trim());
+                  setPhoneNum(e.target.value.trim());
                 }}
-                type="email"
-                placeholder="name@example.com"
+                type="tel"
+                placeholder="+18123474536"
                 className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
                   ${
                     isEmailValid
@@ -111,7 +110,7 @@ export default function ResetPasswordClient() {
             </div>
             {!isEmailValid && (
               <p className="text-xs text-red-500">
-                Please enter a valid email address
+                Please enter a valid phone number
               </p>
             )}
           </div>
@@ -142,7 +141,7 @@ export default function ResetPasswordClient() {
               />
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Your secret code was sent to your email address when you first registered.
+              Your secret code was shown to you when you first registered.
             </p>
           </div>
 
@@ -158,7 +157,7 @@ export default function ResetPasswordClient() {
               />
               <input
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onChange={(e) => setNewPassword(e.target.value.replace(/^\s+|\s+$/g, "").trim())}
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter new password"
                 className={`w-full pl-10 pr-12 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition
@@ -188,10 +187,9 @@ export default function ResetPasswordClient() {
           <Button
             type="submit"
             disabled={
-              !email ||
+              !phone_num ||
               !secretCode ||
               !newPassword ||
-              !isEmailValid ||
               !isPasswordValid ||
               !isSecretCodeValid ||
               loading

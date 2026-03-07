@@ -22,6 +22,10 @@ export default function SearchCar({
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [ownerFound, setOwnerFound] = useState(false);
+  const [errorOrSuccessMessage, setErrorOrSuccessMessage] = useState("");
+  const [callCredits, setCallCredits] = useState(3);
+  const [usedCallCredits, setUsedCallCredits] = useState(0);
+  const [creditsLoading, setCreditsLoading] = useState(true);
 
   const isFindIdValid = finderId.length >= 6 && finderId.length <= 20;
 
@@ -40,7 +44,6 @@ export default function SearchCar({
 
         const data = await res.json();
         setOwnerFound(true);
-        setMessage("User found! You can now message them.");
       } catch (err: any) {
         setMessage(err.message || "User not found");
         setOwnerFound(false);
@@ -51,8 +54,57 @@ export default function SearchCar({
 
     fetchOwner();
   }, [queryFinderId]);
+  useEffect(() => {
+    const fetchCallCredits = async () => {
+      try {
+        setCreditsLoading(true);
+        const res = await fetch("/api/get-call-credits");
 
-  const handleSubmit = (e: React.FormEvent) => {
+        if (!res.ok) {
+          setCallCredits(0);
+          setUsedCallCredits(0);
+          return;
+        }
+
+        const result = await res.json();
+
+        if (result.success) {
+          setCallCredits(result.callCredits);
+          setUsedCallCredits(result.creditsUsed);
+        } else {
+          setCallCredits(0);
+          setUsedCallCredits(0);
+        }
+      } catch (err) {
+        setCallCredits(3);
+      } finally {
+        setCreditsLoading(false);
+      }
+    };
+
+    fetchCallCredits();
+  }, []);
+
+  const getResetTimeInLocalZone = () => {
+    const now = new Date();
+    const utcMidnightToday = new Date(Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      0, 0, 0
+    ));
+
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+      timeZoneName: 'longGeneric',
+    });
+
+    return formatter.format(utcMidnightToday);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!finderId.trim()) {
@@ -62,6 +114,28 @@ export default function SearchCar({
 
     router.push(`/search?finder_id=${encodeURIComponent(finderId)}`);
     setMessage("");
+  };
+  const handleCall = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/voice", {
+        method: "POST",
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || "Something went wrong");
+      }
+
+      setErrorOrSuccessMessage(
+        "Call started for 60s. Incoming shortly - verify the last 4 digits (8181)."
+      );
+    } catch (err: any) {
+      setErrorOrSuccessMessage(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const hasPhoneNumber = phone_num || temp_phone_number;
@@ -80,7 +154,7 @@ export default function SearchCar({
 
           <div className="flex w-full flex-col gap-4 pt-8">
             {/* Input */}
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <form onSubmit={handleSearch} className="flex flex-col gap-3">
               <label className="flex flex-col">
                 <span className="pb-2 text-left text-sm font-semibold text-slate-800 dark:text-slate-300">
                   Finder ID
@@ -96,7 +170,7 @@ export default function SearchCar({
                     value={finderId}
                     onChange={(e) => setFinderId(e.target.value.trim())}
                     maxLength={20}
-                    placeholder="e.g. a1b2c3d4e5f6"
+                    placeholder="e.g. wy863jd-acvxhs2"
                     className="h-14 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 pl-12 pr-4 text-lg font-semibold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 transition-all"
                   />
                 </div>
@@ -128,26 +202,62 @@ export default function SearchCar({
               </div>
             )}
 
-            {/* Action Buttons - Show if owner found and user has phone number */}
             {ownerFound && (
-              <div className="flex flex-col gap-3 pt-4">
-                <Button className="w-full h-12 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg transition-all">
-                  Send Message
-                </Button>
-                {hasPhoneNumber ? (
-                  <Button className="w-full h-12 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition-all">
-                    Call Owner
+              <div className="space-y-4 pt-4">
+
+                <div className="grid grid-cols-2 gap-3">
+
+                  <Button className="h-12 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 text-white font-semibold rounded-lg transition active:scale-[0.97]">
+                    Send Message
                   </Button>
 
-                ) : (
-                  <Link
-                    href={`/verify-phone-unknown-user?next=${encodeURIComponent(finderId)}`}
-                  >
-                      <Button className="w-full h-12 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition-all">
-                      Verify Phone to Call
+                  {hasPhoneNumber ? (
+                    <Button
+                      disabled={loading || callCredits <= 0 || creditsLoading}
+                      onClick={handleCall}
+                      className="h-12 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg transition active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Call Owner
                     </Button>
-                  </Link>
+                  ) : (
+                    <Link
+                      href={`/verify-phone-unknown-user?next=${encodeURIComponent(
+                        finderId
+                      )}`}
+                    >
+                      <Button className="h-12 w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg transition active:scale-[0.97]">
+                        Verify Phone
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+
+                {hasPhoneNumber && (
+                  <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 space-y-2">
+
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-700 dark:text-slate-300">
+                        Credits: <strong className="text-blue-600 dark:text-blue-400">{callCredits}</strong> left
+                      </span>
+
+                      <span className="text-slate-500 dark:text-slate-400 text-xs">
+                        {usedCallCredits} used • resets {getResetTimeInLocalZone()}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      • 1 credit will be used only if the receiver answers the call
+                    </p>
+
+                  </div>
                 )}
+
+                {errorOrSuccessMessage && (
+                  <div className="text-sm text-center font-medium text-green-600 dark:text-green-400">
+                    {errorOrSuccessMessage}
+                  </div>
+                )}
+
               </div>
             )}
           </div>

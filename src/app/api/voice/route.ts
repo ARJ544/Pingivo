@@ -11,7 +11,7 @@ const client = Twilio(
 export async function POST() {
   try {
     const cookieStore = await cookies();
-    const callee_cookie_id = cookieStore.get("receiver_id")?.value;
+    const callee_cookie_id = cookieStore.get("receiver_finder_id")?.value;
 
     if (!callee_cookie_id) {
       return NextResponse.json(

@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (secretcode !== user.secret_code) {
+    if ((secretcode as string).trim() !== (user.secret_code as string).trim()) {
       return NextResponse.json(
         { error: "Invalid secret code" },
         { status: 401 },

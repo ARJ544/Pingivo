@@ -60,7 +60,7 @@ export default function GenerateQRClient({ finder_id }: Props) {
             Your QR Code
           </h1>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Display this on your vehicle windshield
+            Display this on your vehicle windshield or anywhere else
           </p>
         </div>
 

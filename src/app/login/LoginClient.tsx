@@ -5,14 +5,18 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { deleteShowSecretCode } from "@/app/actions";
 
-export default function LoginClient({ showActionPopup }: { showActionPopup: string | undefined }) {
+export default function LoginClient({ showSecretCode }: { showSecretCode: string | undefined }) {
   const router = useRouter();
   const [phone_num, setPhoneNum] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [copied, setCopied] = useState(false);
+
+
 
   const phoneRegex = /^\+[1-9]\d{1,14}$/;
   const isPhoneValid = phone_num === "" || phoneRegex.test(phone_num);
@@ -47,9 +51,71 @@ export default function LoginClient({ showActionPopup }: { showActionPopup: stri
       setLoading(false);
     }
   };
+  const refreshPage = () => {
+    router.refresh();
+  }
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(showSecretCode ?? "---Error Occured Do not Copy---");
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+  };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center px-4 bg-slate-50 dark:bg-slate-950">
+
+      {showSecretCode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-2xl">
+
+            <h2 className="text-xl font-black text-slate-900 dark:text-white mb-3">
+              Your Secret Recovery Code
+            </h2>
+
+            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-5">
+              Please copy and store this code in a <strong>safe and private place</strong>.
+              <br /><br />
+              This code can be used to reset your password by visiting
+              <Link href={'/reset-password'} className="font-semibold text-blue-500"> /reset-password</Link>.
+              <br /><br />
+              If you lose this code, you may not be able to recover your account.
+            </p>
+
+            <div className="flex items-center justify-between mb-5 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-3">
+              <span className="font-mono text-lg tracking-wider text-slate-900 dark:text-white">
+                {showSecretCode}
+              </span>
+
+              <Button
+                onClick={handleCopy}
+                className="ml-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1 rounded-md"
+              >
+                {copied ? "Copied!" : "Copy"}
+              </Button>
+            </div>
+
+            <div className="mb-5 rounded-lg border border-yellow-300 bg-yellow-50 p-3 text-xs text-yellow-900 dark:border-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-200">
+              <strong>Important:</strong> This code will only be shown once.
+              Please store it securely. Anyone with this code can reset your password.
+            </div>
+
+            <Button
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg"
+              onClick={() => {
+                deleteShowSecretCode();
+                refreshPage();
+              }}
+            >
+              I Have Saved My Code
+            </Button>
+
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl p-8">
         {/* Header */}
         <div className="flex flex-col gap-2 mb-8 text-center">

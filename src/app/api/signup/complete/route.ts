@@ -26,7 +26,7 @@ export async function POST() {
       secret_code,
       finder_id,
     })
-    .select("id");
+    .select("id, secret_code");
 
   if (insertError) {
     if (insertError.code === "23505") {
@@ -40,6 +40,13 @@ export async function POST() {
 
   cookie.delete("signup_temp");
   cookie.delete("phone_verified");
+  cookie.set("show_secret_code", insertData[0].secret_code, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 10 * 60,
+  });
 
   return NextResponse.json({ success: true, id: insertData[0].id, message: "User registered successfully" });
 

@@ -10,11 +10,11 @@ export const metadata = {
 export default async function LoginPage() {
   const cookieStore = await cookies();
   const isLoggedIn = await IsLoggedIn();
-  const showActionPopup = cookieStore.get("show_action_popup");
+  const showActionPopup = cookieStore.get("show_secret_code");
 
   if (isLoggedIn) {
     redirect("/home");
   }
 
-  return <LoginClient showActionPopup={showActionPopup?.name} />;
+  return <LoginClient showSecretCode={showActionPopup?.value} />;
 }
