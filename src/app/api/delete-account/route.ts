@@ -11,7 +11,7 @@ export async function DELETE() {
 
     const userId = authResult.user.id;
 
-    const { error } = await supabase.from("users").delete().eq("id", userId);
+    const { error } = await supabase.from("simplified_users").delete().eq("id", userId);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
