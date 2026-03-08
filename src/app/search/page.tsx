@@ -1,7 +1,7 @@
 import {
   getAllCookie,
   IsLoggedIn,
-  getTempPhone,
+  getTempPhoneId,
 } from "@/app/actions";
 import SearchCar from "@/app/search/searchCarClient";
 import { decryptPhone } from "@/lib/crypto";
@@ -13,8 +13,7 @@ export const metadata = {
 export default async function SearchPage() {
   const cookie = await getAllCookie();
   const isLoggedIn = await IsLoggedIn();
-  let temp_phone = await getTempPhone();
-  if (temp_phone) temp_phone = await decryptPhone(temp_phone)
+  let temp_phone = await getTempPhoneId();
   return (
     <SearchCar
       is_loggedin={isLoggedIn}

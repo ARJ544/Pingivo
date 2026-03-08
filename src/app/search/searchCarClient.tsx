@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { deleteTempPhone } from "@/app/actions";
 
 export default function SearchCar({
   is_loggedin,
@@ -26,6 +27,7 @@ export default function SearchCar({
   const [callCredits, setCallCredits] = useState(3);
   const [usedCallCredits, setUsedCallCredits] = useState(0);
   const [creditsLoading, setCreditsLoading] = useState(true);
+  const [clickToReset, setClickToReset] = useState(true);
 
   const isFindIdValid = finderId.length >= 6 && finderId.length <= 20;
 
@@ -57,12 +59,16 @@ export default function SearchCar({
   useEffect(() => {
     const fetchCallCredits = async () => {
       try {
+        setClickToReset(false);
         setCreditsLoading(true);
         const res = await fetch("/api/get-call-credits");
 
         if (!res.ok) {
           setCallCredits(0);
           setUsedCallCredits(0);
+          const errorData = await res.json();
+          setErrorOrSuccessMessage(errorData.error || res.statusText);
+          setClickToReset(true);
           return;
         }
 
@@ -71,12 +77,15 @@ export default function SearchCar({
         if (result.success) {
           setCallCredits(result.callCredits);
           setUsedCallCredits(result.creditsUsed);
+          setClickToReset(false);
         } else {
           setCallCredits(0);
           setUsedCallCredits(0);
+          setClickToReset(true);
         }
       } catch (err) {
         setCallCredits(3);
+        setClickToReset(true);
       } finally {
         setCreditsLoading(false);
       }
@@ -117,6 +126,7 @@ export default function SearchCar({
   };
   const handleCall = async () => {
     setLoading(true);
+    setClickToReset(false);
     try {
       const res = await fetch("/api/voice", {
         method: "POST",
@@ -125,6 +135,7 @@ export default function SearchCar({
       const result = await res.json();
 
       if (!res.ok) {
+        setClickToReset(true);
         throw new Error(result.error || "Something went wrong");
       }
 
@@ -133,10 +144,16 @@ export default function SearchCar({
       );
     } catch (err: any) {
       setErrorOrSuccessMessage(err.message);
+      setClickToReset(true);
     } finally {
       setLoading(false);
     }
   };
+
+  const removeTempPhoneId = async () => {
+    await deleteTempPhone();
+    router.refresh();
+  }
 
   const hasPhoneNumber = phone_num || temp_phone_number;
 
@@ -226,7 +243,7 @@ export default function SearchCar({
                       )}`}
                     >
                       <Button className="h-12 w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg transition active:scale-[0.97]">
-                        Verify Phone
+                        Verify Phone To Call
                       </Button>
                     </Link>
                   )}
@@ -255,6 +272,38 @@ export default function SearchCar({
                 {errorOrSuccessMessage && (
                   <div className="text-sm text-center font-medium text-green-600 dark:text-green-400">
                     {errorOrSuccessMessage}
+                    <br />
+                    No verification Required to message
+                  </div>
+                )}
+                {clickToReset && (
+                  <Button onClick={removeTempPhoneId}>Reload Page</Button>
+                )}
+
+                {temp_phone_number && (
+                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-4 py-3 text-sm space-y-3">
+
+                    <div className="space-y-1">
+                      <p className="font-semibold text-amber-700 dark:text-amber-300">
+                        Temporary Phone Number Active
+                      </p>
+
+                      <p className="text-sm text-amber-600 dark:text-amber-400">
+                        You are currently using a temporary phone number to call the owner.
+                        This number will automatically reset after <strong>1 hour</strong>.
+                      </p>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={removeTempPhoneId}
+                      >
+                        Remove Temporary Phone
+                      </Button>
+                    </div>
+
                   </div>
                 )}
 

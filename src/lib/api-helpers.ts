@@ -1,6 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import { decryptPhone } from "./crypto";
 import { NextResponse } from "next/server";
 
 export const supabase = createClient(
@@ -120,10 +119,25 @@ export async function getCaller(
 ): Promise<{ success: false; response: NextResponse } | { success: true; caller: string }> {
   try {
     const cookieStore = await cookies();
-    const tempPhoneValue = cookieStore.get("temp_phone")?.value;
+    const tempPhoneId = cookieStore.get("temp_phone_id")?.value;
 
-    if (tempPhoneValue) {
-      const caller = await decryptPhone(tempPhoneValue);
+    if (tempPhoneId) {
+      const { data: userData, error } = await supabase
+        .from("temporary_phone")
+        .select("temp_phone")
+        .eq("id", tempPhoneId)
+        .single();
+        
+      if (!userData || error) {
+        return {
+          success: false, response: NextResponse.json(
+            { error: "You are not verified! Click Reload button below and verify phone again" },
+            { status: 500 },
+          )
+        };
+      }
+
+      const caller = userData?.temp_phone;
       if (caller) {
         return { success: true, caller };
       }
@@ -138,7 +152,7 @@ export async function getCaller(
     if (!userIdToUse) {
       return {
         success: false,
-        response: NextResponse.json({ error: "Login first" }, { status: 401 }),
+        response: NextResponse.json({ error: "To make a Call: Verify Phone or Login or Remove Temporary Phone" }, { status: 401 }),
       };
     }
 

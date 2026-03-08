@@ -26,10 +26,10 @@ export async function IsVerified() {
   return verified?.value === "true";
 }
 
-export async function getTempPhone() {
+export async function getTempPhoneId() {
   const cookieStore = await cookies();
-  const temp_phone = cookieStore.get("temp_phone");
-  return temp_phone?.value;
+  const temp_phone_id = cookieStore.get("temp_phone_id");
+  return temp_phone_id?.value;
 }
 
 export async function deleteShowSecretCode() {
@@ -50,7 +50,7 @@ export async function setAllCookie(user: Partial<UserCookie>) {
       path: "/",
       maxAge: SEVEN_DAYS,
     });
-  
+
   if (user.id)
     cookieStore.set("id", user.id, {
       httpOnly: true,
@@ -100,7 +100,11 @@ export async function deleteAllCookie() {
   cookieStore.getAll().forEach((cookie) => {
     cookieStore.delete(cookie.name);
   });
-  redirect('/login')
+  redirect('/login');
+}
+export async function deleteTempPhone() {
+  const cookieStore = await cookies();
+  cookieStore.delete("temp_phone_id");
 }
 
 export async function getAllCookie(): Promise<UserCookie> {
