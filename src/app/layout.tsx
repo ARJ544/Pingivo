@@ -13,6 +13,7 @@ import { Suspense } from "react";
 const poppins = Poppins({
   weight: "400",
   style: "normal",
+  display: "swap",
 });
 
 export const metadata: Metadata = {

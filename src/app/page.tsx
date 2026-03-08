@@ -38,7 +38,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href={"/home"}>
                   <Button className="bg-blue-500 hover:bg-blue-500/90 text-white font-bold h-14 px-10 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
-                    <span>Register your Vehicle</span>
+                    <span>Generate your QR Code</span>
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>

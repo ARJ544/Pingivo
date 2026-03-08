@@ -88,7 +88,7 @@ export default function GenerateQRClient({ finder_id }: Props) {
 
         {/* QR Code Preview */}
         <svg ref={svgRef} width="300" height="400" viewBox="0 0 600 900">
-          <image href="/template.png" width="600" height="900" />
+          <image href="/template.jpg" width="600" height="900" />
 
           {/* QR Code */}
           {finder_id && (
@@ -104,8 +104,15 @@ export default function GenerateQRClient({ finder_id }: Props) {
           )}
 
           {/* Finder ID at bottom */}
-          <text x="300" y="50" fontSize="11" fontWeight="bold" textAnchor="middle" fill="#000">
-            ID: {finder_id}
+          <text
+            x="300"
+            y="50"
+            fontSize="24"
+            fontWeight="700"
+            textAnchor="middle"
+            fill="#000"
+          >
+            Finder ID: {finder_id}
           </text>
         </svg>
 
@@ -122,7 +129,7 @@ export default function GenerateQRClient({ finder_id }: Props) {
         {/* Info */}
         <div className="w-full rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 p-4 text-sm">
           <p className="text-blue-900 dark:text-blue-300">
-            <strong>💡 Tip:</strong> Print and place this QR code on your windshield so others can quickly reach you in case of parking issues.
+            <strong>💡 Tip:</strong> Print and place this QR code anywhere so others can quickly reach you in case of issues.
           </p>
         </div>
       </div>
