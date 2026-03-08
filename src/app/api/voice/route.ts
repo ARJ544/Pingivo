@@ -26,7 +26,7 @@ export async function POST() {
     }
     const caller = callerResult.caller;
 
-    const calleeResult = await getUserById(callee_cookie_id);
+    const calleeResult = await getUserByFinderId(callee_cookie_id);
     if (!calleeResult.success) {
       return NextResponse.json(
         { error: "User not found. Please Refresh the page." },
