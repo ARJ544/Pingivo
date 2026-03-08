@@ -1,20 +1,20 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { escapeHtml, sendBrevoEmail, getUserById } from "@/lib/api-helpers";
+import { escapeHtml, sendBrevoEmail, getUserByFinderId } from "@/lib/api-helpers";
 
 export async function POST(req: Request) {
   try {
     const cookie = await cookies();
-    const receiver_id = cookie.get("receiver_id")?.value;
+    const receiver_finder_id = cookie.get("receiver_finder_id")?.value;
 
-    if (!receiver_id) {
+    if (!receiver_finder_id) {
       return NextResponse.json(
         { error: "Something went Wrong. Refresh Page and Try again" },
         { status: 401 }
       );
     }
 
-    const receiverResult = await getUserById(receiver_id);
+    const receiverResult = await getUserByFinderId(receiver_finder_id);
     if (!receiverResult.success || !receiverResult.user) {
       return NextResponse.json(
         { error: "User not found. Please sign up." },
