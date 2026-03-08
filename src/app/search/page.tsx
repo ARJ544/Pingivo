@@ -4,7 +4,6 @@ import {
   getTempPhoneId,
 } from "@/app/actions";
 import SearchCar from "@/app/search/searchCarClient";
-import { decryptPhone } from "@/lib/crypto";
 
 export const metadata = {
   title: "Search a Car",

@@ -11,7 +11,7 @@ import {
   ScanQrCode,
   BadgeCheck,
 } from "lucide-react";
-import { IsLoggedIn, getAllCookie } from "@/app/actions";
+import RefreshPage from "@/components/refreshPage";
 
 export const metadata = {
   title: "Home",
@@ -19,98 +19,101 @@ export const metadata = {
 
 export default async function HomePage() {
   const company_name = "ParkPing";
-  const isLoggedIn = await IsLoggedIn();
 
   return (
-    <main className="min-h-screen bg-linear-to-br overflow-x-hidden  from-slate-50  via-blue-50/40  to-slate-100  dark:from-slate-950  dark:via-blue-950/30  dark:to-slate-900  text-slate-900  dark:text-slate-100 ">
-      <div className="max-w-7xl mx-auto px-4 py-5">
-        {/* Header */}
-        <header className="flex flex-col gap-4 mb-10">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="bg-linear-to-br from-blue-500 to-indigo-500 p-3 rounded-xl text-white shadow-lg">
-                <ShieldCheck className="size-7" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-black">ParkPing</h1>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Vehicle Safety &amp; Contact Platform
-                </p>
+    <>
+      <RefreshPage />
+
+      <main className="min-h-screen bg-linear-to-br overflow-x-hidden  from-slate-50  via-blue-50/40  to-slate-100  dark:from-slate-950  dark:via-blue-950/30  dark:to-slate-900  text-slate-900  dark:text-slate-100 ">
+        <div className="max-w-7xl mx-auto px-4 py-5">
+          {/* Header */}
+          <header className="flex flex-col gap-4 mb-10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="bg-linear-to-br from-blue-500 to-indigo-500 p-3 rounded-xl text-white shadow-lg">
+                  <ShieldCheck className="size-7" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-black">ParkPing</h1>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    Vehicle Safety &amp; Contact Platform
+                  </p>
+                </div>
               </div>
             </div>
+
+            <div className="mt-4">
+              <h2 className="text-4xl font-black tracking-tight mb-3">
+                Safer Parking. Smarter Connections.
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
+                {company_name} lets vehicle owners stay anonymous while remaining
+                reachable during parking issues, safety alerts, and emergencies.
+              </p>
+            </div>
+          </header>
+
+          {/* Privacy Badge */}
+          <div className="flex items-center gap-2 mb-10 w-fit px-4 py-2 rounded-full bg-green-100/70 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-sm font-semibold">
+            <BadgeCheck className="size-4" />
+            Privacy Protected
           </div>
 
-          <div className="mt-4">
-            <h2 className="text-4xl font-black tracking-tight mb-3">
-              Safer Parking. Smarter Connections.
-            </h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
-              {company_name} lets vehicle owners stay anonymous while remaining
-              reachable during parking issues, safety alerts, and emergencies.
-            </p>
-          </div>
-        </header>
+          {/* Action Cards */}
+          <section className="min-w-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <ActionCard
+              icon={<Search />}
+              title="Search Owner"
+              desc="Look up a vehicle and send an urgent safety message."
+              customText="Search"
+              href="/search"
+            />
 
-        {/* Privacy Badge */}
-        <div className="flex items-center gap-2 mb-10 w-fit px-4 py-2 rounded-full bg-green-100/70 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-sm font-semibold">
-          <BadgeCheck className="size-4" />
-          Privacy Protected
+            <ActionCard
+              icon={<QrCode />}
+              title="Generate QR"
+              desc="Create a QR for your windshield to receive instant alerts."
+              customText="Generate QR"
+              href="/qr"
+            />
+
+            <ActionCard
+              icon={<Edit3 />}
+              title="Update Details"
+              desc="Edit profile info or contact preferences."
+              customText="Update"
+              href="/update"
+            />
+
+            <DangerCard
+              icon={<Trash2 />}
+              title="Delete Account"
+              desc="Permanently delete your account."
+              href="/delete-account"
+            />
+          </section>
+
+          {/* Privacy Tips */}
+          <section className="mt-20">
+            <h3 className="text-xl font-bold mb-6">Quick Privacy Tips</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <TipCard
+                icon={<EyeOff />}
+                title="Always Anonymous"
+                desc="Your phone number and identity are never shared. Messages are securely relayed through ParkPing."
+              />
+
+              <TipCard
+                icon={<ScanQrCode />}
+                title="Check Your QR"
+                desc="Scan your own QR occasionally to ensure alerts are active."
+              />
+            </div>
+          </section>
         </div>
-
-        {/* Action Cards */}
-        <section className="min-w-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <ActionCard
-            icon={<Search />}
-            title="Search Owner"
-            desc="Look up a vehicle and send an urgent safety message."
-            customText="Search"
-            href="/search"
-          />
-
-          <ActionCard
-            icon={<QrCode />}
-            title="Generate QR"
-            desc="Create a QR for your windshield to receive instant alerts."
-            customText="Generate QR"
-            href="/qr"
-          />
-
-          <ActionCard
-            icon={<Edit3 />}
-            title="Update Details"
-            desc="Edit profile info or contact preferences."
-            customText="Update"
-            href="/update"
-          />
-
-          <DangerCard
-            icon={<Trash2 />}
-            title="Delete Account"
-            desc="Permanently delete your account."
-            href="/delete-account"
-          />
-        </section>
-
-        {/* Privacy Tips */}
-        <section className="mt-20">
-          <h3 className="text-xl font-bold mb-6">Quick Privacy Tips</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <TipCard
-              icon={<EyeOff />}
-              title="Always Anonymous"
-              desc="Your phone number and identity are never shared. Messages are securely relayed through ParkPing."
-            />
-
-            <TipCard
-              icon={<ScanQrCode />}
-              title="Check Your QR"
-              desc="Scan your own QR occasionally to ensure alerts are active."
-            />
-          </div>
-        </section>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
 

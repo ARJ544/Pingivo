@@ -34,11 +34,8 @@ export async function Navigation() {
 
           {!isLoggedIn && (
             <>
-              <Link href="/login">
-                <Button className="rounded-full px-2">Login</Button>
-              </Link>
               <Link href="/signup">
-                <Button className="rounded-full px-2">Sign Up</Button>
+                <Button className="rounded-full px-2">SignUp/SignIn</Button>
               </Link>
             </>
           )}

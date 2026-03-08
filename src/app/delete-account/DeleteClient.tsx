@@ -33,12 +33,13 @@ export default function DeleteAccountClient() {
       const res = await fetch("/api/delete-account", {
         method: "DELETE",
       });
+      console.log("Response status:", res.status)
 
       if (!res.ok) {
-        throw new Error("Failed to delete account");
+        throw new Error("Failed to delete account! Refresh Page again");
       }
-
-      router.replace("/signup");
+      setMessage("Account deleted successfully you may refresh page!");
+      router.refresh();
     } catch (err: any) {
       setMessage(err.message || "Something went wrong");
     } finally {

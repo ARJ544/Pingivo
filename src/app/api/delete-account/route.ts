@@ -17,13 +17,17 @@ export async function DELETE() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    await deleteAllCookie();
+    try {
+      await deleteAllCookie();
+    } catch (cookieError) {
+      // console.error("Error deleting cookies:", cookieError);
+    }
 
     return NextResponse.json(
       { message: "Account Deleted successfully" },
       { status: 200 }
     );
-  } catch (_error) {
+  } catch (error) {
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

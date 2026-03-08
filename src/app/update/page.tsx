@@ -11,7 +11,7 @@ export default async function Update() {
   const secure_validator = (await getAllCookie()).secure_validator;
 
   if (!isLoggedIn || !secure_validator) {
-    redirect("/login");
+    redirect("/signup");
   }
 
   return <UpdateClient />;
