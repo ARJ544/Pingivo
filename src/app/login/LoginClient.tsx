@@ -1,6 +1,6 @@
 "use client";
 
-import { Lock, Eye, Phone } from "lucide-react";
+import { Lock, Eye, Phone, Check, Copy } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -93,7 +93,7 @@ export default function LoginClient({ showSecretCode }: { showSecretCode: string
                 onClick={handleCopy}
                 className="ml-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1 rounded-md"
               >
-                {copied ? "Copied!" : "Copy"}
+                {copied ? <Check size={16} /> : <Copy size={16} />}
               </Button>
             </div>
 

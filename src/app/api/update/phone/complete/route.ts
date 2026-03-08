@@ -61,14 +61,14 @@ export async function POST() {
     );
   }
 
-  const latestDetails = {
+  await setAllCookie({
+    loggedin: true,
     id: updateData.id,
     secure_validator: updateData.created_at,
-    phone_num: updateData.phone_num.slice(-4),
+    phone_num: updateData.phone_num,
     finder_id: updateData.finder_id,
-  };
-
-  await setAllCookie(latestDetails);
+    verified: true,
+  });
 
   cookie.delete("update_profile_phone_temp");
   cookie.delete("phone_verified");

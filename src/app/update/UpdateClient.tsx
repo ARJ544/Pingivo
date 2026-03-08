@@ -92,7 +92,7 @@ export default function UpdateClient() {
 
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-slate-950 py-10 px-4">
-      <div className="mx-auto max-w-4xl space-y-8">
+      <div className="mx-auto max-w-3xl space-y-8">
         {/* Header */}
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">

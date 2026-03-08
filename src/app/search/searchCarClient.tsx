@@ -112,7 +112,7 @@ export default function SearchCar({
       return;
     }
 
-    router.push(`/search?finder_id=${encodeURIComponent(finderId)}`);
+    router.push(`/search?finder_id=${encodeURIComponent(finderId.trim().toLowerCase())}`);
     setMessage("");
   };
   const handleCall = async () => {

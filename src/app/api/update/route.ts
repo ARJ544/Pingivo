@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { deleteAllCookie, setAllCookie } from "@/app/actions";
 import { authenticateUser, supabase } from "@/lib/api-helpers";
+import { setAllCookie } from "@/app/actions";
 
 export const runtime = "nodejs";
 
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
     if (!password) {
       return NextResponse.json(
-        { error: "Please provide phone number or password to update" },
+        { error: "Please a password to update" },
         { status: 400 }
       );
     }
@@ -46,6 +46,15 @@ export async function POST(request: Request) {
         { status: 404 }
       );
     }
+
+    await setAllCookie({
+      loggedin: true,
+      id: updated.id,
+      secure_validator: updated.created_at,
+      phone_num: updated.phone_num,
+      finder_id: updated.finder_id,
+      verified: true,
+    });
 
     return NextResponse.json(
       { message: "Profile updated successfully" },

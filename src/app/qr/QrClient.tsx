@@ -5,7 +5,7 @@ import jsPDF from "jspdf";
 import "svg2pdf.js";
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
-import { Copy, Download } from "lucide-react";
+import { Copy, Download, Check } from "lucide-react";
 
 type Props = {
   finder_id: string;
@@ -72,7 +72,7 @@ export default function GenerateQRClient({ finder_id }: Props) {
               type="text"
               value={finder_id}
               readOnly
-              className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-mono text-sm"
+              className="w-full flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-mono text-sm"
             />
             <Button
               onClick={copyToClipboard}
@@ -80,8 +80,8 @@ export default function GenerateQRClient({ finder_id }: Props) {
               variant="outline"
               className="gap-2"
             >
-              <Copy size={16} />
-              {copied ? "Copied!" : "Copy"}
+              
+              {copied ? <Check size={16} /> : <Copy size={16} />}
             </Button>
           </div>
         </div>
