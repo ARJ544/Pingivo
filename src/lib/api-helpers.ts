@@ -287,12 +287,12 @@ export async function sendBrevoEmail(
 /**
  * Fetches user by ID with all fields
  */
-export async function getUserById(userId: string) {
+export async function getUserByFinderId(userFinderId: string) {
   try {
     const { data: user, error } = await supabase
       .from("simplified_users")
       .select("*")
-      .eq("id", userId)
+      .eq("finder_id", userFinderId)
       .single();
 
     if (error) {
