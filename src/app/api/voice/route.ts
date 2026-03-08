@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import Twilio from "twilio";
-import { getCaller, getCallCredits, getUserById } from "@/lib/api-helpers";
+import { getCaller, getCallCredits, getUserByFinderId } from "@/lib/api-helpers";
 
 const client = Twilio(
   process.env.TWILIO_ACCOUNT_SID!,
