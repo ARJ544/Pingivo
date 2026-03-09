@@ -9,11 +9,11 @@ export async function Navigation() {
 
   return (
     <nav className="sticky top-0 z-50 w-full rounded-b-sm backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-1 transition hover:opacity-90"
+          className="flex items-center gap-2 transition hover:opacity-90"
         >
           <Image
             src="/logo.png"
@@ -21,11 +21,17 @@ export async function Navigation() {
             className="h-8 w-8 rounded-sm"
             height={32}
             width={32}
-            priority={true}
+            priority
           />
-          <span className="text-lg font-bold tracking-tight text-foreground">
-            ParkPing
-          </span>
+
+          <div className="flex flex-col leading-tight">
+            <span className="text-lg font-bold tracking-tight text-foreground">
+              ParkPing
+            </span>
+            <span className="text-[10px] text-muted-foreground tracking-wider">
+              The ∘ SigmARJ ∘ Company
+            </span>
+          </div>
         </Link>
 
         {/* Right Actions */}

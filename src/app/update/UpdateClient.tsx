@@ -78,7 +78,7 @@ export default function UpdateClient() {
             )}
 
             {/* Actions */}
-            <div className="p-6 flex justify-end gap-4">
+            <div className="px-6 pb-3 pt-3 flex justify-end gap-4">
               <Button
                 disabled={!canSubmitPhone}
                 className="bg-blue-600 hover:bg-blue-700 text-white"

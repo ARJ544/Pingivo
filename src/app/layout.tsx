@@ -23,7 +23,31 @@ export const metadata: Metadata = {
     template: "%s | ParkPing",
   },
   description:
-    "Redefining vehicle safety through privacy-first communication. Secure, anonymous, and reliable.",
+    "Generate multipurpose QR codes for anything, anywhere. Secure, anonymous linking for vehicles, belongings, and beyond.",
+  keywords: [
+    "QR code",
+    "multipurpose QR",
+    "anonymous linking",
+    "secure QR code",
+    "vehicle QR",
+    "smart sticker",
+    "ParkPing",
+  ],
+  authors: [{ name: "ParkPing" }],
+  creator: "ParkPing",
+  openGraph: {
+    type: "website",
+    title: "ParkPing — QR Codes for Everything",
+    description:
+      "Generate multipurpose QR codes for anything, anywhere. Secure, anonymous linking for vehicles, belongings, and beyond.",
+    siteName: "ParkPing",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ParkPing — QR Codes for Everything",
+    description:
+      "Generate multipurpose QR codes for anything, anywhere. Secure, anonymous linking for vehicles, belongings, and beyond.",
+  },
 };
 
 export const viewport: Viewport = {
@@ -65,8 +89,9 @@ export default function RootLayout({
                       </h2>
                     </div>
                     <p className="text-slate-500 text-sm leading-relaxed">
-                      Redefining vehicle safety through privacy-first
-                      communication. Secure, anonymous, and reliable.
+                      Generate multipurpose QR codes for anything, anywhere.
+                      Secure, anonymous linking for vehicles, belongings, and
+                      beyond.
                     </p>
                     <div className="flex items-center gap-4">
                       <Link
@@ -98,7 +123,7 @@ export default function RootLayout({
                         className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
                         href="#"
                       >
-                        Safety Guide
+                        Use Cases
                       </Link>
                       <Link
                         className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
@@ -170,7 +195,7 @@ export default function RootLayout({
                     © {currentYear} {company_name}. All rights reserved.
                   </p>
                   <div className="flex items-center gap-6">
-                    <span>Designed for Modern Trust</span>
+                    <span>QR Codes for Everything</span>
                     <MapPin className="h-3 w-3" />
                     <span>Global Coverage</span>
                   </div>
