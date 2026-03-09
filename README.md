@@ -1,44 +1,41 @@
 # ParkPing
-**Multipurpose QR Codes · Privacy First**
 
-ParkPing lets you generate a secure QR code for anything you own — your car, bike, bag, laptop, or anything else. Stick it on, and anyone who finds or needs to reach you can send a message or make a call to you instantly, without ever seeing your phone number.
+**Privacy-First Vehicle Protection Platform**
 
-## Why ParkPing?
+ParkPing is a modern, secure web application that keeps vehicle owners connected with anyone who needs to contact them about their car—all without sharing personal information. Generate a unique QR code, stick it on your car, and get instant notifications when someone scans it.
 
-- **Not just for vehicles** — use it on anything you want to keep recoverable
-- **100% Anonymous** — your phone number is never shared with anyone
-- **Instant Alerts** — get notified the moment someone scans your code
-- **30-second setup** — enter your number, download your QR, stick it on
-- **No app needed** — anyone can scan with a regular phone camera or google lens
+## 🎯 Why ParkPing?
 
-## Use Cases
-
-| Item | How it helps |
-|------|-------------|
-| Vehicle | Someone needs to reach you about your parked car |
-| Bicycle | Help a stranger return your bike if found |
-| Bag / Luggage | Lost luggage that finds its way back |
-| Laptop | Let an honest finder contact you if it goes missing |
-| Parcels | Delivery and return routing made instant |
+- **Privacy First**: Communicate anonymously without exposing your phone number
+- **Instant Alerts**: Get notified immediately via email when your car is flagged
+- **Simple Setup**: Register your vehicle and get your QR code in under 2 minutes
+- **No Technical Skills**: Intuitive interface for everyone
+- **Peace of Mind**: Perfect for towing emergencies, parking concerns, or any vehicle-related contact needs
 
 ## Key Features
 
-### Privacy-First Communication
-Every message is relayed through ParkPing anonymously. The person scanning never sees your contact details — they send a message and you decide if you respond.
+### 🛡️ Privacy-First Communication
+Communicate anonymously through our secure portal. No one can get your contact information.
 
-### Multipurpose QR Templates
-Choose from multiple sticker templates, drag and resize the QR to fit, and download a print-ready Sticker in seconds.
+### 🔔 Instant Email Alerts
+Get notified immediately when someone scans your QR code, so you can respond to emergencies in real-time.
 
-### Instant Notifications
-Get alerted the moment someone scans your code and sends a message.
+### Easy Setup
+1. Register your vehicle details (license plate + info)
+2. Download your unique QR code
+3. Print and stick it on your car
+4. Anyone can scan to message you anonymously
 
-### Dark / Light Mode
-Clean UI that adapts to your system preference.
+### 🔐 Secure & Reliable
+Built with industry-standard authentication and encryption to keep your data safe.
 
-## Getting Started
+### Modern Dark/Light Mode
+Beautiful UI that adapts to your preference with seamless theme switching.
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+
+- Node.js 18+ 
 - npm or yarn
 
 ### Installation
@@ -47,44 +44,3 @@ Clean UI that adapts to your system preference.
 ```bash
 git clone <repository-url>
 cd parkping
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Set up environment variables:
-```bash
-cp .env.example .env.local
-```
-
-4. Run the development server:
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `NEXT_PUBLIC_FRONTEND_URL` | Your frontend URL (e.g. `http://localhost:3000`) |
-| `SUPABASE_ANON_KEY` | Your Supabase anon key |
-| `SUPABASE_URL` | Your Supabase db URL |
-| `TWILIO_ACCOUNT_SID` | Your Twilio Account SID |
-| `TWILIO_AUTH_TOKEN` | Your Twilio Account Auth Token |
-| `TWILIO_NUMBER` | Your Twilio Account Purchased Number |
-
-## Tech Stack
-
-- **Next.js** — React framework
-- **Tailwind CSS** — Styling
-- **Syne** — Display font (via `next/font/google`)
-- **jsPDF + svg2pdf.js** — PDF generation
-- **qrcode.react** — QR code rendering
-
----
-
-© ParkPing. QR Codes for Everything.
