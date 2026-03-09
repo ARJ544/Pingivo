@@ -30,7 +30,7 @@ export default function GenerateQRClient({ finder_id }: Props) {
   const [copied, setCopied] = useState(false);
   const [template, setTemplate] = useState(TEMPLATES[2]);
   const [qrSize, setQrSize] = useState(175);
-  const [qrPos, setQrPos] = useState({ x: CW / 2 - 87, y: CH / 2 - 65 });
+  const [qrPos, setQrPos] = useState({ x: CW / 2 - 90, y: CH / 2 - 50 });
   const [scale, setScale] = useState(1);
 
   const dragging = useRef(false);
