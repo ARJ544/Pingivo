@@ -9,7 +9,7 @@ export async function Navigation() {
 
   return (
     <nav className="sticky top-0 z-50 w-full rounded-b-sm backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+      <div className="flex h-16 max-w-7xl w-full items-center justify-between px-2">
         {/* Logo */}
         <Link
           href="/"
@@ -18,7 +18,7 @@ export async function Navigation() {
           <Image
             src="/logo.png"
             alt="ParkPing Logo"
-            className="h-8 w-8 rounded-sm"
+            className="h-10 w-10 rounded-sm"
             height={32}
             width={32}
             priority
@@ -41,7 +41,7 @@ export async function Navigation() {
           {!isLoggedIn && (
             <>
               <Link href="/signup">
-                <Button className="rounded-full px-2">SignUp/SignIn</Button>
+                <Button className="rounded-full">SignUp/SignIn</Button>
               </Link>
             </>
           )}

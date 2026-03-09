@@ -19,5 +19,5 @@ export default async function GenerateQR() {
     redirect("/signup");
   }
 
-  return <GenerateQRClient finder_id={finder_id} />;
+  return <GenerateQRClient finder_id={finder_id ?? "Error"} />;
 }
