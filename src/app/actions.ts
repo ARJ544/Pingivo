@@ -100,7 +100,7 @@ export async function deleteAllCookie() {
   cookieStore.getAll().forEach((cookie) => {
     cookieStore.delete(cookie.name);
   });
-  redirect('/signup');
+  redirect('/signin');
 }
 export async function deleteTempPhone() {
   const cookieStore = await cookies();

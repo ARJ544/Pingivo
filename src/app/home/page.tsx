@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { QrCode, Search, Edit3, Trash2, ArrowRight, ShieldCheck, ScanQrCode } from "lucide-react";
+import { QrCode, Edit3, Trash2, ArrowRight, ShieldCheck, ScanQrCode } from "lucide-react";
 import { Syne } from "next/font/google";
 import RefreshPage from "@/components/refreshPage";
 
@@ -12,7 +12,7 @@ export default async function HomePage() {
     <>
       <RefreshPage />
       <main className="min-h-screen bg-white dark:bg-[#080c10] text-slate-900 dark:text-slate-50">
-        <div className="max-w-lg mx-auto px-6 py-12 flex flex-col gap-10">
+        <div className="max-w-lg mx-auto px-6 py-4 flex flex-col gap-10">
 
           {/* Greeting */}
           <div className="flex flex-col gap-1">

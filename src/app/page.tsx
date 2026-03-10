@@ -3,7 +3,6 @@ import { Sora } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import HomePage from "@/app/home/page";
-import SignupClient from "@/app/signin/SignupClient";
 import { IsLoggedIn } from "@/app/actions";
 
 const sora = Sora({ subsets: ["latin"], weight: ["700", "800"] });
@@ -26,6 +25,7 @@ const steps = [
 
 export default async function Home() {
   const is_logged_in = await IsLoggedIn();
+
   return (
     <div className="bg-white dark:bg-[#080c10] text-slate-900 dark:text-slate-50">
       <main className="max-w-5xl mx-auto px-6">
@@ -52,7 +52,7 @@ export default async function Home() {
         <hr className="border-slate-100 dark:border-slate-800" />
 
         {/* USE CASES */}
-        <section className="py-16">
+        <section className="py-10">
           <h2 className={`${sora.className} text-2xl font-extrabold tracking-tight mb-2`}>Typical Use Cases.</h2>
           <p className="text-sm text-slate-400 mb-8">Not just vehicles — use it on anything.</p>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -71,7 +71,7 @@ export default async function Home() {
         <hr className="border-slate-100 dark:border-slate-800" />
 
         {/* HOW IT WORKS */}
-        <section className="py-16">
+        <section className="py-10">
           <h2 className={`${sora.className} text-2xl font-extrabold tracking-tight mb-2`}>How it works.</h2>
           <p className="text-sm text-slate-400 mb-8">Up and running in under 30 seconds.</p>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -90,7 +90,7 @@ export default async function Home() {
         <hr className="border-slate-100 dark:border-slate-800" />
 
         {/* CTA */}
-        <section className="py-16 flex flex-col gap-4">
+        <section className="py-10 flex flex-col gap-4">
           <h2 className={`${sora.className} text-3xl md:text-4xl font-extrabold tracking-tight`}>
             Ready? It takes 30 seconds.
           </h2>
