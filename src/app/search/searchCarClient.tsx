@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { Phone, RefreshCcw, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { deleteTempPhone } from "@/app/actions";
+import VerifyPhoneUnknownUser from "@/app/verify-phone-unknown-user/verify-phone-unknown-user-client";
 
 function Loader() {
   return (
@@ -207,13 +207,7 @@ export default function SearchCar({
                         Call Owner
                       </Button>
                     ) : (
-                      <Link
-                        href={`/verify-phone-unknown-user?next=${encodeURIComponent(finderId)}`}
-                      >
-                        <Button className="h-12 w-full bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white font-semibold rounded-lg transition active:scale-[0.97]">
-                          Verify Phone To Call
-                        </Button>
-                      </Link>
+                      <VerifyPhoneUnknownUser temp_phone={temp_phone_id} finder_id={finderId} />
                     )}
 
                     {hasPhoneNumber && is_verified && (
