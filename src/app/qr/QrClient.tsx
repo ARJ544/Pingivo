@@ -6,10 +6,10 @@ import "svg2pdf.js";
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
 import { Copy, Download, Check, Share2 } from "lucide-react";
-import { Syne } from "next/font/google";
+import { Sora } from "next/font/google";
 import { Input } from "@/components/ui/input";
 
-const syne = Syne({ subsets: ["latin"], weight: ["700", "800"] });
+const sora = Sora({ subsets: ["latin"], weight: ["700", "800"] });
 
 type Props = { finder_id: string };
 
@@ -65,7 +65,7 @@ export default function GenerateQRClient({ finder_id }: Props) {
       <div className="max-w-5xl mx-auto px-6 py-4 flex flex-col gap-10">
 
         <div className="flex flex-col gap-1">
-          <h1 className={`${syne.className} text-3xl font-extrabold tracking-tight`}>Your QR Code</h1>
+          <h1 className={`${sora.className} text-3xl font-extrabold tracking-tight`}>Your QR Code</h1>
           <p className="text-sm text-slate-400">Choose a template, position your QR, then download.</p>
         </div>
 

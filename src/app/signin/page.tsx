@@ -1,6 +1,6 @@
 import { IsLoggedIn } from "@/app/actions";
 import { redirect } from "next/navigation";
-import SignupClient from "@/app/signup/SignupClient";
+import SignupClient from "@/app/signin/SignupClient";
 
 export const metadata = {
   title: "SignUp",

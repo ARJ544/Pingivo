@@ -11,7 +11,7 @@ export default async function DeleteAccount() {
   const secure_validator = (await getAllCookie()).secure_validator;
 
   if (!isLoggedIn || !secure_validator) {
-    redirect("/signup");
+    redirect("/signin");
   }
 
   return <DeleteAccountClient />;

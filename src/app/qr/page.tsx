@@ -16,7 +16,7 @@ export default async function GenerateQR() {
   const finder_id = (await getFinderIdById(id)).user;
 
   if (!isLoggedIn || !secure_validator || !finder_id) {
-    redirect("/signup");
+    redirect("/signin");
   }
 
   return <GenerateQRClient finder_id={finder_id ?? "Error"} />;
