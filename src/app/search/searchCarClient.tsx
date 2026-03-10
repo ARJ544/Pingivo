@@ -153,7 +153,7 @@ export default function SearchCar({
   const hasPhoneNumber = phone_num || temp_phone_number;
 
   return (
-    <main className="flex flex-1 justify-center px-4 py-12 bg-slate-50 dark:bg-slate-950 transition-colors">
+    <main className="flex flex-1 justify-center px-4 py-8 bg-slate-50 dark:bg-slate-950 transition-colors">
       <div className="layout-content-container flex w-full max-w-2xl flex-col gap-8">
         <div className="flex flex-col items-center text-center">
           <h1 className="pb-3 text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
@@ -258,7 +258,10 @@ export default function SearchCar({
                     </div>
 
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      • 1 credit will be used only if the receiver answers the call
+                      • 1 credit will be used only if the receiver answers the call.
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      • 1 credit is still deducted if you answer but the other person doesn't — this applies when it happens twice.
                     </p>
 
                   </div>
