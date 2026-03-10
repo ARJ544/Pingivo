@@ -1,9 +1,15 @@
+import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 import Twilio from "twilio";
 
 const client = Twilio(
   process.env.TWILIO_ACCOUNT_SID!,
   process.env.TWILIO_AUTH_TOKEN!,
+);
+
+export const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_ANON_KEY!,
 );
 
 export async function POST(req: NextRequest) {
@@ -24,6 +30,10 @@ export async function POST(req: NextRequest) {
   }
 
   if (callStatus === "completed") {
+    await supabase
+      .from("calling_credits")
+      .update({ is_calling: false })
+      .eq("phone_num", caller);
     return NextResponse.json({ received: true });
   }
 

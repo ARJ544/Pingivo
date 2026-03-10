@@ -2,10 +2,16 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import Twilio from "twilio";
 import { getCaller, getCallCredits, getUserByFinderId } from "@/lib/api-helpers";
+import { createClient } from "@supabase/supabase-js";
 
 const client = Twilio(
   process.env.TWILIO_ACCOUNT_SID!,
   process.env.TWILIO_AUTH_TOKEN!,
+);
+
+export const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_ANON_KEY!,
 );
 
 export async function POST() {
@@ -62,6 +68,24 @@ export async function POST() {
         { status: 400 }
       );
     }
+
+    const { data, error } = await supabase
+      .from("calling_credits")
+      .select("is_calling")
+      .eq("phone_num", caller)
+      .single();
+
+    if ((data?.is_calling as string).toLowerCase() === "true") {
+      return NextResponse.json(
+        { error: "You already have a call in progress." },
+        { status: 400 }
+      );
+    }
+
+    await supabase
+      .from("calling_credits")
+      .upsert({ phone_num: caller, is_calling: true })
+      .eq("phone_num", caller);
 
     const mixedNum = `${caller.slice(-5)}${callee.slice(-5)}`;
     const roomName = `conf_${mixedNum}_${Date.now()}`;

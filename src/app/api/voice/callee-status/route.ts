@@ -33,6 +33,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Caller number missing" }, { status: 400 });
     }
 
+    if (status === "completed") {
+      await supabase
+        .from("calling_credits")
+        .update({ is_calling: false })
+        .eq("phone_num", caller);
+    }
+
     const { data, error } = await supabase
       .from("calling_credits")
       .select("credits_used")
@@ -63,6 +70,7 @@ export async function POST(req: NextRequest) {
     }
 
   } else if (["no-answer", "busy", "failed"].includes(status)) {
+    
     if (callerCallSid) {
       try {
         await client.calls(callerCallSid).update({
@@ -73,50 +81,6 @@ export async function POST(req: NextRequest) {
       } catch (e) {
         console.error("Failed to redirect caller call:", e);
       }
-      // Increase credits used for failed call attempts
-      let total_unsuccessful_attempts = 0;
-      const { data, error } = await supabase
-        .from("calling_credits")
-        .select("unsuccessful_attempts, credits_used")
-        .eq("phone_num", caller)
-        .maybeSingle();
-
-      if (error) {
-        return NextResponse.json({ error: "Database read error" }, { status: 500 });
-      }
-
-      if (!data) {
-        const { error: insertError } = await supabase
-          .from("calling_credits")
-          .insert({ phone_num: caller, unsuccessful_attempts: 1 });
-
-        if (insertError) {
-          return NextResponse.json({ error: "Database insert error" }, { status: 500 });
-        }
-        total_unsuccessful_attempts = 1;
-      } else {
-        const { error: updateError } = await supabase
-          .from("calling_credits")
-          .update({ unsuccessful_attempts: data.unsuccessful_attempts + 1 })
-          .eq("phone_num", caller);
-
-        if (updateError) {
-          return NextResponse.json({ error: "Database update error" }, { status: 500 });
-        }
-        total_unsuccessful_attempts = data.unsuccessful_attempts + 1;
-
-        // If there are 2 or more unsuccessful attempts, then unsuccessful_attempts resets and credits_used increases by 1
-        if (total_unsuccessful_attempts >= 2) {
-          const { error: resetError } = await supabase
-            .from("calling_credits")
-            .update({ unsuccessful_attempts: 0, credits_used: data.credits_used + 1 })
-            .eq("phone_num", caller);
-
-          if (resetError) {
-            return NextResponse.json({ error: "Database reset error" }, { status: 500 });
-          }
-        }
-      }
     }
 
     const conferences = await client.conferences.list({
@@ -125,6 +89,56 @@ export async function POST(req: NextRequest) {
     });
     for (const conf of conferences) {
       await client.conferences(conf.sid).update({ status: "completed" });
+    }
+
+    await supabase
+      .from("calling_credits")
+      .update({ is_calling: false })
+      .eq("phone_num", caller);
+
+    // Increase credits used for failed call attempts
+    let total_unsuccessful_attempts = 0;
+    const { data, error } = await supabase
+      .from("calling_credits")
+      .select("unsuccessful_attempts, credits_used")
+      .eq("phone_num", caller)
+      .maybeSingle();
+
+    if (error) {
+      return NextResponse.json({ error: "Database read error" }, { status: 500 });
+    }
+
+    if (!data) {
+      const { error: insertError } = await supabase
+        .from("calling_credits")
+        .insert({ phone_num: caller, unsuccessful_attempts: 1 });
+
+      if (insertError) {
+        return NextResponse.json({ error: "Database insert error" }, { status: 500 });
+      }
+      total_unsuccessful_attempts = 1;
+    } else {
+      const { error: updateError } = await supabase
+        .from("calling_credits")
+        .update({ unsuccessful_attempts: data.unsuccessful_attempts + 1 })
+        .eq("phone_num", caller);
+
+      if (updateError) {
+        return NextResponse.json({ error: "Database update error" }, { status: 500 });
+      }
+      total_unsuccessful_attempts = data.unsuccessful_attempts + 1;
+
+      // If there are 2 or more unsuccessful attempts, then unsuccessful_attempts resets and credits_used increases by 1
+      if (total_unsuccessful_attempts >= 2) {
+        const { error: resetError } = await supabase
+          .from("calling_credits")
+          .update({ unsuccessful_attempts: 0, credits_used: data.credits_used + 1 })
+          .eq("phone_num", caller);
+
+        if (resetError) {
+          return NextResponse.json({ error: "Database reset error" }, { status: 500 });
+        }
+      }
     }
   }
 
