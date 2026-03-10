@@ -27,9 +27,10 @@ export async function POST(req: Request) {
   const verifiedPhone = `${data.user_country_code}${data.user_phone_number}`;
 
   let temp_phone_id: string;
+  let temp_phone_num: string;
   const { data: getTempPhoneData, error: getTempPhoneError } = await supabase
     .from("temporary_phone")
-    .select("id")
+    .select("id, temp_phone")
     .eq("temp_phone", verifiedPhone)
     .maybeSingle()
 
@@ -37,20 +38,29 @@ export async function POST(req: Request) {
     const { data: insertData, error: insertError } = await supabase
       .from("temporary_phone")
       .insert({ temp_phone: verifiedPhone })
-      .select("id")
+      .select("id, temp_phone")
       .single()
 
     if (insertError) {
       return NextResponse.json({ error: insertError.message }, { status: 500 });
     }
     temp_phone_id = insertData.id;
+    temp_phone_num = insertData.temp_phone;
   } else {
     temp_phone_id = getTempPhoneData.id;
+    temp_phone_num = getTempPhoneData.temp_phone;
   }
 
   const ONE_HOUR = 60 * 60;
 
   cookie.set("temp_phone_id", temp_phone_id, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: ONE_HOUR,
+  });
+  cookie.set("temp_phone_num", temp_phone_num.slice(-4), {
     httpOnly: true,
     secure: true,
     sameSite: "lax",

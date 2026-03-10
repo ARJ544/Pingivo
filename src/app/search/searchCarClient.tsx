@@ -1,19 +1,30 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Search } from "lucide-react";
+import { Phone, RefreshCcw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { deleteTempPhone } from "@/app/actions";
 
+function Loader() {
+  return (
+    <div className="flex items-center justify-center gap-2 text-sm text-slate-600">
+      <span className="h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
+      Searching owner...
+    </div>
+  );
+}
+
 export default function SearchCar({
-  is_loggedin,
+  is_verified,
   phone_num,
   temp_phone_number,
+  temp_phone_id,
 }: {
-  is_loggedin: boolean;
+  is_verified: boolean;
   phone_num: string | undefined;
   temp_phone_number: string | undefined;
+  temp_phone_id: string | undefined;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -27,15 +38,12 @@ export default function SearchCar({
   const [callCredits, setCallCredits] = useState(3);
   const [usedCallCredits, setUsedCallCredits] = useState(0);
   const [creditsLoading, setCreditsLoading] = useState(true);
-  const [clickToReset, setClickToReset] = useState(true);
-
-  const isFindIdValid = finderId.length >= 6 && finderId.length <= 20;
 
   useEffect(() => {
     if (!queryFinderId) return;
+    setLoading(true);
 
     const fetchOwner = async () => {
-      setLoading(true);
       try {
         const res = await fetch(`/api/search?finder_id=${queryFinderId}`);
 
@@ -56,19 +64,19 @@ export default function SearchCar({
 
     fetchOwner();
   }, [queryFinderId]);
+
   useEffect(() => {
     const fetchCallCredits = async () => {
       try {
-        setClickToReset(false);
         setCreditsLoading(true);
         const res = await fetch("/api/get-call-credits");
 
         if (!res.ok) {
+          await deleteTempPhone();
           setCallCredits(0);
           setUsedCallCredits(0);
           const errorData = await res.json();
           setErrorOrSuccessMessage(errorData.error || res.statusText);
-          setClickToReset(true);
           return;
         }
 
@@ -77,15 +85,14 @@ export default function SearchCar({
         if (result.success) {
           setCallCredits(result.callCredits);
           setUsedCallCredits(result.creditsUsed);
-          setClickToReset(false);
+
         } else {
           setCallCredits(0);
           setUsedCallCredits(0);
-          setClickToReset(true);
+
         }
       } catch (err) {
         setCallCredits(3);
-        setClickToReset(true);
       } finally {
         setCreditsLoading(false);
       }
@@ -113,20 +120,9 @@ export default function SearchCar({
     return formatter.format(utcMidnightToday);
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!finderId.trim()) {
-      setMessage("Please enter a finder ID");
-      return;
-    }
-
-    router.push(`/search?finder_id=${encodeURIComponent(finderId.trim().toLowerCase())}`);
-    setMessage("");
-  };
   const handleCall = async () => {
     setLoading(true);
-    setClickToReset(false);
+
     try {
       const res = await fetch("/api/voice", {
         method: "POST",
@@ -135,7 +131,7 @@ export default function SearchCar({
       const result = await res.json();
 
       if (!res.ok) {
-        setClickToReset(true);
+        await deleteTempPhone();
         throw new Error(result.error || "Something went wrong");
       }
 
@@ -144,7 +140,6 @@ export default function SearchCar({
       );
     } catch (err: any) {
       setErrorOrSuccessMessage(err.message);
-      setClickToReset(true);
     } finally {
       setLoading(false);
     }
@@ -166,48 +161,12 @@ export default function SearchCar({
           </h1>
 
           <p className="max-w-xl text-base leading-normal text-slate-600 dark:text-slate-400">
-            Enter the unique Finder ID from QR code to reach out to the owner.
+            Scan the QR code to reach out to the owner.
           </p>
 
           <div className="flex w-full flex-col gap-4 pt-8">
-            {/* Input */}
-            <form onSubmit={handleSearch} className="flex flex-col gap-3">
-              <label className="flex flex-col">
-                <span className="pb-2 text-left text-sm font-semibold text-slate-800 dark:text-slate-300">
-                  Finder ID
-                </span>
 
-                <div className="relative w-full">
-                  <Search
-                    size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
-                  />
-
-                  <input
-                    value={finderId}
-                    onChange={(e) => setFinderId(e.target.value.trim())}
-                    maxLength={20}
-                    placeholder="e.g. wy863jd-acvxhs2"
-                    className="h-14 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 pl-12 pr-4 text-lg font-semibold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 transition-all"
-                  />
-                </div>
-              </label>
-
-              {finderId && !isFindIdValid && (
-                <p className="text-xs text-red-500">
-                  Finder ID must be between 6 and 20 characters
-                </p>
-              )}
-
-              {/* Search Button */}
-              <Button
-                type="submit"
-                disabled={loading || !isFindIdValid || !finderId.trim()}
-                className="h-12 w-full rounded-lg bg-blue-500 px-6 text-base font-bold text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-500/40 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-              >
-                {loading ? "Searching..." : "Search Owner"}
-              </Button>
-            </form>
+            {loading && !ownerFound && <Loader />}
 
             {/* Message Display */}
             {message && (
@@ -222,34 +181,63 @@ export default function SearchCar({
             {ownerFound && (
               <div className="space-y-4 pt-4">
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3 items-start">
 
+                  {/* Send Message */}
                   <Button className="h-12 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 text-white font-semibold rounded-lg transition active:scale-[0.97]">
                     Send Message
                   </Button>
 
-                  {hasPhoneNumber ? (
-                    <Button
-                      disabled={loading || callCredits <= 0 || creditsLoading}
-                      onClick={handleCall}
-                      className="h-12 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg transition active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Call Owner
-                    </Button>
-                  ) : (
-                    <Link
-                      href={`/verify-phone-unknown-user?next=${encodeURIComponent(
-                        finderId
-                      )}`}
-                    >
-                      <Button className="h-12 w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg transition active:scale-[0.97]">
-                        Verify Phone To Call
+                  {/* Call Section */}
+                  <div className="flex flex-col gap-1">
+
+                    {hasPhoneNumber ? (
+                      <Button
+                        disabled={loading || callCredits <= 0 || creditsLoading}
+                        onClick={handleCall}
+                        className="h-12 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg transition active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Call Owner
                       </Button>
-                    </Link>
-                  )}
+                    ) : (
+                      <Link
+                        href={`/verify-phone-unknown-user?next=${encodeURIComponent(finderId)}`}
+                      >
+                        <Button className="h-12 w-full bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white font-semibold rounded-lg transition active:scale-[0.97]">
+                          Verify Phone To Call
+                        </Button>
+                      </Link>
+                    )}
+
+                    {hasPhoneNumber && is_verified && (
+                      <div className="flex flex-col items-end">
+
+                        <div className="flex items-center gap-1.5 font-semibold text-slate-700 dark:text-slate-200">
+                          <Phone size={10} className="text-primary" />
+                          ...{temp_phone_number ? temp_phone_number : phone_num}
+                        </div>
+
+                        {!temp_phone_number && (
+                          <button
+                            onClick={() =>
+                              router.push(
+                                `/verify-phone-unknown-user?next=${encodeURIComponent(finderId)}`
+                              )
+                            }
+                            className="flex items-center gap-1 text-blue-600 cursor-pointer text-[9px] font-medium hover:underline -mt-1.5"
+                          >
+                            <RefreshCcw size={10} />
+                            change
+                          </button>
+                        )}
+
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {hasPhoneNumber && (
+
                   <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 space-y-2">
 
                     <div className="flex items-center justify-between text-sm">
@@ -276,11 +264,8 @@ export default function SearchCar({
                     No verification Required to message
                   </div>
                 )}
-                {clickToReset && (
-                  <Button onClick={removeTempPhoneId}>Reload Page</Button>
-                )}
 
-                {temp_phone_number && (
+                {(temp_phone_number || temp_phone_id) && (
                   <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-4 py-3 text-sm space-y-3">
 
                     <div className="space-y-1">

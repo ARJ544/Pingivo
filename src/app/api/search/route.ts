@@ -44,7 +44,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ 
       success: true,
-      finder_id: user.finder_id 
+      finder_id: user.finder_id
     });
   } catch {
     return NextResponse.json(

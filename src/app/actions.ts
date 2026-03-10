@@ -105,6 +105,7 @@ export async function deleteAllCookie() {
 export async function deleteTempPhone() {
   const cookieStore = await cookies();
   cookieStore.delete("temp_phone_id");
+  cookieStore.delete("temp_phone_num");
 }
 
 export async function getAllCookie(): Promise<UserCookie> {

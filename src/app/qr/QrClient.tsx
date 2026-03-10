@@ -1,11 +1,11 @@
 "use client";
 
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState } from "react";
 import jsPDF from "jspdf";
 import "svg2pdf.js";
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
-import { Copy, Download, Check } from "lucide-react";
+import { Copy, Download, Check, Share2 } from "lucide-react";
 import { Syne } from "next/font/google";
 import { Input } from "@/components/ui/input";
 
@@ -15,8 +15,6 @@ type Props = { finder_id: string };
 
 const CW = 360;
 const CH = 500;
-const MIN_QR = 60;
-const MAX_QR = 280;
 
 const TEMPLATES = [
   { id: "0", label: "0", src: "/template.jpg", defaultSize: 175, qrPos: { x: CW / 2 - 87, y: CH / 2 - 65 } },
@@ -31,49 +29,10 @@ export default function GenerateQRClient({ finder_id }: Props) {
   const [template, setTemplate] = useState(TEMPLATES[2]);
   const [qrSize, setQrSize] = useState(175);
   const [qrPos, setQrPos] = useState({ x: CW / 2 - 90, y: CH / 2 - 50 });
-  const [scale, setScale] = useState(1);
-
-  const dragging = useRef(false);
-  const dragStart = useRef({ mx: 0, my: 0, ox: 0, oy: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   const qrValue = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/search?finder_id=${finder_id}`;
-
-  useEffect(() => {
-    const measure = () => {
-      if (canvasRef.current) {
-        setScale(canvasRef.current.clientWidth / CW);
-      }
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, []);
-
-  const onDragMove = useCallback((e: PointerEvent) => {
-    if (!dragging.current) return;
-    const dx = (e.clientX - dragStart.current.mx) / scale;
-    const dy = (e.clientY - dragStart.current.my) / scale;
-    setQrPos({
-      x: Math.min(Math.max(dragStart.current.ox + dx, 0), CW - qrSize),
-      y: Math.min(Math.max(dragStart.current.oy + dy, 0), CH - qrSize),
-    });
-  }, [scale, qrSize]);
-
-  const onDragEnd = useCallback(() => {
-    dragging.current = false;
-    window.removeEventListener("pointermove", onDragMove);
-    window.removeEventListener("pointerup", onDragEnd);
-  }, [onDragMove]);
-
-  const onDragStart = useCallback((e: React.PointerEvent) => {
-    e.preventDefault();
-    dragging.current = true;
-    dragStart.current = { mx: e.clientX, my: e.clientY, ox: qrPos.x, oy: qrPos.y };
-    window.addEventListener("pointermove", onDragMove);
-    window.addEventListener("pointerup", onDragEnd);
-  }, [qrPos, onDragMove, onDragEnd]);
 
   const downloadPDF = async () => {
     if (!svgRef.current) return;
@@ -82,6 +41,17 @@ export default function GenerateQRClient({ finder_id }: Props) {
     await pdf.svg(svgRef.current, { x: 0, y: 0, width: 9, height: 12 });
     pdf.save(`parkping-template[${template.label}]-ID-${finder_id}.pdf`);
     setDownloading(false);
+  };
+
+  const shareQR = async () => {
+    if (!svgRef.current || !navigator.share) return;
+    const pdf = new jsPDF({ orientation: "portrait", unit: "cm", format: [9, 12], compress: true });
+    await pdf.svg(svgRef.current, { x: 0, y: 0, width: 9, height: 12 });
+    const blob = pdf.output("blob");
+    const file = new File([blob], `parkping-qr-${finder_id}.pdf`, { type: "application/pdf" });
+    if (navigator.canShare?.({ files: [file] })) {
+      await navigator.share({ files: [file], title: "ParkPing QR Code" });
+    }
   };
 
   const copyToClipboard = () => {
@@ -148,24 +118,24 @@ export default function GenerateQRClient({ finder_id }: Props) {
               </div>
             </div>
 
-            {/* Tips */}
-            <div className="flex flex-col gap-2 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
-              <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Tips</p>
-              <ul className="flex flex-col gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-                <li>• Drag the QR on the preview to reposition it.</li>
-                <li>• Use the slider below the preview to resize.</li>
-              </ul>
+            <div className="flex gap-3">
+              <Button
+                onClick={downloadPDF}
+                disabled={downloading}
+                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold h-12 rounded-xl flex items-center justify-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                {downloading ? "Generating..." : "Download PDF"}
+              </Button>
+              <Button
+                onClick={shareQR}
+                variant="outline"
+                className="h-12 px-5 rounded-xl flex items-center gap-2 font-bold border-slate-200 dark:border-slate-700"
+              >
+                <Share2 className="w-4 h-4" />
+                Share PDF
+              </Button>
             </div>
-
-            {/* Download */}
-            <Button
-              onClick={downloadPDF}
-              disabled={downloading}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold h-12 rounded-xl flex items-center justify-center gap-2"
-            >
-              <Download className="w-4 h-4" />
-              {downloading ? "Generating PDF…" : "Download Sticker (PDF)"}
-            </Button>
           </div>
 
           {/* ── RIGHT: preview ── */}
@@ -187,57 +157,7 @@ export default function GenerateQRClient({ finder_id }: Props) {
                 <g transform={`translate(${qrPos.x}, ${qrPos.y})`}>
                   <QRCodeSVG value={qrValue} size={qrSize} level="M" bgColor="#ffffff" fgColor="#000000" />
                 </g>
-                <text x={CW / 2} y={CH - 479} fontSize="11" fontWeight="700" textAnchor="middle" fill="#000" fontFamily="monospace">
-                  Finder ID: {finder_id}
-                </text>
               </svg>
-
-              <div
-                onPointerDown={onDragStart}
-                style={{
-                  position: "absolute",
-                  left: qrPos.x * scale,
-                  top: qrPos.y * scale,
-                  width: qrSize * scale,
-                  height: qrSize * scale,
-                  cursor: "grab",
-                  border: "2px dashed rgba(59,130,246,0.8)",
-                  borderRadius: 6,
-                  boxSizing: "border-box",
-                  touchAction: "none",
-                }}
-              />
-            </div>
-
-            {/* Slider below preview */}
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-row items-center justify-between gap-3">
-                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
-                  QR Size — <span className="text-blue-500">{Math.round(qrSize)}px</span>
-                </p>
-                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
-                  Enter a value:
-                </p>
-                <input
-                  type="number"
-                  minLength={MIN_QR}
-                  maxLength={MAX_QR}
-                  value={Math.round(qrSize)}
-                  onChange={(e) => {
-                    setQrSize(Number(e.target.value));
-                  }}
-                  className="text-xs w-16 px-1 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-400 dark:border-slate-700 text-center font-mono text-slate-700 dark:text-slate-200"
-                />
-              </div>
-              <input
-                type="range"
-                min={MIN_QR}
-                max={MAX_QR}
-                value={qrSize}
-                onChange={(e) => setQrSize(Number(e.target.value))}
-                className="w-full accent-blue-500 cursor-pointer"
-              />
-
             </div>
 
             <p className="text-xs text-slate-400">PDF output will be print quality.</p>

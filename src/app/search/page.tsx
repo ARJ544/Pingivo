@@ -1,23 +1,27 @@
 import {
   getAllCookie,
-  IsLoggedIn,
   getTempPhoneId,
+  IsVerified,
 } from "@/app/actions";
 import SearchCar from "@/app/search/searchCarClient";
+import { cookies } from "next/headers";
 
 export const metadata = {
-  title: "Search a Car",
+  title: "Contact The Owner",
 };
 
 export default async function SearchPage() {
   const cookie = await getAllCookie();
-  const isLoggedIn = await IsLoggedIn();
-  let temp_phone = await getTempPhoneId();
+  const isVerified = await IsVerified();
+  
+  const temp_phone_id = await getTempPhoneId();
+  const temp_phone_number = (await cookies()).get("temp_phone_num")?.value;
   return (
     <SearchCar
-      is_loggedin={isLoggedIn}
+      is_verified={isVerified}
       phone_num={cookie.phone_num}
-      temp_phone_number={temp_phone ?? ""}
+      temp_phone_number={temp_phone_number}
+      temp_phone_id={temp_phone_id}
     />
   );
 }

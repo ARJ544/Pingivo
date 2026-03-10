@@ -127,11 +127,11 @@ export async function getCaller(
         .select("temp_phone")
         .eq("id", tempPhoneId)
         .single();
-        
+
       if (!userData || error) {
         return {
           success: false, response: NextResponse.json(
-            { error: "You are not verified! Click Reload button below and verify phone again" },
+            { error: "You are not verified! Remove temporary phone and verify phone again" },
             { status: 500 },
           )
         };
@@ -152,7 +152,7 @@ export async function getCaller(
     if (!userIdToUse) {
       return {
         success: false,
-        response: NextResponse.json({ error: "To make a Call: Verify Phone or Login or Remove Temporary Phone" }, { status: 401 }),
+        response: NextResponse.json({ error: "Verify yourself to make a call" }, { status: 401 }),
       };
     }
 
@@ -348,6 +348,26 @@ export async function getUserByPhone(phoneNum: string) {
       .from("simplified_users")
       .select("*")
       .eq("phone_num", phoneNum)
+      .maybeSingle();
+
+    if (error) {
+      return { success: false, error };
+    }
+
+    return { success: true, user: data };
+  } catch (error) {
+    return { success: false, error };
+  }
+}
+/**
+ * Fetches user by phone number
+ */
+export async function getTempPhoneNumById(temp_phone_id: string) {
+  try {
+    const { data, error } = await supabase
+      .from("temporary_phone")
+      .select("temp_phone")
+      .eq("id", temp_phone_id)
       .maybeSingle();
 
     if (error) {
