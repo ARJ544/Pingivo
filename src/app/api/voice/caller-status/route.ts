@@ -30,10 +30,6 @@ export async function POST(req: NextRequest) {
   }
 
   if (callStatus === "completed") {
-    await supabase
-      .from("calling_credits")
-      .update({ is_calling: false })
-      .eq("phone_num", caller);
     return NextResponse.json({ received: true });
   }
 

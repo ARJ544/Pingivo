@@ -33,13 +33,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Caller number missing" }, { status: 400 });
     }
 
-    if (status === "completed") {
-      await supabase
-        .from("calling_credits")
-        .update({ is_calling: false })
-        .eq("phone_num", caller);
-    }
-
     const { data, error } = await supabase
       .from("calling_credits")
       .select("credits_used")
@@ -90,11 +83,6 @@ export async function POST(req: NextRequest) {
     for (const conf of conferences) {
       await client.conferences(conf.sid).update({ status: "completed" });
     }
-
-    await supabase
-      .from("calling_credits")
-      .update({ is_calling: false })
-      .eq("phone_num", caller);
 
     // Increase credits used for failed call attempts
     let total_unsuccessful_attempts = 0;
