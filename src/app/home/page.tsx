@@ -66,8 +66,8 @@ export default async function HomePage() {
                   <Edit3 className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="font-bold text-sm">Update Details</p>
-                  <p className="text-xs text-slate-400">Edit your profile or number</p>
+                  <p className="font-bold text-sm">Update Phone Number</p>
+                  <p className="text-xs text-slate-400">Edit your phone number</p>
                 </div>
               </div>
               <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
@@ -109,9 +109,6 @@ export default async function HomePage() {
               </p>
             </div>
           </div>
-
-
-
         </div>
       </main>
     </>

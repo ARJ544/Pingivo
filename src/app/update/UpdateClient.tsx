@@ -1,48 +1,68 @@
 "use client";
 
-import { useState } from "react";
-import { User, Mail, Phone, Lock, Eye, Save } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function UpdateClient() {
   const router = useRouter();
+  const [message, setMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const [phone, setPhone] = useState("");
-  const [phoneLoading, setPhoneLoading] = useState(false);
-  const [phoneMessage, setPhoneMessage] = useState("");
+  useEffect(() => {
 
-  const phoneRegex = /^\+[1-9]\d{1,14}$/;
+    const script = document.createElement("script");
+    script.src = "https://www.phone.email/sign_in_button_v1.js";
+    script.async = true;
+    document.querySelector(".pe_signin_button")?.appendChild(script);
 
-  const isPhoneValid = phoneRegex.test(phone);
-  const canSubmitPhone = isPhoneValid && !phoneLoading;
+    let called = false;
 
-  const handlePhoneUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setPhoneLoading(true);
-    setPhoneMessage("");
+    window.phoneEmailListener = async (userObj: any) => {
+      if (called) return;
+      called = true;
 
-    try {
-      const res = await fetch("/api/update/phone/init", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
-      });
+      setLoading(true);
+      setMessage("Verifying your phone number...");
 
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result?.error || "Phone update failed");
+      if (!userObj?.user_json_url) {
+        setMessage("Phone verification failed. Please try again.");
+        setTimeout(() => router.refresh(), 1500);
+        return;
       }
 
-      router.replace("/verify-update-profile-phone");
-      setPhone("");
-    } catch (err: any) {
-      setPhoneMessage(err.message);
-    } finally {
-      setPhoneLoading(false);
-    }
-  };
+      try {
+        const res = await fetch("/api/update/phone", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_json_url: userObj.user_json_url }),
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+
+          setMessage(errorData.error || "Something went wrong.");
+
+          setTimeout(() => {
+            router.refresh();
+          }, 1500);
+
+          return;
+        }
+
+        setMessage("Phone verified successfully! Redirecting...");
+        setTimeout(() => router.replace("/home"), 1200);
+      } catch {
+        setMessage("Something went wrong. Please try again.");
+        setTimeout(() => router.refresh(), 1500);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    return () => {
+      window.phoneEmailListener = undefined;
+    };
+  }, [router]);
 
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-slate-950 py-10 px-4">
@@ -50,93 +70,30 @@ export default function UpdateClient() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">
-            Update Details
+            Update Phone
           </h1>
           <p className="mt-2 text-slate-600 dark:text-slate-400">
-            Update only the fields you want to change.
+            Verify your New Phone Number to Update
           </p>
         </div>
 
-        {/* Phone Update Card */}
         <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-          <form
-            onSubmit={handlePhoneUpdate}
-            className="divide-y divide-slate-200 dark:divide-slate-800"
-          >
-            <Field
-              label="Update Phone (E.164)"
-              icon={<Phone size={18} />}
-              value={phone}
-              onChange={setPhone}
-              type="phone"
-              placeholder="+919876543210"
-              error={phone && !isPhoneValid && "Invalid phone number"}
+          <div className="flex h-30 flex-col items-center justify-center gap-4">
+
+            <div
+              className={`pe_signin_button ${loading ? "pointer-events-none opacity-50" : ""}`}
+              data-client-id="14661853409856503092"
             />
 
-            {phoneMessage && (
-              <p className="px-6 text-sm text-red-500">{phoneMessage}</p>
+            {message && (
+              <p className="text-lg font-medium text-slate-700 dark:text-slate-300">
+                {message}
+              </p>
             )}
-
-            {/* Actions */}
-            <div className="px-6 pb-3 pt-3 flex justify-end gap-4">
-              <Button
-                disabled={!canSubmitPhone}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                {phoneLoading ? (
-                  "Updating..."
-                ) : (
-                  <>
-                    <Save size={18} />
-                    Update Phone
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
+          </div>
         </div>
       </div>
     </main>
-  );
-}
 
-function Field({
-  label,
-  icon,
-  value,
-  onChange,
-  placeholder,
-  type,
-  error,
-}: {
-  label: string;
-  icon: React.ReactNode;
-  value: string;
-  onChange: (v: string) => void;
-  placeholder: string;
-  type: string;
-  error?: string | false;
-}) {
-  return (
-    <div className="p-6">
-      <label className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-        {label}
-      </label>
-      <div className="relative mt-2">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-          {icon}
-        </span>
-        <input
-          value={value}
-          onChange={(e) => onChange(e.target.value.trimStart())}
-          type={type}
-          placeholder={placeholder}
-          className={`w-full pl-10 pr-4 py-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white
-            ${error ? "border-red-500" : "border-slate-200 dark:border-slate-700"}
-          `}
-        />
-      </div>
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
-    </div>
   );
 }

@@ -12,8 +12,8 @@ export default function VerifyPhoneUnknownUser({
   const router = useRouter();
 
   const searchParams = useSearchParams();
-  const queryCarNumber = searchParams.get("next");
-  const carNumber = queryCarNumber ? queryCarNumber : "";
+  const queryFinderId = searchParams.get("next");
+  const finderId = queryFinderId ? queryFinderId : "";
 
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -42,7 +42,7 @@ export default function VerifyPhoneUnknownUser({
       if (!userObj?.user_json_url) {
         setMessage("Phone verification failed. Please try again.");
         setTimeout(
-          () => router.replace(`/search?finder_id=${encodeURIComponent(carNumber)}`),
+          () => router.replace(`/search?finder_id=${encodeURIComponent(finderId)}`),
           2000,
         );
         return;
@@ -59,13 +59,13 @@ export default function VerifyPhoneUnknownUser({
 
         setMessage("Phone verified successfully! Redirecting...");
         setTimeout(
-          () => router.replace(`/search?finder_id=${encodeURIComponent(carNumber)}`),
+          () => router.replace(`/search?finder_id=${encodeURIComponent(finderId)}`),
           1500,
         );
       } catch {
         setMessage("Something went wrong. Please try again.");
         setTimeout(
-          () => router.replace(`/search?finder_id=${encodeURIComponent(carNumber)}`),
+          () => router.replace(`/search?finder_id=${encodeURIComponent(finderId)}`),
           2000,
         );
       } finally {

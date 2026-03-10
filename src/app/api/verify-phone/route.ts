@@ -35,12 +35,11 @@ export async function POST(req: Request) {
       { status: 403 },
     );
   }
-  const secret_code = generateSecretCode();
   const finder_id = generateSecretCode();
 
   const { data: getExistingUserData, error: getExistingUserError } = await supabase
     .from("simplified_users")
-    .select("id, phone_num, created_at, finder_id, secret_code")
+    .select("id, phone_num, created_at, finder_id")
     .eq("phone_num", verifiedPhone)
     .maybeSingle();
 
@@ -49,10 +48,9 @@ export async function POST(req: Request) {
       .from("simplified_users")
       .insert({
         phone_num: verifiedPhone,
-        secret_code: secret_code,
         finder_id: finder_id,
       })
-      .select("id, phone_num, created_at, finder_id, secret_code")
+      .select("id, phone_num, created_at, finder_id")
       .single();
 
     if (insertError) {

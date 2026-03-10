@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Phone, RefreshCcw, Search } from "lucide-react";
+import { Phone, RefreshCcw, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -157,12 +157,19 @@ export default function SearchCar({
       <div className="layout-content-container flex w-full max-w-2xl flex-col gap-8">
         <div className="flex flex-col items-center text-center">
           <h1 className="pb-3 text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-            Find a Vehicle Owner
+            Contact the Owner
           </h1>
 
           <p className="max-w-xl text-base leading-normal text-slate-600 dark:text-slate-400">
             Scan the QR code to reach out to the owner.
           </p>
+          <div className="flex flex-row items-center gap-1 text-xs">
+            TIP:
+            <Camera size={12} />
+            <p className="max-w-xl text-xs leading-normal text-slate-600 dark:text-slate-400">
+              You can scan the QR with Google Lens
+            </p>
+          </div>
 
           <div className="flex w-full flex-col gap-4 pt-8">
 

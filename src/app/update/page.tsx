@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import UpdateClient from "@/app/update/UpdateClient";
 
 export const metadata = {
-  title: "Update Profile",
+  title: "Update Phone Number",
 };
 
 export default async function Update() {
