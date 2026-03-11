@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { IsLoggedIn, deleteAllCookie, getAllCookie } from "@/app/actions";
 import Image from "next/image";
+import { COMPANY_NAME } from "@/config/company";
 
 export async function Navigation() {
   const isLoggedIn = await IsLoggedIn();
@@ -17,7 +18,7 @@ export async function Navigation() {
         >
           <Image
             src="/logo.png"
-            alt="ParkPing Logo"
+            alt={`${COMPANY_NAME} Logo`}
             className="h-10 w-10 rounded-sm"
             height={32}
             width={32}
@@ -26,7 +27,7 @@ export async function Navigation() {
 
           <div className="flex flex-col leading-tight">
             <span className="text-lg font-bold tracking-tight text-foreground">
-              ParkPing
+              {COMPANY_NAME}
             </span>
             <span className="text-[10px] text-muted-foreground tracking-wider">
               The ∘ SigmARJ ∘ Company

@@ -2,6 +2,7 @@ import { Car, Bike, Briefcase, Tag, Laptop, Package, ArrowRight } from "lucide-r
 import { Sora } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { COMPANY_NAME } from "@/config/company";
 
 const sora = Sora({ subsets: ["latin"], weight: ["700", "800"] });
 
@@ -11,7 +12,7 @@ const useCases = [
   { icon: Briefcase, label: "Bag / Luggage", desc: "Lost luggage that finds its way back." },
   { icon: Laptop, label: "Laptop", desc: "Let an honest finder contact you if it goes missing." },
   { icon: Package, label: "Parcels", desc: "Delivery and return routing made instant." },
-  { icon: Tag, label: "Anything Else", desc: "If it's yours and you want it back — stick a ParkPing on it." },
+  { icon: Tag, label: "Anything Else", desc: `If it's yours and you want it back — stick a ${COMPANY_NAME} on it.` },
 ];
 
 const steps = [

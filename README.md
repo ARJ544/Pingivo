@@ -1,9 +1,9 @@
-# ParkPing
+# PingPing
 **Multipurpose QR Codes · Privacy First**
 
-ParkPing lets you generate a secure QR code for anything you own — your car, bike, bag, laptop, or anything else. Stick it on, and anyone who finds or needs to reach you can send a message or make a call to you instantly, without ever seeing your phone number.
+PingPing lets you generate a secure QR code for anything you own — your car, bike, bag, laptop, or anything else. Stick it on, and anyone who finds or needs to reach you can send a message or make a call to you instantly, without ever seeing your phone number.
 
-## Why ParkPing?
+## Why PingPing?
 
 - **Not just for vehicles** — use it on anything you want to keep recoverable
 - **100% Anonymous** — your phone number is never shared with anyone
@@ -24,7 +24,7 @@ ParkPing lets you generate a secure QR code for anything you own — your car, b
 ## Key Features
 
 ### Privacy-First Communication
-Every message is relayed through ParkPing anonymously. The person scanning never sees your contact details — they send a message and you decide if you respond.
+Every message is relayed through PingPing anonymously. The person scanning never sees your contact details — they send a message and you decide if you respond.
 
 ### Multipurpose QR Templates
 Choose from multiple sticker templates, drag and resize the QR to fit, and download a print-ready Sticker in seconds.
@@ -46,7 +46,7 @@ Clean UI that adapts to your system preference.
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd parkping
+cd PingPing
 ```
 
 2. Install dependencies:
@@ -87,4 +87,4 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-© ParkPing. QR Codes for Everything.
+© PingPing. QR Codes for Everything.

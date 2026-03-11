@@ -2,6 +2,7 @@ import Link from "next/link";
 import { QrCode, Edit3, Trash2, ScanQrCodeIcon, ArrowRight, ShieldCheck, ScanQrCode } from "lucide-react";
 import { Syne } from "next/font/google";
 import RefreshPage from "@/components/refreshPage";
+import { COMPANY_NAME } from "@/config/company";
 
 export const metadata = { title: "Home" };
 
@@ -99,7 +100,7 @@ export default async function HomePage() {
             <div className="flex gap-3 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
               <ShieldCheck className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Your phone number is <strong className="text-slate-700 dark:text-slate-200">never shared</strong>. Messages are relayed anonymously through ParkPing.
+                Your phone number is <strong className="text-slate-700 dark:text-slate-200">never shared</strong>. Messages are relayed anonymously through {COMPANY_NAME}.
               </p>
             </div>
             <div className="flex gap-3 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">

@@ -1,3 +1,4 @@
+import { COMPANY_NAME } from "@/config/company";
 import { Syne } from "next/font/google";
 
 export const metadata = { title: "Terms & Conditions" };
@@ -23,21 +24,21 @@ export default function TermsAndConditions() {
           <section className="flex flex-col gap-3">
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-50">1. Agreement</h2>
             <p>
-              By using ParkPing, you agree to these Terms. If you do not agree, do not use our services. We may update these Terms at any time — continued use after changes means you accept them.
+              By using {COMPANY_NAME}, you agree to these Terms. If you do not agree, do not use our services. We may update these Terms at any time — continued use after changes means you accept them.
             </p>
           </section>
 
           <section className="flex flex-col gap-3">
-            <h2 className="text-base font-bold text-slate-900 dark:text-slate-50">2. What ParkPing Is</h2>
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-50">2. What {COMPANY_NAME} Is</h2>
             <p>
-              ParkPing is a multipurpose QR code platform. You can generate a QR code, attach it to any item you own, and allow others to contact you anonymously through our platform when they scan it. ParkPing is a communication relay — we are not responsible for what happens between users outside of our platform.
+              {COMPANY_NAME} is a multipurpose QR code platform. You can generate a QR code, attach it to any item you own, and allow others to contact you anonymously through our platform when they scan it. {COMPANY_NAME} is a communication relay — we are not responsible for what happens between users outside of our platform.
             </p>
           </section>
 
           <section className="flex flex-col gap-3">
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-50">3. Eligibility</h2>
             <p>
-              You must be at least 13 years old to use ParkPing. By registering, you confirm you meet this requirement and are legally capable of entering into a binding agreement.
+              You must be at least 13 years old to use {COMPANY_NAME}. By registering, you confirm you meet this requirement and are legally capable of entering into a binding agreement.
             </p>
           </section>
 
@@ -53,7 +54,7 @@ export default function TermsAndConditions() {
 
           <section className="flex flex-col gap-3">
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-50">5. Acceptable Use</h2>
-            <p>You agree not to use ParkPing to:</p>
+            <p>You agree not to use {COMPANY_NAME} to:</p>
             <ul className="flex flex-col gap-2 pl-4 list-disc">
               <li>Harass, threaten, or stalk other users</li>
               <li>Send spam, fraudulent, or misleading messages</li>
@@ -75,56 +76,56 @@ export default function TermsAndConditions() {
           <section className="flex flex-col gap-3">
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-50">7. Messaging</h2>
             <p>
-              ParkPing relays messages anonymously between scanners and owners. We are not responsible for the content of messages sent between users. We reserve the right to monitor for abuse and remove content or accounts that violate these Terms.
+              {COMPANY_NAME} relays messages anonymously between scanners and owners. We are not responsible for the content of messages sent between users. We reserve the right to monitor for abuse and remove content or accounts that violate these Terms.
             </p>
           </section>
 
           <section className="flex flex-col gap-3">
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-50">8. Fees</h2>
             <p>
-              Basic use of ParkPing is free. If we introduce paid features, fees will be clearly displayed before any charge. Accounts deleted or terminated for policy violations forfeit any remaining credits.
+              Basic use of {COMPANY_NAME} is free. If we introduce paid features, fees will be clearly displayed before any charge. Accounts deleted or terminated for policy violations forfeit any remaining credits.
             </p>
           </section>
 
           <section className="flex flex-col gap-3">
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-50">9. Intellectual Property</h2>
             <p>
-              All content, design, and code on ParkPing is owned by us or our licensors. You may not copy, distribute, or create derivative works without our written permission.
+              All content, design, and code on {COMPANY_NAME} is owned by us or our licensors. You may not copy, distribute, or create derivative works without our written permission.
             </p>
           </section>
 
           <section className="flex flex-col gap-3">
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-50">10. Disclaimers</h2>
             <p>
-              ParkPing is provided "as is" without warranties of any kind. We do not guarantee the accuracy of user-provided item information. We are not a party to any interaction between users and accept no responsibility for outcomes of those interactions.
+              {COMPANY_NAME} is provided "as is" without warranties of any kind. We do not guarantee the accuracy of user-provided item information. We are not a party to any interaction between users and accept no responsibility for outcomes of those interactions.
             </p>
           </section>
 
           <section className="flex flex-col gap-3">
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-50">11. Limitation of Liability</h2>
             <p>
-              To the fullest extent permitted by law, ParkPing is not liable for any indirect, incidental, or consequential damages arising from your use of our services. Our total liability shall not exceed the amount you have paid us in the past 12 months.
+              To the fullest extent permitted by law, {COMPANY_NAME} is not liable for any indirect, incidental, or consequential damages arising from your use of our services. Our total liability shall not exceed the amount you have paid us in the past 12 months.
             </p>
           </section>
 
           <section className="flex flex-col gap-3">
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-50">12. Indemnification</h2>
             <p>
-              You agree to indemnify ParkPing and its team from any claims, damages, or expenses arising from your use of our services, your violation of these Terms, or your content or conduct on the platform.
+              You agree to indemnify {COMPANY_NAME} and its team from any claims, damages, or expenses arising from your use of our services, your violation of these Terms, or your content or conduct on the platform.
             </p>
           </section>
 
           <section className="flex flex-col gap-3">
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-50">13. Service Changes</h2>
             <p>
-              We may modify, suspend, or discontinue any part of ParkPing at any time. We will communicate material changes when possible.
+              We may modify, suspend, or discontinue any part of {COMPANY_NAME} at any time. We will communicate material changes when possible.
             </p>
           </section>
 
           <section className="flex flex-col gap-3">
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-50">14. Governing Law</h2>
             <p>
-              These Terms are governed by applicable law. Any disputes will be resolved in the jurisdiction where ParkPing operates.
+              These Terms are governed by applicable law. Any disputes will be resolved in the jurisdiction where {COMPANY_NAME} operates.
             </p>
           </section>
 

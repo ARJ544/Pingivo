@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Copy, Download, Check, Share2 } from "lucide-react";
 import { Sora } from "next/font/google";
 import { Input } from "@/components/ui/input";
+import { COMPANY_NAME } from "@/config/company";
 
 const sora = Sora({ subsets: ["latin"], weight: ["700", "800"] });
 
@@ -39,7 +40,7 @@ export default function GenerateQRClient({ finder_id }: Props) {
     setDownloading(true);
     const pdf = new jsPDF({ orientation: "portrait", unit: "cm", format: [9, 12], compress: true });
     await pdf.svg(svgRef.current, { x: 0, y: 0, width: 9, height: 12 });
-    pdf.save(`parkping-template[${template.label}]-ID-${finder_id}.pdf`);
+    pdf.save(`${COMPANY_NAME}-template[${template.label}]-ID-${finder_id}.pdf`);
     setDownloading(false);
   };
 
@@ -48,9 +49,9 @@ export default function GenerateQRClient({ finder_id }: Props) {
     const pdf = new jsPDF({ orientation: "portrait", unit: "cm", format: [9, 12], compress: true });
     await pdf.svg(svgRef.current, { x: 0, y: 0, width: 9, height: 12 });
     const blob = pdf.output("blob");
-    const file = new File([blob], `parkping-qr-${finder_id}.pdf`, { type: "application/pdf" });
+    const file = new File([blob], `${COMPANY_NAME}-qr-${finder_id}.pdf`, { type: "application/pdf" });
     if (navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ files: [file], title: "ParkPing QR Code" });
+      await navigator.share({ files: [file], title: `${COMPANY_NAME} QR Code` });
     }
   };
 

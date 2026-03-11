@@ -9,6 +9,7 @@ import OnlineOfflineComponent from "@/components/my_ui/OnlineOfflineComponent";
 import Link from "next/link";
 import { RouteChangeHandler } from "@/components/RouteChangeHandler";
 import { Suspense } from "react";
+import { COMPANY_NAME } from "@/config/company";
 
 const poppins = Poppins({
   weight: "400",
@@ -17,10 +18,10 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  applicationName: "ParkPing",
+  applicationName: COMPANY_NAME,
   title: {
-    default: "ParkPing",
-    template: "%s | ParkPing",
+    default: COMPANY_NAME,
+    template: `%s | ${COMPANY_NAME}`,
   },
   description:
     "Generate multipurpose QR codes for anything, anywhere. Secure, anonymous linking for vehicles, belongings, and beyond.",
@@ -31,20 +32,20 @@ export const metadata: Metadata = {
     "secure QR code",
     "vehicle QR",
     "smart sticker",
-    "ParkPing",
+    COMPANY_NAME,
   ],
-  authors: [{ name: "ParkPing" }],
-  creator: "ParkPing",
+  authors: [{ name: `${COMPANY_NAME}` }],
+  creator: COMPANY_NAME,
   openGraph: {
     type: "website",
-    title: "ParkPing — QR Codes for Everything",
+    title: `${COMPANY_NAME} — QR Codes for Everything`,
     description:
       "Generate multipurpose QR codes for anything, anywhere. Secure, anonymous linking for vehicles, belongings, and beyond.",
-    siteName: "ParkPing",
+    siteName: COMPANY_NAME,
   },
   twitter: {
     card: "summary_large_image",
-    title: "ParkPing — QR Codes for Everything",
+    title: `${COMPANY_NAME} — QR Codes for Everything`,
     description:
       "Generate multipurpose QR codes for anything, anywhere. Secure, anonymous linking for vehicles, belongings, and beyond.",
   },
@@ -59,7 +60,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const company_name: string = "ParkPing";
   const currentYear = new Date().getFullYear();
   return (
     <html lang="en" suppressHydrationWarning>
@@ -85,7 +85,7 @@ export default function RootLayout({
                   <div className="flex flex-col gap-6 col-span-1 md:col-span-1">
                     <div className="flex items-center gap-2">
                       <h2 className="text-lg font-bold tracking-tight">
-                        {company_name}
+                        {COMPANY_NAME}
                       </h2>
                     </div>
                     <p className="text-slate-500 text-sm leading-relaxed">
@@ -192,7 +192,7 @@ export default function RootLayout({
                 </div>
                 <div className="pt-8 border-t border-[#cfdde7] dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400 font-medium">
                   <p>
-                    © {currentYear} {company_name}. All rights reserved.
+                    © {currentYear} {COMPANY_NAME}. All rights reserved.
                   </p>
                   <div className="flex items-center gap-6">
                     <span>QR Codes for Everything</span>

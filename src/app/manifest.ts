@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
+import { COMPANY_NAME } from "@/config/company";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "ParkPing",
-    short_name: "ParkPing",
+    name: COMPANY_NAME,
+    short_name: COMPANY_NAME,
     description: "Privacy-First Vehicle Protection Platform",
     start_url: "/",
     display: "standalone",
