@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { QrCode, Edit3, Trash2, ArrowRight, ShieldCheck, ScanQrCode } from "lucide-react";
+import { QrCode, Edit3, Trash2, ScanQrCodeIcon, ArrowRight, ShieldCheck, ScanQrCode } from "lucide-react";
 import { Syne } from "next/font/google";
 import RefreshPage from "@/components/refreshPage";
 
@@ -12,7 +12,7 @@ export default async function HomePage() {
     <>
       <RefreshPage />
       <main className="min-h-screen bg-white dark:bg-[#080c10] text-slate-900 dark:text-slate-50">
-        <div className="max-w-lg mx-auto px-6 py-4 flex flex-col gap-10">
+        <div className="max-w-lg mx-auto px-6 py-12 flex flex-col gap-10">
 
           {/* Greeting */}
           <div className="flex flex-col gap-1">
@@ -42,6 +42,22 @@ export default async function HomePage() {
           {/* Secondary Actions */}
           <div className="flex flex-col gap-3">
             <Link
+              href="/scan"
+              className="flex items-center justify-between p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-500 flex items-center justify-center">
+                  <ScanQrCodeIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm">Scan QR code</p>
+                  <p className="text-xs text-slate-400">Look up an item or vehicle</p>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
+            </Link>
+
+            <Link
               href="/update"
               className="flex items-center justify-between p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
             >
@@ -56,24 +72,24 @@ export default async function HomePage() {
               </div>
               <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
             </Link>
-
-            {/* Danger zone */}
-            <Link
-              href="/delete-account"
-              className="flex items-center justify-between p-5 rounded-2xl border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-900/10 hover:border-red-300 dark:hover:border-red-700 transition-colors"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 text-red-500 flex items-center justify-center">
-                  <Trash2 className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="font-bold text-sm text-red-500">Delete Account</p>
-                  <p className="text-xs text-slate-400">Permanently remove your data</p>
-                </div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-red-300" />
-            </Link>
           </div>
+
+          {/* Danger zone */}
+          <Link
+            href="/delete-account"
+            className="flex items-center justify-between p-5 rounded-2xl border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-900/10 hover:border-red-300 dark:hover:border-red-700 transition-colors"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 text-red-500 flex items-center justify-center">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="font-bold text-sm text-red-500">Delete Account</p>
+                <p className="text-xs text-slate-400">Permanently remove your data</p>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-red-300" />
+          </Link>
 
           <hr className="border-slate-100 dark:border-slate-800" />
 
@@ -94,6 +110,7 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
+
       </main>
     </>
   );

@@ -2,8 +2,6 @@ import { Car, Bike, Briefcase, Tag, Laptop, Package, ArrowRight } from "lucide-r
 import { Sora } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import HomePage from "@/app/home/page";
-import { IsLoggedIn } from "@/app/actions";
 
 const sora = Sora({ subsets: ["latin"], weight: ["700", "800"] });
 
@@ -24,7 +22,6 @@ const steps = [
 ];
 
 export default async function Home() {
-  const is_logged_in = await IsLoggedIn();
 
   return (
     <div className="bg-white dark:bg-[#080c10] text-slate-900 dark:text-slate-50">
@@ -37,13 +34,21 @@ export default async function Home() {
             Without -<br />
             <span className="text-blue-500">Showing your number.</span>
           </h1>
-          <p className="text-base text-slate-500 dark:text-slate-400 max-w-sm">
+          <p className="text-base italic text-slate-500 dark:text-slate-400 max-w-sm">
             Multipurpose QR codes for anything you own. Stay reachable — contact anonymously.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link href="/home">
               <Button className="bg-blue-500 hover:bg-blue-600 text-white font-bold h-11 px-7 rounded-xl flex items-center gap-2">
                 Generate your QR Code <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/scan">
+              <Button
+                variant="outline"
+                className="h-11 px-7 rounded-xl font-bold"
+              >
+                Scan QR Code
               </Button>
             </Link>
           </div>
