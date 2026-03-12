@@ -1,4 +1,4 @@
-import { Html5QrcodeScanner, Html5QrcodeScannerState } from "html5-qrcode";
+import { Html5QrcodeScanner, Html5QrcodeScannerState, Html5QrcodeScannerConfig } from "html5-qrcode";
 import { Html5QrcodeResult } from "html5-qrcode";
 import { useEffect, useRef } from "react";
 
@@ -15,16 +15,15 @@ interface Props {
   qrCodeErrorCallback?: (error: string) => void;
 }
 
-const createConfig = (props: Props) => {
-  const config: Record<string, any> = {
+const createConfig = (props: Props): Html5QrcodeScannerConfig => {
+  return {
     fps: props.fps ?? 10,
     qrbox: props.qrbox ?? 250,
     disableFlip: props.disableFlip ?? false,
     rememberLastUsedCamera: true,
-    supportedScanTypes: [], // camera only, no file upload ambiguity
+    supportedScanTypes: [],
+    ...(props.aspectRatio && { aspectRatio: props.aspectRatio }),
   };
-  if (props.aspectRatio) config.aspectRatio = props.aspectRatio;
-  return config;
 };
 
 export default function Html5QrcodePlugin(props: Props) {
@@ -63,7 +62,6 @@ export default function Html5QrcodePlugin(props: Props) {
         }
       } catch (_) {}
 
-      // Delay clear so the DOM has time to settle
       setTimeout(() => {
         try {
           s.clear().catch(() => {});
