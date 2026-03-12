@@ -21,7 +21,6 @@ export default function ScanPage() {
 
   const onNewScanResult = useCallback(
     (decodedText: string, _decodedResult: Html5QrcodeResult) => {
-      // Use ref to avoid stale closure — this is why camera scan did nothing
       if (showModalRef.current) return;
       showModalRef.current = true;
 
