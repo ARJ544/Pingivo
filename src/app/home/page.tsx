@@ -51,8 +51,8 @@ export default async function HomePage() {
                   <ScanQrCodeIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="font-bold text-sm">Scan QR code</p>
-                  <p className="text-xs text-slate-400">Look up an item or vehicle</p>
+                  <p className="font-bold text-sm">Scan {COMPANY_NAME} QR code</p>
+                  <p className="text-xs text-slate-400">Look up an item by scanning its { COMPANY_NAME } QR code</p>
                 </div>
               </div>
               <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
