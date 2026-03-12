@@ -78,7 +78,7 @@ export default function ScanPage() {
               {result}
             </p>
             {isUrl && result && (
-              
+              <a
                 href={result}
                 target="_blank"
                 rel="noopener noreferrer"
