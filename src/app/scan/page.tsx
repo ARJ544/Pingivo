@@ -1,10 +1,14 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Html5QrcodePlugin from "@/components/Html5QrcodePlugin";
 import { Html5QrcodeResult } from "html5-qrcode";
 
+const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL ?? "";
+
 export default function ScanPage() {
+  const router = useRouter();
   const [result, setResult] = useState<string | null>(null);
   const [isUrl, setIsUrl] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -25,6 +29,12 @@ export default function ScanPage() {
       showModalRef.current = true;
 
       const url = isValidUrl(decodedText);
+
+      if (url && FRONTEND_URL && decodedText.startsWith(FRONTEND_URL)) {
+        router.push(decodedText);
+        return;
+      }
+
       setResult(decodedText);
       setIsUrl(url);
       setShowModal(true);
@@ -68,7 +78,7 @@ export default function ScanPage() {
               {result}
             </p>
             {isUrl && result && (
-              <a
+              
                 href={result}
                 target="_blank"
                 rel="noopener noreferrer"
