@@ -1,4 +1,4 @@
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5QrcodeScanner, Html5QrcodeScannerState } from "html5-qrcode";
 import { Html5QrcodeResult } from "html5-qrcode";
 import { useEffect, useRef } from "react";
 
@@ -16,16 +16,19 @@ interface Props {
 }
 
 const createConfig = (props: Props) => {
-  const config: Record<string, any> = {};
-  if (props.fps) config.fps = props.fps;
-  if (props.qrbox) config.qrbox = props.qrbox;
+  const config: Record<string, any> = {
+    fps: props.fps ?? 10,
+    qrbox: props.qrbox ?? 250,
+    disableFlip: props.disableFlip ?? false,
+    rememberLastUsedCamera: true,
+    supportedScanTypes: [], // camera only, no file upload ambiguity
+  };
   if (props.aspectRatio) config.aspectRatio = props.aspectRatio;
-  if (props.disableFlip !== undefined) config.disableFlip = props.disableFlip;
-  config.facingMode = props.facingMode ?? "environment";
   return config;
 };
 
 export default function Html5QrcodePlugin(props: Props) {
+  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
   const successCallbackRef = useRef(props.qrCodeSuccessCallback);
   const errorCallbackRef = useRef(props.qrCodeErrorCallback);
 
@@ -38,25 +41,35 @@ export default function Html5QrcodePlugin(props: Props) {
     const config = createConfig(props);
     const verbose = props.verbose === true;
 
-    if (!props.qrCodeSuccessCallback) {
-      throw new Error("qrCodeSuccessCallback is required.");
-    }
+    const scanner = new Html5QrcodeScanner(qrcodeRegionId, config, verbose);
+    scannerRef.current = scanner;
 
-    const html5QrcodeScanner = new Html5QrcodeScanner(
-      qrcodeRegionId,
-      config,
-      verbose
-    );
-
-    html5QrcodeScanner.render(
+    scanner.render(
       (text, result) => successCallbackRef.current(text, result),
       (error) => errorCallbackRef.current?.(error)
     );
 
     return () => {
-      html5QrcodeScanner.clear().catch((error) => {
-        console.error("Failed to clear scanner", error);
-      });
+      const s = scannerRef.current;
+      if (!s) return;
+
+      try {
+        const state = s.getState();
+        if (
+          state === Html5QrcodeScannerState.SCANNING ||
+          state === Html5QrcodeScannerState.PAUSED
+        ) {
+          s.pause();
+        }
+      } catch (_) {}
+
+      // Delay clear so the DOM has time to settle
+      setTimeout(() => {
+        try {
+          s.clear().catch(() => {});
+        } catch (_) {}
+        scannerRef.current = null;
+      }, 100);
     };
   }, []);
 
