@@ -49,7 +49,7 @@ export default async function Home() {
                 variant="outline"
                 className="h-11 px-7 rounded-xl font-bold"
               >
-                Scan QR Code
+                Scan {COMPANY_NAME} QR Code
               </Button>
             </Link>
           </div>
