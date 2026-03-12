@@ -1,4 +1,4 @@
-import { Html5QrcodeScanner, Html5QrcodeScannerState, Html5QrcodeScannerConfig } from "html5-qrcode";
+import { Html5QrcodeScanner, Html5QrcodeScannerState, Html5QrcodeScanType } from "html5-qrcode";
 import { Html5QrcodeResult } from "html5-qrcode";
 import { useEffect, useRef } from "react";
 
@@ -9,22 +9,10 @@ interface Props {
   qrbox?: number;
   aspectRatio?: number;
   disableFlip?: boolean;
-  facingMode?: "environment" | "user";
   verbose?: boolean;
   qrCodeSuccessCallback: (text: string, result: Html5QrcodeResult) => void;
   qrCodeErrorCallback?: (error: string) => void;
 }
-
-const createConfig = (props: Props): Html5QrcodeScannerConfig => {
-  return {
-    fps: props.fps ?? 10,
-    qrbox: props.qrbox ?? 250,
-    disableFlip: props.disableFlip ?? false,
-    rememberLastUsedCamera: true,
-    supportedScanTypes: [],
-    ...(props.aspectRatio && { aspectRatio: props.aspectRatio }),
-  };
-};
 
 export default function Html5QrcodePlugin(props: Props) {
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
@@ -37,7 +25,16 @@ export default function Html5QrcodePlugin(props: Props) {
   });
 
   useEffect(() => {
-    const config = createConfig(props);
+    const config: { [key: string]: any } = {
+      fps: props.fps ?? 10,
+      qrbox: props.qrbox ?? 250,
+      disableFlip: props.disableFlip ?? false,
+      rememberLastUsedCamera: true,
+      supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
+    };
+
+    if (props.aspectRatio) config.aspectRatio = props.aspectRatio;
+
     const verbose = props.verbose === true;
 
     const scanner = new Html5QrcodeScanner(qrcodeRegionId, config, verbose);
