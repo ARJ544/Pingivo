@@ -25,18 +25,16 @@ export default function Html5QrcodePlugin(props: Props) {
   });
 
   useEffect(() => {
-    const config: { [key: string]: any } = {
+    const config: any = {
       fps: props.fps ?? 10,
       qrbox: props.qrbox ?? 250,
       disableFlip: props.disableFlip ?? false,
       rememberLastUsedCamera: true,
       supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
     };
-
     if (props.aspectRatio) config.aspectRatio = props.aspectRatio;
 
     const verbose = props.verbose === true;
-
     const scanner = new Html5QrcodeScanner(qrcodeRegionId, config, verbose);
     scannerRef.current = scanner;
 
@@ -48,7 +46,6 @@ export default function Html5QrcodePlugin(props: Props) {
     return () => {
       const s = scannerRef.current;
       if (!s) return;
-
       try {
         const state = s.getState();
         if (
@@ -58,7 +55,6 @@ export default function Html5QrcodePlugin(props: Props) {
           s.pause();
         }
       } catch (_) {}
-
       setTimeout(() => {
         try {
           s.clear().catch(() => {});
