@@ -45,7 +45,7 @@ export default function ScanPage() {
           QR Code Scanner
         </h1>
         <p className="text-sm mb-6 text-gray-600 dark:text-gray-400">
-          Scan a QR code using your camera
+          Scan PingPing QR code using your camera
         </p>
         <div className="relative rounded-xl border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950">
           <Html5QrcodePlugin
