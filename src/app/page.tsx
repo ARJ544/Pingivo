@@ -47,7 +47,7 @@ export default async function Home() {
             <Link href="/scan">
               <Button
                 variant="outline"
-                className="h-11 px-7 rounded-xl font-bold"
+                className="h-11 px-5 rounded-xl font-bold"
               >
                 Scan {COMPANY_NAME} QR Code
               </Button>
