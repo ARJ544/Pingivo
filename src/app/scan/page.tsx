@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import Html5QrcodePlugin from "@/components/Html5QrcodePlugin";
 import { Html5QrcodeResult } from "html5-qrcode";
 
@@ -8,6 +8,7 @@ export default function ScanPage() {
   const [result, setResult] = useState<string | null>(null);
   const [isUrl, setIsUrl] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const showModalRef = useRef(false);
 
   const isValidUrl = (text: string) => {
     try {
@@ -19,19 +20,21 @@ export default function ScanPage() {
   };
 
   const onNewScanResult = useCallback(
-    (decodedText: string, decodedResult: Html5QrcodeResult) => {
-      setShowModal((prev) => {
-        if (prev) return prev;
-        const url = isValidUrl(decodedText);
-        setResult(decodedText);
-        setIsUrl(url);
-        return true;
-      });
+    (decodedText: string, _decodedResult: Html5QrcodeResult) => {
+      // Use ref to avoid stale closure — this is why camera scan did nothing
+      if (showModalRef.current) return;
+      showModalRef.current = true;
+
+      const url = isValidUrl(decodedText);
+      setResult(decodedText);
+      setIsUrl(url);
+      setShowModal(true);
     },
     []
   );
 
   const closeModal = () => {
+    showModalRef.current = false;
     setShowModal(false);
     setResult(null);
   };
@@ -50,7 +53,6 @@ export default function ScanPage() {
             fps={10}
             qrbox={250}
             disableFlip={false}
-            facingMode="environment"
             qrCodeSuccessCallback={onNewScanResult}
           />
           <div className="absolute w-full h-0.5 bg-blue-500 animate-scan" />
