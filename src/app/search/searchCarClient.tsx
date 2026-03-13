@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { deleteTempPhone } from "@/app/actions";
 import VerifyPhoneUnknownUser from "@/app/verify-phone-unknown-user/verify-phone-unknown-user-client";
+import Link from "next/link";
 
 function Loader() {
   return (
@@ -167,7 +168,8 @@ export default function SearchCar({
             TIP:
             <Camera size={12} />
             <p className="max-w-xl text-xs leading-normal text-slate-600 dark:text-slate-400">
-              You can scan the QR with Google Lens
+              You can also scan the QR with Google Lens or use {" "}
+              <Link href="/scan" className="underline font-bold text-blue-600">Pingivo Scanner</Link>
             </p>
           </div>
 

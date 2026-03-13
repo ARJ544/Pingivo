@@ -4,6 +4,7 @@ import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Html5QrcodePlugin from "@/components/Html5QrcodePlugin";
 import { Html5QrcodeResult } from "html5-qrcode";
+import { COMPANY_NAME } from "@/config/company";
 
 const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL ?? "";
 
@@ -39,8 +40,16 @@ export default function ScanPage() {
       setIsUrl(url);
       setShowModal(true);
     },
-    []
+    [router]
   );
+
+  const onError = (error: any) => {
+    if (error?.name === "NotAllowedError") {
+      alert(
+        "Camera permission is blocked.\n\nClick the 🔒 icon in your browser address bar → Allow Camera → Reload page."
+      );
+    }
+  };
 
   const closeModal = () => {
     showModalRef.current = false;
@@ -52,10 +61,10 @@ export default function ScanPage() {
     <div className="min-h-screen flex items-center justify-center p-6 bg-gray-100 dark:bg-gray-950">
       <div className="w-full max-w-md text-center rounded-2xl p-8 bg-white border border-gray-200 shadow-xl dark:bg-gray-900 dark:border-gray-800">
         <h1 className="text-2xl font-bold mb-2 dark:text-white">
-          QR Code Scanner
+          {COMPANY_NAME} QR Scanner
         </h1>
         <p className="text-sm mb-6 text-gray-600 dark:text-gray-400">
-          Scan Pingivo QR code using your camera
+          Scan {COMPANY_NAME} QR code using your camera
         </p>
         <div className="relative rounded-xl border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950">
           <Html5QrcodePlugin
@@ -63,6 +72,7 @@ export default function ScanPage() {
             qrbox={250}
             disableFlip={false}
             qrCodeSuccessCallback={onNewScanResult}
+            qrCodeErrorCallback={onError}
           />
           <div className="absolute w-full h-0.5 bg-blue-500 animate-scan" />
         </div>

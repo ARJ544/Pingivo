@@ -66,7 +66,7 @@ export default function GenerateQRClient({ finder_id }: Props) {
 
         <div className="flex flex-col gap-1">
           <h1 className={`${sora.className} text-3xl font-extrabold tracking-tight`}>Your QR Code</h1>
-          <p className="text-sm text-slate-400">Choose a template, position your QR, then download.</p>
+          <p className="text-sm text-slate-400">Choose a template, then download your sticker.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
@@ -125,7 +125,7 @@ export default function GenerateQRClient({ finder_id }: Props) {
                 className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold h-12 rounded-xl flex items-center justify-center gap-2"
               >
                 <Download className="w-4 h-4" />
-                {downloading ? "Generating..." : "Download PDF"}
+                {downloading ? "Generating..." : "Download Sticker"}
               </Button>
               <Button
                 onClick={shareQR}
