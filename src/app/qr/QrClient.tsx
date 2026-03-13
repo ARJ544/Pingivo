@@ -18,18 +18,17 @@ const CW = 360;
 const CH = 500;
 
 const TEMPLATES = [
-  { id: "0", label: "0", src: "/template.jpg", defaultSize: 175, qrPos: { x: CW / 2 - 87, y: CH / 2 - 65 } },
-  { id: "1", label: "1", src: "/template2.jpg", defaultSize: 156, qrPos: { x: CW / 2 - 80, y: CH / 2 - 121 } },
-  { id: "2", label: "2", src: "/template3.jpg", defaultSize: 180, qrPos: { x: CW / 2 - 88, y: CH / 2 - 113 } },
+  { id: "0", label: "1", src: "/template0.jpg", defaultSize: 160, qrPos: { x: CW / 2 - 79, y: CH / 2 - 113 } },
+  { id: "1", label: "2", src: "/template1.jpg", defaultSize: 160, qrPos: { x: CW / 2 - 80, y: CH / 2 - 118 } },
 ];
 
 
 export default function GenerateQRClient({ finder_id }: Props) {
   const [downloading, setDownloading] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [template, setTemplate] = useState(TEMPLATES[2]);
-  const [qrSize, setQrSize] = useState(180);
-  const [qrPos, setQrPos] = useState({ x: CW / 2 - 88, y: CH / 2 - 113 });
+  const [template, setTemplate] = useState(TEMPLATES[0]);
+  const [qrSize, setQrSize] = useState(160);
+  const [qrPos, setQrPos] = useState({ x: CW / 2 - 79, y: CH / 2 - 113 });
   const canvasRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
