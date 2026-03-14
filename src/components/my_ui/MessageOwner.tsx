@@ -82,7 +82,7 @@ export default function MessageOwner() {
 
             {/* Status */}
             {sent && (
-              <p className="text-center text-sm font-medium text-[#25D366] pt-3">Message sent!</p>
+              <p className="text-center text-sm font-medium text-[#25D366] pt-3">Under Trial!</p>
             )}
 
             {/* Send button */}
