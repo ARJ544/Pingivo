@@ -9,7 +9,7 @@ export async function Navigation() {
   const isLoggedIn = await IsLoggedIn();
 
   return (
-    <nav className="sticky top-0 z-50 w-full rounded-b-sm backdrop-blur-md">
+    <nav className="sticky border-b border-gray-800 top-0 z-50 w-full rounded-b-sm backdrop-blur-md">
       <div className="flex h-16 max-w-7xl w-full items-center justify-between px-2">
         {/* Logo */}
         <Link

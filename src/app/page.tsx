@@ -28,37 +28,48 @@ export default async function Home() {
     <div className="bg-white dark:bg-[#080c10] text-slate-900 dark:text-slate-50">
       <main className="max-w-5xl mx-auto px-6">
 
-        {/* HERO */}
-        <section className="py-4 flex flex-col gap-6 max-w-xl">
-          <h1 className={`${sora.className} text-5xl md:text-6xl font-extrabold leading-tight tracking-tight`}>
-            Stay Reachable.<br />
-            Without -<br />
-            <span className="text-blue-500">Showing your number.</span>
-          </h1>
-          <p className="text-base italic text-slate-500 dark:text-slate-400 max-w-sm">
-            Multipurpose QR codes for anything you own. Stay reachable — contact anonymously.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3">
+        <section className="py-8 grid gap-8 items-center max-w-6xl mx-auto md:grid-cols-2">
+
+          <div className="hidden md:flex flex-col gap-6 px-4 max-w-xl">
+            <h1 className={`${sora.className} text-5xl md:text-5xl font-extrabold leading-tight tracking-tight`}>
+              Stay Reachable.<br />
+              Without -<br />
+              <span className="text-blue-500">Showing your number.</span>
+            </h1>
+
+            <p className="text-base italic text-slate-500 dark:text-slate-400 max-w-sm">
+              Multipurpose QR codes for anything you own. Stay reachable — Get contact anonymously.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <img
+              src="/bg.jpeg"
+              alt="QR preview"
+              className="w-full max-w-md md:max-w-lg h-auto object-contain rounded-2xl"
+            />
+
+            <p className="md:hidden text-base italic text-slate-500 dark:text-slate-400 max-w-sm">
+              Multipurpose QR codes for anything you own. Stay reachable — Get contact anonymously.
+            </p>
+          </div>
+
+          {/* BUTTON */}
+          <div className="md:col-span-2 flex justify-start">
             <Link href="/home">
               <Button className="bg-blue-500 hover:bg-blue-600 text-white font-bold h-11 px-7 rounded-xl flex items-center gap-2">
-                Generate your QR Code <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/scan">
-              <Button
-                variant="outline"
-                className="h-11 px-5 rounded-xl font-bold"
-              >
-                Scan {COMPANY_NAME} QR Code
+                Generate your QR Code
+                <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </div>
-        </section>
 
+        </section>
+        
         <hr className="border-slate-100 dark:border-slate-800" />
 
         {/* USE CASES */}
-        <section className="py-10">
+        <section className="py-8">
           <h2 className={`${sora.className} text-2xl font-extrabold tracking-tight mb-2`}>Typical Use Cases.</h2>
           <p className="text-sm text-slate-400 mb-8">Not just vehicles — use it on anything.</p>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">

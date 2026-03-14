@@ -25,7 +25,7 @@ const TEMPLATES = [
 
 export default function GenerateQRClient({ finder_id }: Props) {
   const [downloading, setDownloading] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const [template, setTemplate] = useState(TEMPLATES[0]);
   const [qrSize, setQrSize] = useState(160);
   const [qrPos, setQrPos] = useState({ x: CW / 2 - 79, y: CH / 2 - 113 });
@@ -39,25 +39,62 @@ export default function GenerateQRClient({ finder_id }: Props) {
     setDownloading(true);
     const pdf = new jsPDF({ orientation: "portrait", unit: "cm", format: [9, 12], compress: true });
     await pdf.svg(svgRef.current, { x: 0, y: 0, width: 9, height: 12 });
-    pdf.save(`${COMPANY_NAME}-template[${template.label}]-ID-${finder_id}.pdf`);
+    pdf.save(`${COMPANY_NAME}-ID-${finder_id}.pdf`);
     setDownloading(false);
   };
 
   const shareQR = async () => {
-    if (!svgRef.current || !navigator.share) return;
-    const pdf = new jsPDF({ orientation: "portrait", unit: "cm", format: [9, 12], compress: true });
-    await pdf.svg(svgRef.current, { x: 0, y: 0, width: 9, height: 12 });
-    const blob = pdf.output("blob");
-    const file = new File([blob], `${COMPANY_NAME}-qr-${finder_id}.pdf`, { type: "application/pdf" });
-    if (navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ files: [file], title: `${COMPANY_NAME} QR Code` });
-    }
-  };
+    if (!svgRef.current) return;
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(finder_id);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setSharing(true);
+
+    try {
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "cm",
+        format: [9, 12],
+        compress: true,
+      });
+
+      await pdf.svg(svgRef.current, { x: 0, y: 0, width: 9, height: 12 });
+
+      const blob = pdf.output("blob");
+
+      const file = new File(
+        [blob],
+        `${COMPANY_NAME}-qr-${finder_id}.pdf`,
+        { type: "application/pdf" }
+      );
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: `My ${COMPANY_NAME} QR Code`,
+        });
+        return;
+      }
+
+      if (navigator.share) {
+        await navigator.share({
+          title: `My ${COMPANY_NAME} QR Code`,
+          text: "Scan My QR sticker",
+          url: window.location.href,
+        });
+        return;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${COMPANY_NAME}-qr-${finder_id}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+    } catch (err) {
+      console.error("Share failed:", err);
+    } finally {
+      setSharing(false);
+    }
   };
 
   return (
@@ -71,83 +108,17 @@ export default function GenerateQRClient({ finder_id }: Props) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
 
-          {/* ── LEFT: controls ── */}
-          <div className="flex flex-col gap-6">
-
-            {/* Finder ID */}
-            <div className="flex flex-col gap-2">
-              <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Your Finder ID</p>
-              <div className="flex items-center gap-1">
-                <Input
-                  readOnly
-                  value={finder_id}
-                  className="w-1 flex-1 px-2 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 font-mono text-sm text-slate-700 dark:text-slate-200"
-                />
-                <Button onClick={copyToClipboard} size="sm" variant="outline" className="h-10 w-10 p-0 rounded-xl">
-                  {copied ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
-                </Button>
-              </div>
-            </div>
-
-            {/* Template picker */}
-            <div className="flex flex-col gap-3">
-              <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Choose Template</p>
-              <div className="grid grid-cols-3 gap-3">
-                {TEMPLATES.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => { setTemplate(t); setQrSize(t.defaultSize); setQrPos(t.qrPos) }}
-                    className={`relative rounded-xl overflow-hidden border-2 transition-colors aspect-3/4 bg-slate-100 dark:bg-slate-800
-                      ${template.id === t.id
-                        ? "border-blue-500"
-                        : "border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700"
-                      }`}
-                  >
-                    
-                    <img src={t.src} alt={t.label} className="w-full h-full object-cover" />
-                    <div className="absolute bottom-0 inset-x-0 bg-black/40 py-1">
-                      <p className="text-white text-xs font-bold text-center">{t.label}</p>
-                    </div>
-                    {template.id === t.id && (
-                      <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center">
-                        <Check className="w-2.5 h-2.5 text-white" />
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <Button
-                onClick={downloadPDF}
-                disabled={downloading}
-                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold h-12 rounded-xl flex items-center justify-center gap-2"
-              >
-                <Download className="w-4 h-4" />
-                {downloading ? "Generating..." : "Download Sticker"}
-              </Button>
-              <Button
-                onClick={shareQR}
-                variant="outline"
-                className="h-12 px-5 rounded-xl flex items-center gap-2 font-bold border-slate-200 dark:border-slate-700"
-              >
-                <Share2 className="w-4 h-4" />
-                Share PDF
-              </Button>
-            </div>
-          </div>
-
-          {/* ── RIGHT: preview ── */}
-          <div className="flex flex-col gap-4">
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Preview</p>
+          {/* LEFT — Preview */}
+          <div className="flex flex-col gap-4 lg:sticky lg:top-6">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+              Preview
+            </p>
 
             <div
               ref={canvasRef}
-              className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-md select-none w-full h-full"
+              className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-lg select-none w-full"
               style={{ aspectRatio: `${CW} / ${CH}` }}
             >
-              
               <svg
                 ref={svgRef}
                 viewBox={`0 0 ${CW} ${CH}`}
@@ -160,8 +131,79 @@ export default function GenerateQRClient({ finder_id }: Props) {
               </svg>
             </div>
 
-            <p className="text-xs text-slate-400">PDF output will be print quality.</p>
+            <p className="text-xs text-slate-400">
+              PDF output will be print quality.
+            </p>
           </div>
+
+
+          {/* RIGHT — Controls */}
+          <div className="flex flex-col gap-8">
+
+            {/* Buttons */}
+            <div className="flex gap-3">
+              <Button
+                onClick={downloadPDF}
+                disabled={downloading}
+                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold h-11 rounded-xl flex items-center justify-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                {downloading ? "Generating..." : "Download Sticker"}
+              </Button>
+
+              <Button
+                onClick={shareQR}
+                disabled={sharing}
+                variant="outline"
+                className="h-11 px-5 rounded-xl flex items-center gap-2 font-bold border-slate-200 dark:border-slate-700"
+              >
+                <Share2 className="w-4 h-4" />
+                {sharing ? "Preparing..." : "Share PDF"}
+              </Button>
+            </div>
+
+
+            {/* Templates */}
+            <div className="flex flex-col gap-3">
+              <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                Choose Template
+              </p>
+
+              <div className="grid grid-cols-3 gap-3">
+                {TEMPLATES.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => {
+                      setTemplate(t)
+                      setQrSize(t.defaultSize)
+                      setQrPos(t.qrPos)
+                    }}
+                    className={`relative rounded-xl overflow-hidden border-2 transition-colors aspect-3/4
+            ${template.id === t.id
+                        ? "border-blue-500"
+                        : "border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700"
+                      }`}
+                  >
+                    <img src={t.src} alt={t.label} className="w-full h-full object-cover" />
+
+                    <div className="absolute bottom-0 inset-x-0 bg-black/40 py-1">
+                      <p className="text-white text-xs font-bold text-center">
+                        {t.label}
+                      </p>
+                    </div>
+
+                    {template.id === t.id && (
+                      <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center">
+                        <Check className="w-2.5 h-2.5 text-white" />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+          </div>
+
         </div>
       </div>
     </div>

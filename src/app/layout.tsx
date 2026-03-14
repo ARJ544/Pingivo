@@ -110,37 +110,6 @@ export default function RootLayout({
                   </div>
                   <div className="flex flex-col gap-6">
                     <h4 className="font-bold text-sm uppercase tracking-widest text-slate-400">
-                      Product
-                    </h4>
-                    <nav className="flex flex-col gap-3">
-                      <Link
-                        className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
-                        href="#"
-                      >
-                        Features
-                      </Link>
-                      <Link
-                        className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
-                        href="#"
-                      >
-                        Use Cases
-                      </Link>
-                      <Link
-                        className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
-                        href="#"
-                      >
-                        Pricing
-                      </Link>
-                      <Link
-                        className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
-                        href="#"
-                      >
-                        Sticker Shop
-                      </Link>
-                    </nav>
-                  </div>
-                  <div className="flex flex-col gap-6">
-                    <h4 className="font-bold text-sm uppercase tracking-widest text-slate-400">
                       Company
                     </h4>
                     <nav className="flex flex-col gap-3">
@@ -154,19 +123,7 @@ export default function RootLayout({
                         className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
                         href="#"
                       >
-                        Blog
-                      </Link>
-                      <Link
-                        className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
-                        href="#"
-                      >
                         Contact
-                      </Link>
-                      <Link
-                        className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
-                        href="#"
-                      >
-                        Partners
                       </Link>
                     </nav>
                   </div>
