@@ -36,6 +36,7 @@ export default function SignupClient() {
 
       if (!userObj?.user_json_url) {
         setMessage("Phone verification failed. Please try again.");
+        router.refresh();
         setTimeout(() => router.replace("/signup"), 2000);
         return;
       }
@@ -50,9 +51,11 @@ export default function SignupClient() {
         if (!res.ok) throw new Error();
 
         setMessage("Phone verified successfully! Redirecting...");
-        setTimeout(() => router.replace("/"), 1500);
+        router.refresh();
+        setTimeout(() => router.replace("/qr"), 1500);
       } catch {
         setMessage("Something went wrong. Please try again.");
+        router.refresh();
         setTimeout(() => router.replace("/signup"), 2000);
       } finally {
         setLoading(false);

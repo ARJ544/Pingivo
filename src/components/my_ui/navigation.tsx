@@ -1,12 +1,14 @@
 import { ModeToggle } from "@/components/ui/mode_toggle";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { IsLoggedIn, deleteAllCookie, getAllCookie } from "@/app/actions";
+import { getAllCookie } from "@/app/actions";
 import Image from "next/image";
 import { COMPANY_NAME } from "@/config/company";
+import ProfileDropdown from "@/components/my_ui/profile-dropdown";
 
 export async function Navigation() {
-  const isLoggedIn = await IsLoggedIn();
+  const isLoggedIn = (await getAllCookie()).loggedin;
+  const isVerified = (await getAllCookie()).verified;
 
   return (
     <nav className="sticky border-b border-gray-800 top-0 z-50 w-full rounded-b-sm backdrop-blur-md">
@@ -40,18 +42,13 @@ export async function Navigation() {
           <ModeToggle />
 
           {!isLoggedIn && (
-            <>
-              <Link href="/signin">
-                <Button className="rounded-full">SignIn</Button>
-              </Link>
-            </>
+            <Link href="/signin">
+              <Button className="rounded-full">Sign In</Button>
+            </Link>
           )}
 
           {isLoggedIn && (
-            <div className="flex flex-col items-center leading-none">
-
-              <Button variant="destructive" onClick={deleteAllCookie} className="rounded-full px-2">Log Out</Button>
-            </div>
+            <ProfileDropdown isVerified={isVerified} />
           )}
         </div>
       </div>
