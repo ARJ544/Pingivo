@@ -50,7 +50,7 @@ export default function SignupClient() {
         if (!res.ok) throw new Error();
 
         setMessage("Phone verified successfully! Redirecting...");
-        setTimeout(() => router.replace("/home"), 1500);
+        setTimeout(() => router.replace("/"), 1500);
       } catch {
         setMessage("Something went wrong. Please try again.");
         setTimeout(() => router.replace("/signup"), 2000);

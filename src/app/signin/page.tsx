@@ -10,7 +10,7 @@ export default async function LoginPage() {
   const isLoggedIn = await IsLoggedIn();
 
   if (isLoggedIn) {
-    redirect("/home");
+    redirect("/");
   }
 
   return <SignupClient />;

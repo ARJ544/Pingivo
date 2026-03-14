@@ -50,7 +50,7 @@ export default function UpdateClient() {
         }
 
         setMessage("Phone verified successfully! Redirecting...");
-        setTimeout(() => router.replace("/home"), 1200);
+        setTimeout(() => router.replace("/"), 1200);
       } catch {
         setMessage("Something went wrong. Please try again.");
         setTimeout(() => router.refresh(), 1500);

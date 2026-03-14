@@ -168,15 +168,6 @@ export default function SearchCar({
             Contact the Owner
           </h1>
 
-          <div className="flex flex-wrap items-center gap-1 text-xs text-slate-600 dark:text-slate-400">
-            <span>
-              You can also scan the QR with {" "}
-              <Link href="/scan" className="underline font-bold text-blue-600">
-                Pingivo Scanner
-              </Link>
-            </span>
-          </div>
-
           <div className="flex w-full flex-col gap-4 pt-8">
 
             {loading && !ownerFound ? <Loader /> : null}
