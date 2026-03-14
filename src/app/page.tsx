@@ -46,7 +46,7 @@ export default async function Home() {
             <img
               src="/bg.jpeg"
               alt="QR preview"
-              className="w-full max-w-md md:max-w-lg h-auto object-contain rounded-2xl"
+              className="w-full h-auto object-contain rounded-2xl"
             />
 
             <p className="md:hidden text-base italic text-slate-500 dark:text-slate-400 max-w-sm">
