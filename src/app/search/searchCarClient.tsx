@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Phone, RefreshCcw, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -32,7 +32,7 @@ export default function SearchCar({
   const searchParams = useSearchParams();
   const queryFinderId = searchParams.get("finder_id");
 
-  const [finderId, setFinderId] = useState(queryFinderId ? queryFinderId : "");
+  const finderId = queryFinderId ?? "";
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [ownerFound, setOwnerFound] = useState(false);
@@ -52,12 +52,12 @@ export default function SearchCar({
         setIsError(false);
         const res = await fetch(`/api/search?finder_id=${queryFinderId}`);
 
+        const result = await res.json()
+
         if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.error || "Request failed");
+          throw new Error(result.error || "Request failed")
         }
 
-        const data = await res.json();
         setOwnerFound(true);
       } catch (err: any) {
         setMessage(err.message || "User not found");
@@ -109,24 +109,26 @@ export default function SearchCar({
     fetchCallCredits();
   }, []);
 
-  const getResetTimeInLocalZone = () => {
-    const now = new Date();
-    const utcMidnightToday = new Date(Date.UTC(
-      now.getUTCFullYear(),
-      now.getUTCMonth(),
-      now.getUTCDate(),
-      0, 0, 0
-    ));
+  const getResetTimeInLocalZone = useMemo(() => {
+    const now = new Date()
 
-    const formatter = new Intl.DateTimeFormat('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
+    const utcMidnightToday = new Date(
+      Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate(),
+        0, 0, 0
+      )
+    )
+
+    return new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
       hour12: true,
-      timeZoneName: 'longGeneric',
-    });
+      timeZoneName: "longGeneric",
+    }).format(utcMidnightToday)
 
-    return formatter.format(utcMidnightToday);
-  };
+  }, []);
 
   const handleCall = async () => {
     setLoading(true);
@@ -155,12 +157,8 @@ export default function SearchCar({
     }
   };
 
-  const removeTempPhoneId = async () => {
-    await deleteTempPhone();
-    router.refresh();
-  }
 
-  const hasPhoneNumber = phone_num || temp_phone_number;
+  const hasPhoneNumber = Boolean(phone_num || temp_phone_number);
 
   return (
     <main className="flex flex-1 justify-center px-4 py-8 bg-slate-50 dark:bg-slate-950 transition-colors">
@@ -181,7 +179,7 @@ export default function SearchCar({
 
           <div className="flex w-full flex-col gap-4 pt-8">
 
-            {loading && !ownerFound && <Loader />}
+            {loading && !ownerFound ? <Loader /> : null}
 
             {/* Message Display */}
             {message && (
@@ -269,7 +267,7 @@ export default function SearchCar({
                     {/* Reset + Info Icon */}
                     <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
 
-                      <span>Resets {getResetTimeInLocalZone()}</span>
+                      <span>Resets {getResetTimeInLocalZone}</span>
 
                       <button
                         onClick={() => setShowInfo(!showInfo)}
@@ -331,7 +329,10 @@ export default function SearchCar({
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={removeTempPhoneId}
+                      onClick={async () => {
+                        await deleteTempPhone()
+                        router.refresh()
+                      }}
                       className="h-7 px-2"
                     >
                       Remove

@@ -42,15 +42,12 @@ export default function VerifyPhoneUnknownUser({
 
       setLoading(true);
       setMessage("Verifying your phone number...");
-      const randomId = crypto.randomUUID().slice(-4) || "rfd";
-      const randomId2 = crypto.randomUUID().slice(-4) || "true";
 
       if (!userObj?.user_json_url) {
         setMessage("Phone verification failed. Please try again.");
-        setTimeout(
-          () => router.replace(`/search?finder_id=${encodeURIComponent(safeFinderId)}&${randomId}=${randomId2}`),
-          2000,
-        );
+        setTimeout(() => {
+          window.location.href = `/search?finder_id=${encodeURIComponent(safeFinderId)}`;
+        }, 1500);
         return;
       }
 
@@ -64,16 +61,14 @@ export default function VerifyPhoneUnknownUser({
         if (!res.ok) throw new Error();
 
         setMessage("Phone verified successfully! Redirecting...");
-        setTimeout(
-          () => router.replace(`/search?finder_id=${encodeURIComponent(safeFinderId)}&${randomId}=${randomId2}`),
-          1500,
-        );
+        setTimeout(() => {
+          window.location.href = `/search?finder_id=${encodeURIComponent(safeFinderId)}`;
+        }, 1500);
       } catch {
         setMessage("Something went wrong. Please try again.");
-        setTimeout(
-          () => router.replace(`/search?finder_id=${encodeURIComponent(safeFinderId)}&${randomId}=${randomId2}`),
-          2000,
-        );
+        setTimeout(() => {
+          window.location.href = `/search?finder_id=${encodeURIComponent(safeFinderId)}`;
+        }, 1500);
       } finally {
         setLoading(false);
       }
