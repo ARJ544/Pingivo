@@ -42,11 +42,13 @@ export default function VerifyPhoneUnknownUser({
 
       setLoading(true);
       setMessage("Verifying your phone number...");
+      const randomId = crypto.randomUUID().slice(-4) || "rfd";
+      const randomId2 = crypto.randomUUID().slice(-4) || "true";
 
       if (!userObj?.user_json_url) {
         setMessage("Phone verification failed. Please try again.");
         setTimeout(
-          () => router.replace(`/search?finder_id=${encodeURIComponent(safeFinderId)}`),
+          () => router.replace(`/search?finder_id=${encodeURIComponent(safeFinderId)}&${randomId}=${randomId2}`),
           2000,
         );
         return;
@@ -63,13 +65,13 @@ export default function VerifyPhoneUnknownUser({
 
         setMessage("Phone verified successfully! Redirecting...");
         setTimeout(
-          () => router.replace(`/search?finder_id=${encodeURIComponent(safeFinderId)}`),
+          () => router.replace(`/search?finder_id=${encodeURIComponent(safeFinderId)}&${randomId}=${randomId2}`),
           1500,
         );
       } catch {
         setMessage("Something went wrong. Please try again.");
         setTimeout(
-          () => router.replace(`/search?finder_id=${encodeURIComponent(safeFinderId)}`),
+          () => router.replace(`/search?finder_id=${encodeURIComponent(safeFinderId)}&${randomId}=${randomId2}`),
           2000,
         );
       } finally {

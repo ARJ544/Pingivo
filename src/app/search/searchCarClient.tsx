@@ -1,11 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Phone, RefreshCcw, Camera } from "lucide-react";
+import { Phone, RefreshCcw, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { deleteTempPhone } from "@/app/actions";
 import VerifyPhoneUnknownUser from "@/app/verify-phone-unknown-user/verify-phone-unknown-user-client";
 import Link from "next/link";
+import MessageOwner from "@/components/my_ui/MessageOwner";
 
 function Loader() {
   return (
@@ -36,16 +37,19 @@ export default function SearchCar({
   const [message, setMessage] = useState("");
   const [ownerFound, setOwnerFound] = useState(false);
   const [errorOrSuccessMessage, setErrorOrSuccessMessage] = useState("");
+  const [isError, setIsError] = useState(false);
   const [callCredits, setCallCredits] = useState(3);
   const [usedCallCredits, setUsedCallCredits] = useState(0);
   const [creditsLoading, setCreditsLoading] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
 
   useEffect(() => {
     if (!queryFinderId) return;
-    setLoading(true);
 
     const fetchOwner = async () => {
       try {
+        setLoading(true);
+        setIsError(false);
         const res = await fetch(`/api/search?finder_id=${queryFinderId}`);
 
         if (!res.ok) {
@@ -58,6 +62,7 @@ export default function SearchCar({
       } catch (err: any) {
         setMessage(err.message || "User not found");
         setOwnerFound(false);
+        setIsError(true);
       } finally {
         setLoading(false);
       }
@@ -69,6 +74,7 @@ export default function SearchCar({
   useEffect(() => {
     const fetchCallCredits = async () => {
       try {
+        setIsError(false);
         setCreditsLoading(true);
         const res = await fetch("/api/get-call-credits");
 
@@ -78,20 +84,21 @@ export default function SearchCar({
           setUsedCallCredits(0);
           const errorData = await res.json();
           setErrorOrSuccessMessage(errorData.error || res.statusText);
+          setIsError(true);
           return;
         }
 
         const result = await res.json();
 
-        if (result.success) {
-          setCallCredits(result.callCredits);
-          setUsedCallCredits(result.creditsUsed);
-
-        } else {
+        if (!result.success) {
           setCallCredits(0);
           setUsedCallCredits(0);
-
+          return;
         }
+
+        setCallCredits(result.callCredits);
+        setUsedCallCredits(result.creditsUsed);
+
       } catch (err) {
         setCallCredits(3);
       } finally {
@@ -123,6 +130,7 @@ export default function SearchCar({
 
   const handleCall = async () => {
     setLoading(true);
+    setIsError(false);
 
     try {
       const res = await fetch("/api/voice", {
@@ -141,6 +149,7 @@ export default function SearchCar({
       );
     } catch (err: any) {
       setErrorOrSuccessMessage(err.message);
+      setIsError(true);
     } finally {
       setLoading(false);
     }
@@ -161,16 +170,13 @@ export default function SearchCar({
             Contact the Owner
           </h1>
 
-          <p className="max-w-xl text-base leading-normal text-slate-600 dark:text-slate-400">
-            Scan the QR code to reach out to the owner.
-          </p>
-          <div className="flex flex-row items-center gap-1 text-xs">
-            TIP:
-            <Camera size={12} />
-            <p className="max-w-xl text-xs leading-normal text-slate-600 dark:text-slate-400">
-              You can also scan the QR with Google Lens or use {" "}
-              <Link href="/scan" className="underline font-bold text-blue-600">Pingivo Scanner</Link>
-            </p>
+          <div className="flex flex-wrap items-center gap-1 text-xs text-slate-600 dark:text-slate-400">
+            <span>
+              You can also scan the QR with {" "}
+              <Link href="/scan" className="underline font-bold text-blue-600">
+                Pingivo Scanner
+              </Link>
+            </span>
           </div>
 
           <div className="flex w-full flex-col gap-4 pt-8">
@@ -193,9 +199,7 @@ export default function SearchCar({
                 <div className="grid grid-cols-2 gap-3 items-start">
 
                   {/* Send Message */}
-                  <Button className="h-12 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 text-white font-semibold rounded-lg transition active:scale-[0.97]">
-                    Send Message
-                  </Button>
+                  <MessageOwner />
 
                   {/* Call Section */}
                   <div className="flex flex-col gap-1">
@@ -241,59 +245,97 @@ export default function SearchCar({
 
                 {hasPhoneNumber && (
 
-                  <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 space-y-2">
+                  <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 shadow-sm text-sm">
 
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-700 dark:text-slate-300">
-                        Credits: <strong className="text-blue-600 dark:text-blue-400">{callCredits}</strong> left
-                      </span>
+                    {/* Top */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-500 dark:text-slate-400">
+                          Credits
+                        </span>
 
-                      <span className="text-slate-500 dark:text-slate-400 text-xs">
-                        {usedCallCredits} used • resets {getResetTimeInLocalZone()}
+                        <span className="px-2 py-0.5 font-semibold rounded-md bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
+                          {callCredits}
+                        </span>
+                      </div>
+
+                      <span className="text-xs text-slate-500">
+                        {usedCallCredits} used
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      • 1 credit will be used only if the receiver answers the call.
-                    </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      • 1 credit is still deducted if you answer but the other person doesn't — this applies when it happens twice.
-                    </p>
+                    <hr className="my-2 border-slate-200 dark:border-slate-700" />
+
+                    {/* Reset + Info Icon */}
+                    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+
+                      <span>Resets {getResetTimeInLocalZone()}</span>
+
+                      <button
+                        onClick={() => setShowInfo(!showInfo)}
+                        className="hover:text-slate-700 dark:hover:text-slate-200 transition"
+                      >
+                        <Info size={14} />
+                      </button>
+
+                    </div>
+
+                    {/* Rules (toggle) */}
+                    {showInfo && (
+                      <div className="mt-2 text-xs text-slate-500 dark:text-slate-400 space-y-0.5">
+                        <p>• Credit used only if receiver answers</p>
+                        <p>• If you answer twice but other doesn't → 1 credit deducted</p>
+                      </div>
+                    )}
 
                   </div>
                 )}
 
                 {errorOrSuccessMessage && (
-                  <div className="text-sm text-center font-medium text-green-600 dark:text-green-400">
-                    {errorOrSuccessMessage}
-                    <br />
-                    No verification Required to message
+                  <div
+                    className={`flex items-start gap-2 rounded-lg border px-3 py-2 text-sm
+                    ${isError
+                        ? "border-red-200 bg-red-50 dark:border-red-900/40 dark:bg-red-900/20"
+                        : "border-green-200 bg-green-50 dark:border-green-900/40 dark:bg-green-900/20"
+                      }`}
+                  >
+                    <span
+                      className={`mt-0.5 ${isError ? "text-red-600" : "text-green-600"
+                        }`}
+                    >
+                      {isError ? "✕" : "✓"}
+                    </span>
+
+                    <div
+                      className={`text-left ${isError
+                        ? "text-red-700 dark:text-red-300"
+                        : "text-green-700 dark:text-green-300"
+                        }`}
+                    >
+                      {errorOrSuccessMessage}
+
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Messaging does not require verification
+                      </p>
+                    </div>
                   </div>
                 )}
 
                 {(temp_phone_number || temp_phone_id) && (
-                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-4 py-3 text-sm space-y-3">
+                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg py-4 px-1 text-sm flex items-center justify-between">
 
-                    <div className="space-y-1">
-                      <p className="font-semibold text-amber-700 dark:text-amber-300">
-                        Temporary Phone Number Active
-                      </p>
+                    <p className="text-amber-700 dark:text-amber-300">
+                      Temp number active · resets in <strong>1h</strong>
+                    </p>
 
-                      <p className="text-sm text-amber-600 dark:text-amber-400">
-                        You are currently using a temporary phone number to call the owner.
-                        This number will automatically reset after <strong>1 hour</strong>.
-                      </p>
-                    </div>
-
-                    <div className="flex justify-end">
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={removeTempPhoneId}
-                      >
-                        Remove Temporary Phone
-                      </Button>
-                    </div>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={removeTempPhoneId}
+                      className="h-7 px-2"
+                    >
+                      Remove
+                    </Button>
 
                   </div>
                 )}

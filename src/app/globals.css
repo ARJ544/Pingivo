@@ -136,3 +136,19 @@
 .animate-scan {
   animation: scan 2s linear infinite;
 }
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0.6;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
