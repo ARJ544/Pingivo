@@ -15,7 +15,7 @@ const triggerBtn =
   "h-12 w-full bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 text-white font-semibold rounded-lg transition active:scale-[0.97]";
 
 const sheet =
-  "relative w-full bg-white dark:bg-zinc-900 rounded-t-2xl pb-8 animate-slideUp max-h-[90dvh] flex flex-col";
+  "relative w-full bg-white dark:bg-zinc-900 rounded-t-2xl animate-slideUp max-h-[90dvh] flex flex-col";
 
 const headerBorder = "border-b border-zinc-100 dark:border-white/10";
 

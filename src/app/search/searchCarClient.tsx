@@ -154,7 +154,7 @@ export default function SearchCar({
             )}
 
             {ownerFound && (
-              <div className="space-y-4 pt-4">
+              <>
 
                 <MessageOwner
                   autoOpen={ownerFound}
@@ -217,7 +217,7 @@ export default function SearchCar({
                   </div>
                 )}
 
-              </div>
+              </>
             )}
           </div>
         </div>
