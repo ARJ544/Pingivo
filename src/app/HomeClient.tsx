@@ -41,7 +41,7 @@ export default function HomeClient() {
             </h1>
 
             <p className="text-base italic text-slate-500 dark:text-slate-400 max-w-sm">
-              Multipurpose QR codes for anything you own. Stay reachable — Get contact anonymously.
+              Multipurpose QR codes for anything you own. Stay reachable — Get Contacted anonymously.
             </p>
           </div>
 
@@ -53,7 +53,7 @@ export default function HomeClient() {
             />
 
             <p className="md:hidden text-base italic text-slate-500 dark:text-slate-400 max-w-sm">
-              Multipurpose QR codes for anything you own. Stay reachable — Get contact anonymously.
+              Multipurpose QR codes for anything you own. Stay reachable — Get Contacted anonymously.
             </p>
           </div>
 
