@@ -90,15 +90,45 @@ export default function MessageOwner({
     setFeedback(null);
   }
 
-  function handleSend() {
+  async function handleSend() {
     if (!activeMsg) return;
-    console.log("Message:", activeMsg);
-    setSending(true);
-    setFeedback(null);
-    setTimeout(() => {
+
+    try {
+      setSending(true);
+      setFeedback(null);
+
+      const res = await fetch("/api/message-owner", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ alertMessage: activeMsg }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to send message");
+      }
+
+      // console.log("WhatsApp Response:", data);
+
+      setFeedback({
+        msg: "Message successfully sent to WhatsApp",
+        isError: false,
+      });
+
+    } catch (error: any) {
+      console.error("Error:", error);
+
+      setFeedback({
+        msg: error.message || "Something went wrong while sending message",
+        isError: true,
+      });
+
+    } finally {
       setSending(false);
-      setFeedback({ msg: "Under Trial · Message was not sent to WhatsApp", isError: false });
-    }, 600);
+    }
   }
 
   async function handleCall() {
