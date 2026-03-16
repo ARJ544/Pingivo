@@ -108,10 +108,10 @@ export default function MessageOwner({
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to send message");
+        throw new Error(data.error.message || "Failed to send message");
       }
 
-      // console.log("WhatsApp Response:", data);
+      console.log("WhatsApp Response:", data);
 
       setFeedback({
         msg: "Message successfully sent to WhatsApp",
