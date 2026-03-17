@@ -23,6 +23,22 @@ export async function POST(request: Request) {
   const recipientPhoneWithCountryCode = recipientPhoneResult.user.phone_num;
   const recipientPhone = recipientPhoneWithCountryCode.replace(/^\+/, "");
   const { alertMessage } = await request.json();
+  
+  if (!alertMessage || !alertMessage.trim()) {
+    return NextResponse.json(
+      { error: "Please enter a message" },
+      { status: 400 }
+    );
+  }
+
+let formattedMessage = alertMessage.replace(/\n/g, " ").replace(/\t/g, " ").replace(/\s+/g, " ").trim();
+
+if (formattedMessage.length > 500) {
+  return NextResponse.json(
+    { error: "Message too long (max 500 characters)" },
+    { status: 400 }
+  );
+}
 
   const url = `https://graph.facebook.com/v25.0/${whatsAppPhoneNumerId}/messages`;
 
@@ -41,7 +57,7 @@ export async function POST(request: Request) {
           parameters: [
             {
               type: "text",
-              text: alertMessage
+              text: formattedMessage
             }
           ]
         }
@@ -54,7 +70,7 @@ export async function POST(request: Request) {
     to: recipientPhone,
     type: "text",
     text: {
-      body: alertMessage
+      body: formattedMessage
     }
   };
 
