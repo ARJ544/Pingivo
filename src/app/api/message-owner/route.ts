@@ -5,10 +5,11 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
 
   const cookieStore = await cookies();
+  const senderFinderId = cookieStore.get("finder_id")?.value;
   const receiverFinderId = cookieStore.get("receiver_finder_id")?.value;
-  const whatsAppPhoneNumerId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  const whatsAppPhoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   const whatsAppToken = process.env.WHATSAPP_PERMANENT_TOKEN;
-  if (!whatsAppPhoneNumerId || !whatsAppToken) {
+  if (!whatsAppPhoneNumberId || !whatsAppToken) {
     return NextResponse.json(
       { error: { message: "WhatsApp configuration is missing" } },
       { status: 500 }
@@ -22,6 +23,13 @@ export async function POST(request: Request) {
     );
   }
 
+  if (senderFinderId && receiverFinderId === senderFinderId) {
+    return NextResponse.json(
+      { error: { message: "Please do not message yourself." } },
+      { status: 404 }
+    );
+  }
+
   const recipientPhoneResult = await getUserByFinderId(receiverFinderId);
   if (!recipientPhoneResult.success) {
     return NextResponse.json(
@@ -29,7 +37,13 @@ export async function POST(request: Request) {
       { status: 404 }
     );
   }
-  const recipientPhoneWithCountryCode = recipientPhoneResult.user.phone_num;
+  const recipientPhoneWithCountryCode = recipientPhoneResult.user?.phone_num;
+  if (!recipientPhoneWithCountryCode) {
+    return NextResponse.json(
+      { error: { message: "Receiver phone number not found." } },
+      { status: 404 }
+    );
+  }
   const recipientPhone = recipientPhoneWithCountryCode.replace(/^\+/, "");
   const { alertMessage } = await request.json();
   
@@ -49,7 +63,7 @@ if (formattedMessage.length > 500) {
   );
 }
 
-  const url = `https://graph.facebook.com/v25.0/${whatsAppPhoneNumerId}/messages`;
+  const url = `https://graph.facebook.com/v25.0/${whatsAppPhoneNumberId}/messages`;
 
   const payload = {
     messaging_product: "whatsapp",
@@ -99,7 +113,7 @@ if (formattedMessage.length > 500) {
       return NextResponse.json(result, { status: response.status });
     }
 
-    return NextResponse.json(result);
+    return NextResponse.json({success: true});
   } catch (error: any) {
     return NextResponse.json({ error: { message: "Failed to send alert" } },{ status: 500 });
   }
