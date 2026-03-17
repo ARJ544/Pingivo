@@ -65,7 +65,7 @@ export async function POST(request: Request) {
         "Authorization": `Bearer ${whatsAppToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(tempPayload),
+      body: JSON.stringify(payload),
     });
 
     const result = await response.json();
