@@ -9,16 +9,25 @@ export async function POST(request: Request) {
   const whatsAppPhoneNumerId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   const whatsAppToken = process.env.WHATSAPP_PERMANENT_TOKEN;
   if (!whatsAppPhoneNumerId || !whatsAppToken) {
-    return NextResponse.json({ error: "WhatsApp configuration is missing" }, { status: 500 });
+    return NextResponse.json(
+      { error: { message: "WhatsApp configuration is missing" } },
+      { status: 500 }
+    );
   }
 
   if (!receiverFinderId) {
-    return NextResponse.json({ error: "Receiver not found. Please refresh the page." }, { status: 404 });
+    return NextResponse.json(
+      { error: { message: "Receiver not found. Please refresh the page." } },
+      { status: 404 }
+    );
   }
 
   const recipientPhoneResult = await getUserByFinderId(receiverFinderId);
   if (!recipientPhoneResult.success) {
-    return NextResponse.json({ error: "Receiver not found. Please refresh the page." }, { status: 404 });
+    return NextResponse.json(
+      { error: { message: "Receiver not found. Please refresh the page." } },
+      { status: 404 }
+    );
   }
   const recipientPhoneWithCountryCode = recipientPhoneResult.user.phone_num;
   const recipientPhone = recipientPhoneWithCountryCode.replace(/^\+/, "");
@@ -26,7 +35,7 @@ export async function POST(request: Request) {
   
   if (!alertMessage || !alertMessage.trim()) {
     return NextResponse.json(
-      { error: "Please enter a message" },
+      { error: { message: "Please enter a message" } },
       { status: 400 }
     );
   }
@@ -35,7 +44,7 @@ let formattedMessage = alertMessage.replace(/\n/g, " ").replace(/\t/g, " ").repl
 
 if (formattedMessage.length > 500) {
   return NextResponse.json(
-    { error: "Message too long (max 500 characters)" },
+    { error: { message: "Message too long (max 500 characters)" } },
     { status: 400 }
   );
 }
@@ -92,6 +101,6 @@ if (formattedMessage.length > 500) {
 
     return NextResponse.json(result);
   } catch (error: any) {
-    return NextResponse.json({ error: "Failed to send alert" }, { status: 500 });
+    return NextResponse.json({ error: { message: "Failed to send alert" } },{ status: 500 });
   }
 }
