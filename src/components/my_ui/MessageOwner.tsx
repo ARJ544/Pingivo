@@ -111,7 +111,7 @@ export default function MessageOwner({
         throw new Error(data.error.message || "Failed to send message");
       }
 
-      console.log("WhatsApp Response:", data);
+      // console.log("WhatsApp Response:", data);
 
       setFeedback({
         msg: "Message successfully sent to WhatsApp",
