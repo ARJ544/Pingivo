@@ -8,7 +8,7 @@ const supabase = createClient(
   process.env.SUPABASE_ANON_KEY!,
 );
 
-function generateSecretCode() {
+export function generateSecretCode() {
   const bytes = crypto.getRandomValues(new Uint8Array(14));
   const chars = [...bytes].map(b => (b % 36).toString(36)).join("");
   return chars.slice(0, 7) + "-" + chars.slice(7);
@@ -36,10 +36,11 @@ export async function POST(req: Request) {
     );
   }
   const finder_id = generateSecretCode();
+  const token = generateSecretCode();
 
   const { data: getExistingUserData, error: getExistingUserError } = await supabase
     .from("simplified_users")
-    .select("id, phone_num, created_at, finder_id")
+    .select("id, phone_num, created_at, finder_id, bsuid")
     .eq("phone_num", verifiedPhone)
     .maybeSingle();
 
@@ -49,8 +50,9 @@ export async function POST(req: Request) {
       .insert({
         phone_num: verifiedPhone,
         finder_id: finder_id,
+        token: token,
       })
-      .select("id, phone_num, created_at, finder_id")
+      .select("id, phone_num, created_at, finder_id, bsuid")
       .single();
 
     if (insertError) {
@@ -63,6 +65,7 @@ export async function POST(req: Request) {
       phone_num: insertData.phone_num,
       finder_id: insertData.finder_id,
       verified: true,
+      has_bsuid: insertData.bsuid ? true : false,
     });
   } else {
     await setAllCookie({
@@ -72,11 +75,9 @@ export async function POST(req: Request) {
       phone_num: getExistingUserData.phone_num,
       finder_id: getExistingUserData.finder_id,
       verified: true,
+      has_bsuid: getExistingUserData.bsuid ? true : false,
     });
   }
-
-
-
 
   const cookie = await cookies();
   cookie.set("phone_verified", "true", {

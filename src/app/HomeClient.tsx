@@ -5,7 +5,8 @@ import { Sora } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { COMPANY_NAME } from "@/config/company";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { setBsuidCookieAction } from "@/lib/bsuid-cookie-setter";
 
 const sora = Sora({ subsets: ["latin"], weight: ["700", "800"] });
 
@@ -25,8 +26,34 @@ const steps = [
   { n: "4", title: "Someone scans → you get pinged", body: "They message you or call. Your number stays private." },
 ];
 
-export default function HomeClient() {
+export default function HomeClient({ loggedin, bsuid, token, shouldSetBsuidCookie }: { loggedin: boolean; bsuid: string | undefined; token: string | undefined; shouldSetBsuidCookie: boolean }) {
+
   const [additionalOpen, setAdditionalOpen] = useState(false);
+  const [showConnectModal, setShowConnectModal] = useState(false);
+
+  useEffect(() => {
+    if (shouldSetBsuidCookie) {
+      setBsuidCookieAction();
+    }
+  }, [shouldSetBsuidCookie]);
+
+  useEffect(() => {
+    if (loggedin && token && !bsuid) {
+      setShowConnectModal(true);
+    }
+  }, [loggedin, token, bsuid]);
+
+  const handleConnectWhatsApp = () => {
+    if (!token) return;
+
+    const message = `CONNECT_${token}`;
+    const encodedMessage = encodeURIComponent(message);
+
+    const url = `https://wa.me/916124530919?text=${encodedMessage}`;
+
+    window.open(url, "_blank");
+  };
+
   return (
     <div className="bg-white dark:bg-[#080c10] text-slate-900 dark:text-slate-50">
       <main className="max-w-5xl mx-auto px-6">
@@ -83,7 +110,6 @@ export default function HomeClient() {
               <div className="flex flex-col gap-7">
                 {/* Secondary Actions */}
                 <div className="flex flex-col gap-3">
-                  
                   <Link href="/scan" className="flex items-center justify-between p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-500 flex items-center justify-center">
@@ -161,6 +187,50 @@ export default function HomeClient() {
         </section>
 
       </main>
+      {showConnectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+
+          <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
+
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+              Activate WhatsApp Messaging 💬
+            </h2>
+
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+              Send a quick message to our system to link your account and receive messages from finders securely.
+            </p>
+
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg text-xs text-slate-400 mb-5 italic">
+              ✔ We never see your phone number
+              <br />
+              ✔ Link by sending one secure text
+            </div>
+
+            <p className="text-xs text-red-600 dark:text-red-400 mb-4">
+              Note: If you skip this, finders can only reach you via call. You won't be able to receive chat messages.
+            </p>
+
+
+            <div className="flex gap-3">
+              <Button
+                onClick={handleConnectWhatsApp}
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold"
+              >
+                Connect Now
+              </Button>
+
+              <Button
+                onClick={() => setShowConnectModal(false)}
+                variant="outline"
+                className="flex-1"
+              >
+                Later
+              </Button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }

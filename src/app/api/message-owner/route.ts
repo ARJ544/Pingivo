@@ -30,23 +30,28 @@ export async function POST(request: Request) {
     );
   }
 
-  const recipientPhoneResult = await getUserByFinderId(receiverFinderId);
-  if (!recipientPhoneResult.success) {
+  const recipientBsuidResult = await getUserByFinderId(receiverFinderId);
+  if (!recipientBsuidResult.success) {
     return NextResponse.json(
       { error: { message: "Receiver not found. Please refresh the page." } },
       { status: 404 }
     );
   }
-  const recipientPhoneWithCountryCode = recipientPhoneResult.user?.phone_num;
-  if (!recipientPhoneWithCountryCode) {
+  const recipientBsuid = recipientBsuidResult.user?.bsuid;
+  if (!recipientBsuid) {
     return NextResponse.json(
-      { error: { message: "Receiver phone number not found." } },
+      { error: { message: "Receiver BSUID not found." } },
       { status: 404 }
     );
   }
-  const recipientPhone = recipientPhoneWithCountryCode.replace(/^\+/, "");
+
+  let bsuid = recipientBsuid;
+  if (recipientBsuid.startsWith("+")) {
+    bsuid = recipientBsuid.replace(/^\+/, "");
+  }
+
   const { alertMessage } = await request.json();
-  
+
   if (!alertMessage || !alertMessage.trim()) {
     return NextResponse.json(
       { error: { message: "Please enter a message" } },
@@ -54,20 +59,20 @@ export async function POST(request: Request) {
     );
   }
 
-let formattedMessage = alertMessage.replace(/\n/g, " ").replace(/\t/g, " ").replace(/\s+/g, " ").trim();
+  let formattedMessage = alertMessage.replace(/\n/g, " ").replace(/\t/g, " ").replace(/\s+/g, " ").trim();
 
-if (formattedMessage.length > 500) {
-  return NextResponse.json(
-    { error: { message: "Message too long (max 500 characters)" } },
-    { status: 400 }
-  );
-}
+  if (formattedMessage.length > 500) {
+    return NextResponse.json(
+      { error: { message: "Message too long (max 500 characters)" } },
+      { status: 400 }
+    );
+  }
 
   const url = `https://graph.facebook.com/v25.0/${whatsAppPhoneNumberId}/messages`;
 
   const payload = {
     messaging_product: "whatsapp",
-    to: recipientPhone,
+    to: bsuid,
     type: "template",
     template: {
       name: "pingivo_safety_alerts",
@@ -88,15 +93,6 @@ if (formattedMessage.length > 500) {
     }
   };
 
-  const tempPayload = {
-    messaging_product: "whatsapp",
-    to: recipientPhone,
-    type: "text",
-    text: {
-      body: formattedMessage
-    }
-  };
-
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -113,8 +109,8 @@ if (formattedMessage.length > 500) {
       return NextResponse.json(result, { status: response.status });
     }
 
-    return NextResponse.json({success: true});
+    return NextResponse.json({ success: true });
   } catch (error: any) {
-    return NextResponse.json({ error: { message: "Failed to send alert" } },{ status: 500 });
+    return NextResponse.json({ error: { message: "Failed to send alert" } }, { status: 500 });
   }
 }

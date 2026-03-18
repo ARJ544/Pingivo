@@ -1,3 +1,4 @@
+import { generateSecretCode } from "@/app/api/verify-phone/route";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -7,25 +8,13 @@ export const supabase = createClient(
   process.env.SUPABASE_ANON_KEY!,
 );
 
-export function escapeHtml(str: string): string {
-  return str.replace(
-    /[&<>"']/g,
-    (m) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;",
-      })[m]!,
-  );
-}
-
 export interface AuthenticatedUser {
   id: string;
   phone_num: string;
   created_at: string;
-  [key: string]: any;
+  finder_id: string;
+  token: string;
+  bsuid: string;
 }
 
 /**
@@ -34,7 +23,7 @@ export interface AuthenticatedUser {
  */
 export async function authenticateUser(
   requireLogin: boolean = true,
-): Promise<{ success: false; response: NextResponse } | { success: true; user: AuthenticatedUser }> {
+): Promise<{ success: false; response: NextResponse } | { success: true; user: AuthenticatedUser, shouldSetCookie?: boolean }> {
   try {
     const { id, phone_num, secure_validator } = await (
       await import("@/app/actions")
@@ -96,6 +85,10 @@ export async function authenticateUser(
           { status: 401 },
         ),
       };
+    }
+
+    if (user.bsuid) {
+      return { success: true, user, shouldSetCookie: true };
     }
 
     return { success: true, user };
@@ -239,65 +232,6 @@ export async function getCallCredits(
   }
 }
 
-export interface BrevoEmailData {
-  sender: {
-    name: string;
-    email: string;
-  };
-  to: Array<{ email: string; name: string }>;
-  subject: string;
-  templateId: number;
-  params: Record<string, string>;
-}
-
-/**
- * Sends email via Brevo API
- */
-export async function sendBrevoEmail(
-  emailData: BrevoEmailData,
-): Promise<{ success: false; error: string; details?: any } | { success: true; data: any }> {
-  try {
-    const BREVO_API_KEY = process.env.BREVO_API_KEY;
-
-    if (!BREVO_API_KEY) {
-      return {
-        success: false,
-        error: "Email service not configured",
-      };
-    }
-
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "api-key": BREVO_API_KEY,
-      },
-      body: JSON.stringify(emailData),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return {
-        success: false,
-        error: "Failed to send email",
-        details: data,
-      };
-    }
-
-    return { success: true, data };
-  } catch (error) {
-    console.error("Brevo email error:", error);
-    return {
-      success: false,
-      error: "Error sending email",
-      details: error,
-    };
-  }
-}
-
-
 /**
  * Fetches user by ID with all fields
  */
@@ -305,7 +239,7 @@ export async function getUserByFinderId(userFinderId: string) {
   try {
     const { data: user, error } = await supabase
       .from("simplified_users")
-      .select("*")
+      .select("phone_num, bsuid")
       .eq("finder_id", userFinderId)
       .single();
 
@@ -379,6 +313,29 @@ export async function getTempPhoneNumById(temp_phone_id: string) {
     return { success: false, error };
   }
 }
+
+/**
+ * Generate New Token for user and update in database
+ */
+export async function refreshUserToken(userId: string) {
+  try {
+    const newToken = generateSecretCode();
+    const { error } = await supabase
+      .from("simplified_users")
+      .update({ token: newToken })
+      .eq("id", userId);
+
+    if (error) {
+      console.error("Token refresh failed:", error);
+      return { success: false, error };
+    }
+    return { success: true, token: newToken };
+  } catch (error) {
+    console.error("Token refresh error:", error);
+    return { success: false, error };
+  }
+}
+
 
 /**
  * Verifies password against hashed password

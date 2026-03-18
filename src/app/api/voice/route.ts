@@ -33,7 +33,7 @@ export async function POST() {
         { status: 404 }
       );
     }
-    const callee = calleeResult.user.phone_num;
+    const callee = calleeResult.user?.phone_num;
 
     if (!caller || !callee) {
       return NextResponse.json(
