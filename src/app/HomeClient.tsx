@@ -220,12 +220,12 @@ export default function HomeClient({ loggedin, bsuid, token, shouldSetBsuidCooki
                 variant="outline"
                 className="flex-1 text-sm"
               >
-                Skip
+                Later
               </Button>
             </div>
 
             <p className="text-[11px] text-center text-red-600 dark:text-red-400 mt-4">
-              Note: If you skip this, finders can only reach you via call. You won't be able to receive chat messages.
+              Note: If you skip this for now, finders can only reach you via call. You won't be able to receive chat messages.
             </p>
 
           </div>
