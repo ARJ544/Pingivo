@@ -72,6 +72,8 @@ export async function POST(request: Request) {
 
   const payload = {
     messaging_product: "whatsapp",
+    recipient_type: "individual",
+    // recipient: bsuid,
     to: bsuid,
     type: "template",
     template: {

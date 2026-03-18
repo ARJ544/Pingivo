@@ -72,6 +72,8 @@ async function sendWhatsAppMessage(to: string, message: string) {
       },
       body: JSON.stringify({
         messaging_product: "whatsapp",
+        recipient_type: "individual",
+        // recipient: to,
         to: to,
         type: "text",
         text: {
@@ -87,14 +89,15 @@ async function sendWhatsAppMessage(to: string, message: string) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("Webhook message:", JSON.stringify(body.entry?.[0]?.changes?.[0]?.value?.messages?.[0], null, 2));
+    console.log("Webhook body:", JSON.stringify(body, null, 2));
 
     const message = body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+    const contact = body.entry?.[0]?.changes?.[0]?.value?.contacts?.[0];
 
-    if (!message) {
-      return NextResponse.json({ status: "no message" });
+    if (!message || !contact) {
+      return NextResponse.json({ status: "no message or contact" });
     }
-    const bsuid = message.user_id || message.from;
+    const bsuid = contact.user_id || message.from_user_id || message.from;
     const text = message.text?.body;
 
     if (!text || !text.toUpperCase().startsWith("CONNECT_")) {
