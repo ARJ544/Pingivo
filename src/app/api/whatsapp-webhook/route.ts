@@ -110,13 +110,13 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (error) {
-      sendWhatsAppMessage(bsuid, "An error occurred while connecting. Please try again.");
+      sendWhatsAppMessage(bsuid, "An error occurred while connecting. Please Refresh that Page and Try again.");
       return NextResponse.json({ error: "db error" }, { status: 500 });
     }
 
     if (!user) {
       console.log("Invalid token:", token);
-      sendWhatsAppMessage(bsuid, "Invalid token. Please check and try again.");
+      sendWhatsAppMessage(bsuid, "Invalid token or expired. Please Refresh that Page and Try again.");
       return NextResponse.json({ status: "invalid token" });
     }
 
@@ -130,7 +130,7 @@ export async function POST(req: Request) {
 
     if (updateError) {
       console.error("Update error:", updateError);
-      sendWhatsAppMessage(bsuid, "Failed to connect. Please try again.");
+      sendWhatsAppMessage(bsuid, "Failed to connect. Please Refresh that Page and Try again.");
       return NextResponse.json({ error: "update failed" }, { status: 500 });
     }
 

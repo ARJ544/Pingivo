@@ -40,7 +40,7 @@ export async function POST(request: Request) {
   const recipientBsuid = recipientBsuidResult.user?.bsuid;
   if (!recipientBsuid) {
     return NextResponse.json(
-      { error: { message: "Receiver BSUID not found." } },
+      { error: { message: "Receiver has not connected their WhatsApp yet but you can still contact them via Call." } },
       { status: 404 }
     );
   }
