@@ -190,43 +190,43 @@ export default function HomeClient({ loggedin, bsuid, token, shouldSetBsuidCooki
       {showConnectModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
 
-          <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
+          <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-xl p-5 shadow-xl border border-slate-200 dark:border-slate-800">
 
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
               Activate WhatsApp Messaging 💬
             </h2>
 
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-              Send a quick message to our system to link your account and receive messages from finders securely.
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
+              You'll be redirected to WhatsApp to send a message.
             </p>
 
-            <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg text-xs text-slate-400 mb-5 italic">
-              ✔ We never see your phone number
-              <br />
-              ✔ Link by sending one secure text
-            </div>
-
-            <p className="text-xs text-red-600 dark:text-red-400 mb-4">
-              Note: If you skip this, finders can only reach you via call. You won't be able to receive chat messages.
+            <p className="text-xs text-blue-600 dark:text-blue-400 mb-4">
+              Don't edit the message — just tap send.
             </p>
 
-
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <Button
-                onClick={handleConnectWhatsApp}
-                className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold"
+                onClick={() => {
+                  handleConnectWhatsApp();
+                  setShowConnectModal(false);
+                }}
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white text-sm"
               >
-                Connect Now
+                Continue
               </Button>
 
               <Button
                 onClick={() => setShowConnectModal(false)}
                 variant="outline"
-                className="flex-1"
+                className="flex-1 text-sm"
               >
-                Later
+                Skip
               </Button>
             </div>
+
+            <p className="text-[11px] text-center text-red-600 dark:text-red-400 mt-4">
+              Note: If you skip this, finders can only reach you via call. You won't be able to receive chat messages.
+            </p>
 
           </div>
         </div>

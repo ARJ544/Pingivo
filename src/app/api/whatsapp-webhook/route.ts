@@ -62,6 +62,28 @@ export async function GET(req: Request) {
   return new Response("Forbidden", { status: 403 });
 }
 
+async function sendWhatsAppMessage(to: string, message: string) {
+  try {
+    await fetch(`https://graph.facebook.com/v25.0/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.WHATSAPP_PERMANENT_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        to: to,
+        type: "text",
+        text: {
+          body: message
+        }
+      }),
+    });
+  } catch (error) {
+    console.error("Failed to send message:", error);
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -88,11 +110,13 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (error) {
+      sendWhatsAppMessage(bsuid, "An error occurred while connecting. Please try again.");
       return NextResponse.json({ error: "db error" }, { status: 500 });
     }
 
     if (!user) {
       console.log("Invalid token:", token);
+      sendWhatsAppMessage(bsuid, "Invalid token. Please check and try again.");
       return NextResponse.json({ status: "invalid token" });
     }
 
@@ -106,28 +130,11 @@ export async function POST(req: Request) {
 
     if (updateError) {
       console.error("Update error:", updateError);
+      sendWhatsAppMessage(bsuid, "Failed to connect. Please try again.");
       return NextResponse.json({ error: "update failed" }, { status: 500 });
     }
 
-    try {
-      await fetch(`https://graph.facebook.com/v25.0/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.WHATSAPP_PERMANENT_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messaging_product: "whatsapp",
-          to: bsuid,
-          type: "text",
-          text: {
-            body: "Connected successfully! You can now receive messages to this number."
-          }
-        }),
-      });
-    } catch (error) {
-      console.error("Failed to send confirmation message:", error);
-    }
+    sendWhatsAppMessage(bsuid, "Connected successfully! You can now receive messages to this number.");
 
     return NextResponse.json({ status: "linked" }, { status: 200 });
 
