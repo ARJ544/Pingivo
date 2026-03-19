@@ -37,7 +37,8 @@ export async function POST(request: Request) {
       { status: 404 }
     );
   }
-  const recipientBsuid = recipientBsuidResult.user?.bsuid;
+  const recipientBsuid = recipientBsuidResult.user?.phone_num;
+  // const recipientBsuid = recipientBsuidResult.user?.bsuid; // uncomment this line and comment the above line to switch to using bsuid instead of phone number for WhatsApp messaging
   if (!recipientBsuid) {
     return NextResponse.json(
       { error: { message: "Receiver has not connected their WhatsApp yet but you can still contact them via Call." } },

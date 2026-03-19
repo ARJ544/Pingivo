@@ -188,50 +188,50 @@ export default function HomeClient({ loggedin, bsuid, token, shouldSetBsuidCooki
 
       </main>
       {showConnectModal && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-    <div className="w-full max-w-xs bg-white dark:bg-slate-900 rounded-xl p-4 shadow-xl border border-slate-200 dark:border-slate-800">
-      <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-1">
-        Activate WhatsApp Messaging
-      </h2>
-      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-        You'll be redirected to WhatsApp to send a message. Don't edit it — just tap send.
-      </p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+          <div className="w-full max-w-xs bg-white dark:bg-slate-900 rounded-xl p-4 shadow-xl border border-slate-200 dark:border-slate-800">
+            <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-1">
+              Activate WhatsApp Messaging
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+              You'll be redirected to WhatsApp to send a message. Don't edit it — just tap send.
+            </p>
 
-      <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 rounded-lg px-3 py-2 mb-3 space-y-1">
-        <p>
-          Use the <span className="font-medium">same number you signed in with</span>, otherwise a different number will be linked.
-        </p>
-        <p>
-          You can connect or disconnect anytime from the <span className="font-medium">profile menu</span> (top right).
-        </p>
-      </div>
+            <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 rounded-lg px-3 py-2 mb-3 space-y-1">
+              <p>
+                Use the <span className="font-medium">same number you signed in with</span>, otherwise a different number will be linked.
+              </p>
+              <p>
+                You can connect or disconnect anytime from the <span className="font-medium">profile menu</span> (top right).
+              </p>
+            </div>
 
-      <div className="flex gap-2">
-        <Button
-          onClick={() => {
-            handleConnectWhatsApp();
-            setShowConnectModal(false);
-          }}
-          className="flex-1 bg-green-500 hover:bg-green-600 text-white text-sm"
-        >
-          Continue
-        </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => {
+                  handleConnectWhatsApp();
+                  setShowConnectModal(false);
+                }}
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white text-sm"
+              >
+                Continue
+              </Button>
 
-        <Button
-          onClick={() => setShowConnectModal(false)}
-          variant="outline"
-          className="flex-1 text-sm"
-        >
-          Later
-        </Button>
-      </div>
+              <Button
+                onClick={() => setShowConnectModal(false)}
+                variant="outline"
+                className="flex-1 text-sm"
+              >
+                Later
+              </Button>
+            </div>
 
-      <p className="text-[11px] text-center text-red-500 dark:text-red-400 mt-3">
-        Skipping means that you will not receive messages, finders can only reach you via call.
-      </p>
-    </div>
-  </div>
-)}
+            <p className="text-[11px] text-center text-red-500 dark:text-red-400 mt-3">
+              Skipping means that you will not receive messages, finders can only reach you via call.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
