@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from "@supabase/supabase-js";
+import { generateSecretCode } from "@/app/api/verify-phone/route";
+
 const BeforeOldWebhook = {
   "object": "whatsapp_business_account",
   "entry": [
@@ -99,11 +101,50 @@ export async function POST(req: Request) {
     const bsuid = contact.user_id || message.from_user_id || message.from;
     const text = message.text?.body;
 
-    if (!text || !text.toUpperCase().startsWith("CONNECT_")) {
-      return NextResponse.json({ status: 200, message: "Message does not start with CONNECT_" });
+    if (!text || (!text.toUpperCase().startsWith("CONNECT_") && !text.toUpperCase().startsWith("DISCONNECT_ME"))) {
+
+      await sendWhatsAppMessage(bsuid, "⚠️ *Unrecognized Command*\nPlease send a message starting with *CONNECT_token* to connect or *DISCONNECT_ME* to disconnect your WhatsApp number from Pingivo account.");
+
+      return NextResponse.json({ status: 200, message: "Message does not start with CONNECT_ or DISCONNECT_ME" });
+    }
+
+    if (text.toUpperCase().startsWith("DISCONNECT_ME")) {
+      const { data: existingUser, error: findError } = await supabase
+        .from("simplified_users")
+        .select("id")
+        .eq("bsuid", bsuid)
+        .maybeSingle();
+
+      if (findError) {
+        await sendWhatsAppMessage(bsuid, "❌ *An error occurred.*\nPlease resend your message again.");
+        return NextResponse.json({ status: 200, message: "Database error" });
+      }
+
+      if (!existingUser) {
+        await sendWhatsAppMessage(bsuid, "⚠️ *Not Connected*\nThis number is not connected to any Pingivo account. You can recconnect it by sending the *CONNECT_token* from your profile menu on the Pingivo dashboard.");
+        return NextResponse.json({ status: 200, message: "Not connected" });
+      }
+
+      const newToken = generateSecretCode();
+      const { error: disconnectError } = await supabase
+        .from("simplified_users")
+        .update({ bsuid: null, token: newToken })
+        .eq("bsuid", bsuid);
+
+      if (disconnectError) {
+        await sendWhatsAppMessage(bsuid, "❌ *Failed to disconnect.*\nPlease resend your message again.");
+        return NextResponse.json({ status: 200, message: "Disconnect failed" });
+      }
+
+      await sendWhatsAppMessage(bsuid, "✅ *Disconnected successfully!*\nThis WhatsApp number has been removed from Pingivo account. You can connect it again anytime.");
+      return NextResponse.json({ status: 200, message: "Disconnected" });
     }
 
     const token = text.replace(/CONNECT_/i, "").trim();
+    if (!token) {
+      await sendWhatsAppMessage(bsuid, "⚠️ *Token Missing*\nPlease provide a token after CONNECT_. You can find the token in the profile menu of your Pingivo dashboard.");
+      return NextResponse.json({ status: 200, message: "Token missing" });
+    }
     const { data: user, error } = await supabase
       .from("simplified_users")
       .select("id, token, phone_num")
@@ -131,7 +172,7 @@ export async function POST(req: Request) {
 
     if (updateError) {
       if (updateError.code === '23405' || updateError.code === '23505') {
-        await sendWhatsAppMessage(bsuid, "⚠️ *Duplicate Entry*\nThis number is already connected. Please disconnect it from the profile menu of the currently connected account and try again.");
+        await sendWhatsAppMessage(bsuid, "⚠️ *Duplicate Entry*\nThis number is already connected. You can disconnect it by sending *DISCONNECT_ME*.");
 
         return NextResponse.json({ status: 200, message: "Duplicate entry" });
       }
