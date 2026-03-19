@@ -43,7 +43,7 @@ export default function SignupClient() {
 
         setMessage("Phone verified successfully! Redirecting...");
         router.refresh();
-        setTimeout(() => router.replace("/"), 1500);
+        setTimeout(() => router.replace("/"), 800);
       } catch {
         setMessage("Something went wrong. Please try again.");
         router.refresh();
