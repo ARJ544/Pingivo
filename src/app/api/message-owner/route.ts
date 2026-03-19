@@ -74,7 +74,7 @@ export async function POST(request: Request) {
   const payload = {
     messaging_product: "whatsapp",
     recipient_type: "individual",
-    // recipient: bsuid,
+    // recipient: bsuid, // uncomment this line and comment the below line to switch to using bsuid instead of phone number for WhatsApp messaging
     to: bsuid,
     type: "template",
     template: {
