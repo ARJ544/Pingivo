@@ -180,7 +180,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ status: 200, message: "Failed to update" });
     }
 
-    await sendWhatsAppMessage(bsuid, `✅ *Connected successfully!*\n\nYou will now receive:\n• Messages on this WhatsApp number\n• Calls at *${user.phone_num}*\n\n_You can now safely clear this chat._`);
+    await sendWhatsAppMessage(bsuid, `✅ *Connected successfully!*\n\nYou will now receive:\n• Messages on this WhatsApp number\n• Calls at *${user.phone_num}*\n\nYou can disconnect your number any time by sending *DISCONNECT_ME* or through the Pingivo profile menu.\n\n_You can now safely clear this chat._`);
 
     return NextResponse.json({ status: 200, message: "Successfully linked" });
   } catch (error) {
