@@ -57,9 +57,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ status: 200, message: "No message or contact found" });
     }
 
-    const bsuid = contact.user_id || message.from_user_id || contact.wa_id;
+    const bsuid = contact.user_id || message.from_user_id;
     let userPhone = message.from || contact.wa_id;
     const text = message.text?.body?.trim().replace(/^\*+|\*+$/g, "").trim();
+
+    if (userPhone) {
+      await sendWhatsAppMessage(userPhone, "*The API will start working from 31st March 2026*.\nPlease check back after that date to connect your WhatsApp number with Pingivo account and start receiving messages on WhatsApp.");
+      return NextResponse.json({ status: 200, message: "API not active yet" });
+    } // Will be removed after 31st march 2026
 
     if (!text || (!text.toUpperCase().startsWith("CONNECT_") && !text.toUpperCase().startsWith("DISCONNECT_ME"))) {
 
