@@ -9,15 +9,6 @@ export default function SignupClient() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const refreshedOnce = useRef(false);
-
-  useEffect(() => {
-    if (!refreshedOnce.current) {
-      refreshedOnce.current = true;
-      router.refresh();
-    }
-  }, [router]);
-
   useEffect(() => {
 
     const script = document.createElement("script");
@@ -37,7 +28,7 @@ export default function SignupClient() {
       if (!userObj?.user_json_url) {
         setMessage("Phone verification failed. Please try again.");
         router.refresh();
-        setTimeout(() => router.replace("/signup"), 2000);
+        setTimeout(() => router.replace("/signin"), 2000);
         return;
       }
 
@@ -52,11 +43,11 @@ export default function SignupClient() {
 
         setMessage("Phone verified successfully! Redirecting...");
         router.refresh();
-        setTimeout(() => router.replace("/qr"), 1500);
+        setTimeout(() => router.replace("/"), 1500);
       } catch {
         setMessage("Something went wrong. Please try again.");
         router.refresh();
-        setTimeout(() => router.replace("/signup"), 2000);
+        setTimeout(() => router.replace("/signin"), 2000);
       } finally {
         setLoading(false);
       }
