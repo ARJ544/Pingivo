@@ -1,5 +1,6 @@
-import { generateSecretCode } from "@/app/api/verify-phone/route";
+import { cache } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { generateSecretCode } from "@/app/api/verify-phone/route";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -21,9 +22,9 @@ export interface AuthenticatedUser {
  * Authenticates user from cookies and validates against database
  * Checks cookies and verifies phone_num and created_at match database
  */
-export async function authenticateUser(
+export const authenticateUser = cache(async (
   requireLogin: boolean = true,
-): Promise<{ success: false; response: NextResponse } | { success: true; user: AuthenticatedUser, shouldSetCookie?: boolean }> {
+): Promise<{ success: false; response: NextResponse } | { success: true; user: AuthenticatedUser, shouldSetCookie?: boolean }> => {
   try {
     const { id, phone_num, secure_validator } = await (
       await import("@/app/actions")
@@ -45,7 +46,6 @@ export async function authenticateUser(
         ),
       };
     }
-
     // Fetch user from database
     const { data: user, error } = await supabase
       .from("simplified_users")
@@ -54,7 +54,7 @@ export async function authenticateUser(
       .single();
 
     if (error) {
-      console.error("User fetch failed:", error);
+      console.log("User fetch failed:", error);
       return {
         success: false,
         response: NextResponse.json(
@@ -93,7 +93,6 @@ export async function authenticateUser(
 
     return { success: true, user };
   } catch (error) {
-    console.error("Authentication error:", error);
     return {
       success: false,
       response: NextResponse.json(
@@ -102,7 +101,7 @@ export async function authenticateUser(
       ),
     };
   }
-}
+});
 
 /**
  * Gets the caller phone number from temp_phone cookie or authenticated user
