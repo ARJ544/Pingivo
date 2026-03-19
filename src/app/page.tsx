@@ -18,7 +18,7 @@ export default async function Home() {
     return <HomeClient token={undefined} loggedin={loggedin} bsuid={undefined} shouldSetBsuidCookie={false} />;
   }
 
-  if ((!auth.user.token && !auth.user.bsuid) || !auth.user.bsuid) {
+  if (!auth.user.token && !auth.user.bsuid) {
     const refreshedToken = await refreshUserToken(auth.user.id);
     if (!refreshedToken.success) {
       return <HomeClient token={auth.user.token} loggedin={loggedin} bsuid={undefined} shouldSetBsuidCookie={false} />;
