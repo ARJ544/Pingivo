@@ -10,7 +10,6 @@ type UserCookie = {
   phone_num?: string;
   finder_id?: string;
   verified: boolean;
-  has_bsuid: boolean;
 };
 
 export async function IsLoggedIn() {
@@ -93,14 +92,6 @@ export async function setAllCookie(user: Partial<UserCookie>) {
     path: "/",
     maxAge: SEVEN_DAYS,
   });
-
-  cookieStore.set("has_bsuid", String(user.has_bsuid ?? false), {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: SEVEN_DAYS,
-  });
 }
 
 export async function deleteAllCookie() {
@@ -130,6 +121,5 @@ export async function getAllCookie(): Promise<UserCookie> {
     id: get("id"),
     phone_num: get("phone_num"),
     finder_id: get("finder_id"),
-    has_bsuid: get("has_bsuid") === "true",
   };
 }

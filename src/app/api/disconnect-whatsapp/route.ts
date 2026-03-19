@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { authenticateUser, supabase } from "@/lib/api-helpers";
 import { generateSecretCode } from "@/app/api/verify-phone/route";
-import { cookies } from "next/headers";
 
 export async function POST() {
   const auth = await authenticateUser(true);
@@ -24,9 +23,6 @@ export async function POST() {
       { status: 500 }
     );
   }
-
-  const cookieStore = await cookies();
-  cookieStore.delete("has_bsuid");
 
   return NextResponse.json({ success: true });
 }

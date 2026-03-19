@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { COMPANY_NAME } from "@/config/company";
 import { useEffect, useState } from "react";
-import { setBsuidCookieAction } from "@/lib/bsuid-cookie-setter";
 
 const sora = Sora({ subsets: ["latin"], weight: ["700", "800"] });
 
@@ -26,16 +25,10 @@ const steps = [
   { n: "4", title: "Someone scans → you get pinged", body: "They message you or call. Your number stays private." },
 ];
 
-export default function HomeClient({ loggedin, bsuid, token, shouldSetBsuidCookie }: { loggedin: boolean; bsuid: string | undefined; token: string | undefined; shouldSetBsuidCookie: boolean }) {
+export default function HomeClient({ loggedin, bsuid, token }: { loggedin: boolean; bsuid: string | undefined; token: string | undefined; }) {
 
   const [additionalOpen, setAdditionalOpen] = useState(false);
   const [showConnectModal, setShowConnectModal] = useState(false);
-
-  useEffect(() => {
-    if (shouldSetBsuidCookie) {
-      setBsuidCookieAction();
-    }
-  }, [shouldSetBsuidCookie]);
 
   useEffect(() => {
     if (loggedin && token && !bsuid) {

@@ -65,7 +65,6 @@ export async function POST(req: Request) {
       phone_num: insertData.phone_num,
       finder_id: insertData.finder_id,
       verified: true,
-      has_bsuid: insertData.bsuid ? true : false,
     });
   } else {
     await setAllCookie({
@@ -75,7 +74,6 @@ export async function POST(req: Request) {
       phone_num: getExistingUserData.phone_num,
       finder_id: getExistingUserData.finder_id,
       verified: true,
-      has_bsuid: getExistingUserData.bsuid ? true : false,
     });
   }
 

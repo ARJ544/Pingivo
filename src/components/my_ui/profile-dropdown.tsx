@@ -32,6 +32,7 @@ type ProfileDropdownProps = {
 
 export default function ProfileDropdown({ isVerified, bsuid, token }: ProfileDropdownProps) {
   const [showDisconnectWarning, setShowDisconnectWarning] = useState(false);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
   const router = useRouter();
 
   const handleConnectWhatsApp = () => {
@@ -46,15 +47,22 @@ export default function ProfileDropdown({ isVerified, bsuid, token }: ProfileDro
   };
 
   const handleDisconnectWhatsApp = async () => {
-    const response = await fetch("/api/disconnect-whatsapp", { method: "POST" });
-    const result = await response.json();
-    if (!response.ok) {
-      alert(`Failed to disconnect WhatsApp. Please try again. Error: ${result.error || "Unknown error"}`);
-      return;
+    try {
+      setIsDisconnecting(true);
+      const response = await fetch("/api/disconnect-whatsapp", { method: "POST" });
+      const result = await response.json();
+      if (!response.ok) {
+        alert(`Failed to disconnect WhatsApp. Please try again. Error: ${result.error || "Unknown error"}`);
+        return;
+      }
+      router.push("/signin");
+      router.refresh();
+      setShowDisconnectWarning(false);
+    } catch (error) {
+      alert(`An error occurred while disconnecting WhatsApp. Please try again. Error: ${error instanceof Error ? error.message : "Unknown error"}`);
+    } finally {
+      setIsDisconnecting(false);
     }
-    router.push("/signin");
-    router.refresh();
-    setShowDisconnectWarning(false);
   };
 
   return (
@@ -276,9 +284,10 @@ export default function ProfileDropdown({ isVerified, bsuid, token }: ProfileDro
             <div className="flex gap-2">
               <button
                 onClick={handleDisconnectWhatsApp}
+                disabled={isDisconnecting}
                 className="flex-1 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg px-3 py-2 transition-colors"
               >
-                Disconnect
+                {isDisconnecting ? "Disconnecting..." : "Disconnect"}
               </button>
               <button
                 onClick={() => setShowDisconnectWarning(false)}
