@@ -87,20 +87,20 @@ async function sendWhatsAppMessage(to: string, message: string) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("Webhook body:", JSON.stringify(body, null, 2));
+    console.log("Webhook only value:", JSON.stringify(body.entry?.[0]?.changes?.[0]?.value, null, 2));
 
     const message = body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
     const contact = body.entry?.[0]?.changes?.[0]?.value?.contacts?.[0];
 
     if (!message || !contact) {
-      return NextResponse.json({ status: "no message or contact" });
+      return NextResponse.json({ status: 200, message: "No message or contact found" });
     }
 
     const bsuid = contact.user_id || message.from_user_id || message.from;
     const text = message.text?.body;
 
     if (!text || !text.toUpperCase().startsWith("CONNECT_")) {
-      return NextResponse.json({ status: "ignored" });
+      return NextResponse.json({ status: 200, message: "Message does not start with CONNECT_" });
     }
 
     const token = text.replace(/CONNECT_/i, "").trim();
@@ -111,14 +111,14 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (error) {
-      sendWhatsAppMessage(bsuid, "❌ *An error occurred while connecting.*\nPlease *Refresh that page* and try again.");
-      return NextResponse.json({ error: "db error" }, { status: 500 });
+      await sendWhatsAppMessage(bsuid, "❌ *An error occurred while connecting.*\nPlease *Refresh that page* and try again.");
+      return NextResponse.json({ status: 200, message: "Database error" });
     }
 
     if (!user) {
       console.log("Invalid token:", token);
-      sendWhatsAppMessage(bsuid, "❌ *Invalid or expired token.*\nPlease *Refresh that page* and try again.");
-      return NextResponse.json({ status: "invalid token" });
+      await sendWhatsAppMessage(bsuid, "❌ *Invalid or expired token.*\nPlease *Refresh that page* and try again.");
+      return NextResponse.json({ status: 200, message: "Invalid or expired token" });
     }
 
     const { error: updateError } = await supabase
@@ -130,16 +130,20 @@ export async function POST(req: Request) {
       .eq("id", user.id);
 
     if (updateError) {
-      console.error("Update error:", updateError);
-      sendWhatsAppMessage(bsuid, "❌ *Failed to connect.*\nPlease *Refresh that page* and try again.");
-      return NextResponse.json({ error: "update failed" }, { status: 500 });
+      if (updateError.code === '23405' || updateError.code === '23505') {
+        await sendWhatsAppMessage(bsuid, "⚠️ *Duplicate Entry*\nThis number is already connected. Please disconnect it from the profile menu of the currently connected account and try again.");
+
+        return NextResponse.json({ status: 200, message: "Duplicate entry" });
+      }
+      await sendWhatsAppMessage(bsuid, "❌ *Failed to update.*\nPlease *Refresh that page* and try again.");
+      return NextResponse.json({ status: 200, message: "Failed to update" });
     }
 
-    sendWhatsAppMessage(bsuid, `✅ *Connected successfully!*\n\nYou will now receive:\n• Messages on this WhatsApp number\n• Calls at *${user.phone_num}*\n\n_You can now safely clear this chat._`);
+    await sendWhatsAppMessage(bsuid, `✅ *Connected successfully!*\n\nYou will now receive:\n• Messages on this WhatsApp number\n• Calls at *${user.phone_num}*\n\n_You can now safely clear this chat._`);
 
-    return NextResponse.json({ status: "linked" }, { status: 200 });
+    return NextResponse.json({ status: 200, message: "Successfully linked" });
   } catch (error) {
     console.error("Webhook error:", error);
-    return NextResponse.json({ error: "invalid request" }, { status: 400 });
+    return NextResponse.json({ error: "invalid request" }, { status: 200 });
   }
 }
