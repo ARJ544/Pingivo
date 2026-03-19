@@ -99,12 +99,12 @@ export async function POST(req: Request) {
       .eq("token", token)
       .maybeSingle();
     if (error) {
-      sendWhatsAppMessage(bsuid, "❌ *An error occurred while connecting.* Please refresh the page and try again.");
+      sendWhatsAppMessage(bsuid, "❌ *An error occurred while connecting.*\nPlease *Refresh that page* and try again.");
       return NextResponse.json({ error: "db error" }, { status: 500 });
     }
     if (!user) {
       console.log("Invalid token:", token);
-      sendWhatsAppMessage(bsuid, "❌ *Invalid or expired token.* Please refresh the page and try again.");
+      sendWhatsAppMessage(bsuid, "❌ *Invalid or expired token.*\nPlease *Refresh that page* and try again.");
       return NextResponse.json({ status: "invalid token" });
     }
     const { error: updateError } = await supabase
@@ -116,10 +116,10 @@ export async function POST(req: Request) {
       .eq("id", user.id);
     if (updateError) {
       console.error("Update error:", updateError);
-      sendWhatsAppMessage(bsuid, "❌ *Failed to connect.* Please refresh the page and try again.");
+      sendWhatsAppMessage(bsuid, "❌ *Failed to connect.*\nPlease *Refresh that page* and try again.");
       return NextResponse.json({ error: "update failed" }, { status: 500 });
     }
-    sendWhatsAppMessage(bsuid, `✅ *Connected successfully!* You will receive messages on this WhatsApp number and calls at *${user.phone_num}*. You can now clear this chat.`);
+    sendWhatsAppMessage(bsuid, `✅ *Connected successfully!*\n\nYou will now receive:\n• Messages on this WhatsApp number\n• Calls at *${user.phone_num}*\n\n_You can now safely clear this chat._`);
     return NextResponse.json({ status: "linked" }, { status: 200 });
   } catch (error) {
     console.error("Webhook error:", error);
