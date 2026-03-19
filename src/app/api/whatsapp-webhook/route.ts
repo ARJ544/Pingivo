@@ -99,11 +99,11 @@ export async function POST(req: Request) {
     }
 
     const bsuid = contact.user_id || message.from_user_id || message.from;
-    const text = message.text?.body;
+    const text = message.text?.body?.trim().replace(/^\*+|\*+$/g, "").trim();
 
     if (!text || (!text.toUpperCase().startsWith("CONNECT_") && !text.toUpperCase().startsWith("DISCONNECT_ME"))) {
 
-      await sendWhatsAppMessage(bsuid, "⚠️ *Unrecognized Command*\nPlease send a message starting with *CONNECT_token* to connect or *DISCONNECT_ME* to disconnect your WhatsApp number from Pingivo account.");
+      await sendWhatsAppMessage(bsuid, "⚠️ *Unrecognized Command*\nPlease send a message starting with *CONNECT_<token>* to connect or *DISCONNECT_ME* to disconnect your WhatsApp number from Pingivo account.");
 
       return NextResponse.json({ status: 200, message: "Message does not start with CONNECT_ or DISCONNECT_ME" });
     }
@@ -172,7 +172,7 @@ export async function POST(req: Request) {
 
     if (updateError) {
       if (updateError.code === '23405' || updateError.code === '23505') {
-        await sendWhatsAppMessage(bsuid, "⚠️ *Duplicate Entry*\nThis number is already connected. You can disconnect it by sending *DISCONNECT_ME*.");
+        await sendWhatsAppMessage(bsuid, "⚠️ *Duplicate Entry*\nThis number is already connected. You can disconnect it by sending *DISCONNECT_ME* in this chat.");
 
         return NextResponse.json({ status: 200, message: "Duplicate entry" });
       }
@@ -180,7 +180,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ status: 200, message: "Failed to update" });
     }
 
-    await sendWhatsAppMessage(bsuid, `✅ *Connected successfully!*\n\nYou will now receive:\n• Messages on this WhatsApp number\n• Calls at *${user.phone_num}*\n\nYou can disconnect your number any time by sending *DISCONNECT_ME* or through the Pingivo profile menu.\n\n_You can now safely clear this chat._`);
+    await sendWhatsAppMessage(bsuid, `✅ *Connected successfully!*\n\nYou will now receive:\n• Messages on this WhatsApp number\n• Calls at *${user.phone_num}*\n\nYou can disconnect your number any time by sending *DISCONNECT_ME* in this chat or through the Pingivo profile menu.\n\n_You can now safely clear this chat._`);
 
     return NextResponse.json({ status: 200, message: "Successfully linked" });
   } catch (error) {
