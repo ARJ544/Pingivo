@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
 import { createClient } from "@supabase/supabase-js";
 import { generateSecretCode } from "@/app/api/verify-phone/route";
 
@@ -45,6 +45,10 @@ async function sendWhatsAppMessage(to: string, message: string) {
   }
 }
 
+function ok(message: string) {
+  return NextResponse.json({ status: 200, message });
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -54,7 +58,25 @@ export async function POST(req: Request) {
     const contact = body.entry?.[0]?.changes?.[0]?.value?.contacts?.[0];
 
     if (!message || !contact) {
-      return NextResponse.json({ status: 200, message: "No message or contact found" });
+      return ok("No message or contact found");
+    }
+
+    const messageId = message.id;
+
+    const { data: upsertData, error: upsertError } = await supabase
+      .from("processed_webhooks")
+      .upsert(
+        { message_id: messageId },
+        { onConflict: "message_id", ignoreDuplicates: true }
+      )
+      .select("id");
+
+    if (upsertError) {
+      return ok("Database error tracking webhook");
+    }
+
+    if (!upsertData || upsertData.length === 0) {
+      return ok("Duplicate webhook ignored");
     }
 
     const bsuid = contact.user_id || message.from_user_id;
@@ -62,16 +84,26 @@ export async function POST(req: Request) {
     const text = message.text?.body?.trim().replace(/^\*+|\*+$/g, "").trim();
 
     if (userPhone) {
-      await sendWhatsAppMessage(userPhone, "*The API will start working from 31st March 2026*.\nPlease check back after that date to connect your WhatsApp number with Pingivo account and start receiving messages on WhatsApp.");
-      return NextResponse.json({ status: 200, message: "API not active yet" });
+      after(sendWhatsAppMessage(
+        userPhone,
+        "⏳ *Pingivo WhatsApp Integration — Coming Soon*\n\n" +
+        "The WhatsApp API will be available from *31st March 2026*.\n\n" +
+        "Once it's live, you'll be able to:\n" +
+        "• Link this number to your Pingivo account\n" +
+        "• Receive messages directly on WhatsApp\n\n" +
+        "To connect after launch, go to your *Pingivo → Profile menu → Connect Whatsapp* and send it here as:\n" +
+        "*CONNECT_<your-token>*\n\n" +
+        "_Check back on or after 31st March 2026._"
+      ));
+      return ok("API not active yet");
     } // Will be removed after 31st march 2026
 
     if (!text || (!text.toUpperCase().startsWith("CONNECT_") && !text.toUpperCase().startsWith("DISCONNECT_ME"))) {
 
       if (userPhone) {
-        await sendWhatsAppMessage(userPhone, "⚠️ *Unrecognized Command*\nPlease send a message starting with *CONNECT_<token>* to connect or *DISCONNECT_ME* to disconnect your WhatsApp number from Pingivo account.");
+        after(sendWhatsAppMessage(userPhone, "⚠️ *Unrecognized Command*\nPlease send a message starting with *CONNECT_<token>* to connect or *DISCONNECT_ME* to disconnect your WhatsApp number from Pingivo account."));
       }
-      return NextResponse.json({ status: 200, message: "Message does not start with CONNECT_ or DISCONNECT_ME" });
+      return ok("Message does not start with CONNECT_ or DISCONNECT_ME");
     }
 
     if (text.toUpperCase().startsWith("DISCONNECT_ME")) {
@@ -83,16 +115,16 @@ export async function POST(req: Request) {
 
       if (findError) {
         if (userPhone) {
-          await sendWhatsAppMessage(userPhone, "❌ *An error occurred.*\nPlease resend your message again.");
+          after(sendWhatsAppMessage(userPhone, "❌ *An error occurred.*\nPlease resend your message again."));
         }
-        return NextResponse.json({ status: 200, message: "Database error" });
+        return ok("Database error");
       }
 
       if (!existingUser) {
         if (userPhone) {
-          await sendWhatsAppMessage(userPhone, "⚠️ *Not Connected*\nThis number is not connected to any Pingivo account. You can recconnect it by sending the *CONNECT_token* from your profile menu on the Pingivo dashboard.");
+          after(sendWhatsAppMessage(userPhone, "⚠️ *Not Connected*\nThis number is not connected to any Pingivo account. You can recconnect it by sending the *CONNECT_token* from your profile menu on the Pingivo dashboard."));
         }
-        return NextResponse.json({ status: 200, message: "Not connected" });
+        return ok("Not connected");
       }
 
       const newToken = generateSecretCode();
@@ -103,22 +135,22 @@ export async function POST(req: Request) {
 
       if (disconnectError) {
         if (userPhone) {
-          await sendWhatsAppMessage(userPhone, "❌ *Failed to disconnect.*\nPlease resend your message again.");
+          after(sendWhatsAppMessage(userPhone, "❌ *Failed to disconnect.*\nPlease resend your message again."));
         }
-        return NextResponse.json({ status: 200, message: "Disconnect failed" });
+        return ok("Disconnect failed");
       }
       if (userPhone) {
-        await sendWhatsAppMessage(userPhone, "✅ *Disconnected successfully!*\nThis WhatsApp number has been removed from Pingivo account. You can connect it again anytime.");
+        after(sendWhatsAppMessage(userPhone, "✅ *Disconnected successfully!*\nThis WhatsApp number has been removed from Pingivo account. You can connect it again anytime."));
       }
-      return NextResponse.json({ status: 200, message: "Disconnected" });
+      return ok("Disconnected");
     }
 
     const token = text.replace(/CONNECT_/i, "").trim();
     if (!token) {
       if (userPhone) {
-        await sendWhatsAppMessage(userPhone, "⚠️ *Token Missing*\nPlease provide a token after CONNECT_. You can find the token in the profile menu of your Pingivo dashboard.");
+        after(sendWhatsAppMessage(userPhone, "⚠️ *Token Missing*\nPlease provide a token after CONNECT_. You can find the token in the profile menu of your Pingivo dashboard."));
       }
-      return NextResponse.json({ status: 200, message: "Token missing" });
+      return ok("Token missing");
     }
     const { data: user, error } = await supabase
       .from("simplified_users")
@@ -128,17 +160,17 @@ export async function POST(req: Request) {
 
     if (error) {
       if (userPhone) {
-        await sendWhatsAppMessage(userPhone, "❌ *An error occurred while connecting.*\nPlease *Refresh that page* and try again.");
+        after(sendWhatsAppMessage(userPhone, "❌ *An error occurred while connecting.*\nPlease *Refresh that page* and try again."));
       }
-      return NextResponse.json({ status: 200, message: "Database error" });
+      return ok("Database error");
     }
 
     if (!user) {
       console.log("Invalid token:", token);
       if (userPhone) {
-        await sendWhatsAppMessage(userPhone, "❌ *Invalid or expired token.*\nPlease *Refresh that page* and try again.");
+        after(sendWhatsAppMessage(userPhone, "❌ *Invalid or expired token.*\nPlease *Refresh that page* and try again."));
       }
-      return NextResponse.json({ status: 200, message: "Invalid or expired token" });
+      return ok("Invalid or expired token");
     }
 
     const { error: updateError } = await supabase
@@ -150,24 +182,24 @@ export async function POST(req: Request) {
       .eq("id", user.id);
 
     if (updateError) {
-      if (updateError.code === '23405' || updateError.code === '23505') {
+      if (updateError.code === '23505') {
         if (userPhone) {
-          await sendWhatsAppMessage(userPhone, "⚠️ *Duplicate Entry*\nThis number is already connected. You can disconnect it by sending *DISCONNECT_ME* in this chat.");
+          after(sendWhatsAppMessage(userPhone, "⚠️ *Duplicate Entry*\nThis number is already connected. You can disconnect it by sending *DISCONNECT_ME* in this chat."));
         }
-        return NextResponse.json({ status: 200, message: "Duplicate entry" });
+        return ok("Duplicate entry");
       }
       if (userPhone) {
-        await sendWhatsAppMessage(userPhone, "❌ *Failed to update.*\nPlease *Refresh that page* and try again.");
+        after(sendWhatsAppMessage(userPhone, "❌ *Failed to update.*\nPlease *Refresh that page* and try again."));
       }
-      return NextResponse.json({ status: 200, message: "Failed to update" });
+      return ok("Failed to update");
     }
 
     if (userPhone) {
-      await sendWhatsAppMessage(userPhone, `✅ *Connected successfully!*\n\nYou will now receive:\n• Messages on this WhatsApp number\n• Calls at *${user.phone_num}*\n\nYou can disconnect your number any time by sending *DISCONNECT_ME* in this chat or through the Pingivo profile menu.\n\n_You can now safely clear this chat._`);
+      after(sendWhatsAppMessage(userPhone, `✅ *Connected successfully!*\n\nYou will now receive:\n• Messages on this WhatsApp number\n• Calls at *${user.phone_num}*\n\nYou can disconnect your number any time by sending *DISCONNECT_ME* in this chat or through the Pingivo profile menu.\n\n_You can now safely clear this chat._`));
     }
-    return NextResponse.json({ status: 200, message: "Successfully linked" });
+    return ok("Connected successfully");
   } catch (error) {
     console.error("Webhook error:", error);
-    return NextResponse.json({ error: "invalid request" }, { status: 200 });
+    return ok("Internal server error");
   }
 }
