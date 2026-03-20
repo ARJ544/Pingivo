@@ -2,7 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 import Twilio from "twilio";
 
-const client = Twilio(
+const twilio = Twilio(
   process.env.TWILIO_ACCOUNT_SID!,
   process.env.TWILIO_AUTH_TOKEN!,
 );
@@ -25,17 +25,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing params" }, { status: 400 });
   }
 
-  if (["no-answer", "busy", "failed"].includes(callStatus as string)) {
+  if (["no-answer", "busy", "failed", "completed"].includes(callStatus as string)) {
+    await endConferenceRoom(room);
     return NextResponse.json({ received: true });
   }
-
-  if (callStatus === "completed") {
-    return NextResponse.json({ received: true });
-  }
-
 
   if (callStatus === "in-progress" || callStatus === "answered") {
-    await client.calls.create({
+    await twilio.calls.create({
       to: callee,
       from: process.env.TWILIO_NUMBER!,
       url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/webhook?room=${encodeURIComponent(room)}&role=B`,
@@ -47,4 +43,17 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ received: true });
+}
+
+async function endConferenceRoom(room: string) {
+  const conferences = await twilio.conferences.list({
+    friendlyName: room,
+    status: "in-progress",
+  });
+
+  await Promise.allSettled(
+    conferences.map((c) =>
+      twilio.conferences(c.sid).update({ status: "completed" })
+    )
+  );
 }

@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (status === "completed" || status === "in-progress") {
+    if (status === "completed") {
       await addCredit(caller);
       return NextResponse.json({ success: true });
     }
@@ -53,10 +53,7 @@ export async function POST(req: NextRequest) {
       const record = await getCallerRecord(caller);
 
       if (!record) {
-        await upsertRecord(caller, {
-          unsuccessful_attempts: 1,
-          credits_used: 0,
-        });
+        await upsertRecord(caller, 0, 1);
         return NextResponse.json({ success: true });
       }
 
@@ -64,14 +61,9 @@ export async function POST(req: NextRequest) {
       const credits = record?.credits_used ?? 0;
 
       if (attempts >= 2) {
-        await upsertRecord(caller, {
-          unsuccessful_attempts: 0,
-          credits_used: credits + 1,
-        });
+        await upsertRecord(caller, credits + 1, 0);
       } else {
-        await upsertRecord(caller, {
-          unsuccessful_attempts: attempts,
-        });
+        await upsertRecord(caller, credits, attempts);
       }
     }
 
@@ -107,25 +99,21 @@ async function addCredit(caller: string) {
 
   const newCredits = (record?.credits_used ?? 0) + 1;
 
-  await upsertRecord(caller, {
-    credits_used: newCredits,
-    unsuccessful_attempts: record?.unsuccessful_attempts ?? 0,
-  });
+  await upsertRecord(caller, newCredits, record?.unsuccessful_attempts ?? 0);
 }
 
 async function upsertRecord(
   caller: string,
-  fields: {
-    credits_used?: number;
-    unsuccessful_attempts?: number;
-  }
+  credits_used?: number,
+  unsuccessful_attempts?: number,
 ) {
   const { error } = await supabase
     .from("calling_credits")
     .upsert(
       {
         phone_num: caller,
-        ...fields,
+        credits_used: credits_used,
+        unsuccessful_attempts: unsuccessful_attempts,
       },
       { onConflict: "phone_num" }
     );
@@ -149,7 +137,7 @@ async function endConferenceRoom(room: string) {
     status: "in-progress",
   });
 
-  await Promise.all(
+  await Promise.allSettled(
     conferences.map((c) =>
       twilio.conferences(c.sid).update({ status: "completed" })
     )
