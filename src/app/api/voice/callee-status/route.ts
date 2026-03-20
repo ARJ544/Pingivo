@@ -2,7 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 import Twilio from "twilio";
 
-const client = Twilio(
+const twilio = Twilio(
   process.env.TWILIO_ACCOUNT_SID!,
   process.env.TWILIO_AUTH_TOKEN!
 );
@@ -13,148 +13,145 @@ const supabase = createClient(
 );
 
 export async function POST(req: NextRequest) {
-  const formData = await req.formData();
-  const status = formData.get("CallStatus") as string | null;
+  try {
 
-  const { searchParams } = new URL(req.url);
-  const room = searchParams.get("room");
-  const caller = searchParams.get("caller");
-  const callerCallSid = searchParams.get("callerCallSid");
+    const formData = await req.formData();
+    const status = formData.get("CallStatus") as string | null;
 
-  if (!room) {
-    return NextResponse.json({ error: "No room found for conference" }, { status: 400 });
-  }
+    const { searchParams } = new URL(req.url);
+    const room = searchParams.get("room");
+    const caller = searchParams.get("caller");
+    const callerCallSid = searchParams.get("callerCallSid");
 
-  if (!status) {
-    return NextResponse.json({ error: "No call status found" }, { status: 400 });
-  }
-
-  if (!caller) {
-    return NextResponse.json({ error: "Caller number missing" }, { status: 400 });
-  }
-
-
-  if (status === "completed" || status === "in-progress") {
-    const { data, error } = await supabase
-      .from("calling_credits")
-      .select("credits_used")
-      .eq("phone_num", caller)
-      .maybeSingle();
-
-    if (error) {
-      return NextResponse.json({ error: "Database read error" }, { status: 500 });
+    if (!room || !status || !caller) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
-    const credits = (data?.credits_used ?? 0) + 1;
+    if (status === "completed" || status === "in-progress") {
+      await addCredit(caller);
+      return NextResponse.json({ success: true });
+    }
 
-    if (!data) {
-      const { error: insertError } = await supabase
-        .from("calling_credits")
-        .insert({
-          phone_num: caller,
-          credits_used: 1,
-          unsuccessful_attempts: 0,
+    if (["no-answer", "busy", "failed"].includes(status)) {
+
+      const results = await Promise.allSettled([
+        callerCallSid
+          ? playBusyMessage(callerCallSid)
+          : Promise.resolve(),
+        endConferenceRoom(room),
+      ]);
+
+      results.forEach((r, i) => {
+        if (r.status === "rejected") {
+          console.error(`Async task ${i} failed:`, r.reason);
+        }
+      });
+
+      const record = await getCallerRecord(caller);
+
+      if (!record) {
+        await upsertRecord(caller, {
+          unsuccessful_attempts: 1,
+          credits_used: 0,
         });
-
-      if (insertError) {
-        return NextResponse.json({ error: "Database insert error" }, { status: 500 });
+        return NextResponse.json({ success: true });
       }
-    } else {
-      const { error: updateError } = await supabase
-        .from("calling_credits")
-        .update({ credits_used: credits })
-        .eq("phone_num", caller);
 
-      if (updateError) {
-        return NextResponse.json({ error: "Database update error" }, { status: 500 });
+      const attempts = (record?.unsuccessful_attempts ?? 0) + 1;
+      const credits = record?.credits_used ?? 0;
+
+      if (attempts >= 2) {
+        await upsertRecord(caller, {
+          unsuccessful_attempts: 0,
+          credits_used: credits + 1,
+        });
+      } else {
+        await upsertRecord(caller, {
+          unsuccessful_attempts: attempts,
+        });
       }
     }
 
     return NextResponse.json({ success: true });
+
+  } catch (err) {
+    console.error("Error:", err);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+
+async function getCallerRecord(caller: string) {
+  const { data, error } = await supabase
+    .from("calling_credits")
+    .select("credits_used, unsuccessful_attempts")
+    .eq("phone_num", caller)
+    .maybeSingle();
+
+  if (error) {
+    console.error("DB read error:", error);
+    throw new Error("Database read failed");
   }
 
-  if (["no-answer", "busy", "failed"].includes(status)) {
+  return data;
+}
 
-    if (callerCallSid) {
-      try {
-        await client.calls(callerCallSid).update({
-          url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/busy-message`,
-          method: "POST",
-        });
-      } catch (err) {
-        console.error("Caller redirect failed:", err);
-      }
-    }
+async function addCredit(caller: string) {
+  const record = await getCallerRecord(caller);
 
-    try {
-      const conferences = await client.conferences.list({
-        friendlyName: room,
-        status: "in-progress",
-      });
+  const newCredits = (record?.credits_used ?? 0) + 1;
 
-      for (const conf of conferences) {
-        await client.conferences(conf.sid).update({ status: "completed" });
-      }
-    } catch (err) {
-      console.error("Conference ending error:", err);
-    }
+  await upsertRecord(caller, {
+    credits_used: newCredits,
+    unsuccessful_attempts: record?.unsuccessful_attempts ?? 0,
+  });
+}
 
-    const { data, error } = await supabase
-      .from("calling_credits")
-      .select("unsuccessful_attempts, credits_used")
-      .eq("phone_num", caller)
-      .maybeSingle();
-
-    if (error) {
-      return NextResponse.json({ error: "Database read error" }, { status: 500 });
-    }
-
-    const attempts = (data?.unsuccessful_attempts ?? 0) + 1;
-    const credits = data?.credits_used ?? 0;
-
-    if (!data) {
-      const { error: insertError } = await supabase
-        .from("calling_credits")
-        .insert({
-          phone_num: caller,
-          unsuccessful_attempts: 1,
-          credits_used: 0,
-        });
-
-      if (insertError) {
-        return NextResponse.json({ error: "Database insert error" }, { status: 500 });
-      }
-
-      return NextResponse.json({ success: true });
-    }
-
-    if (attempts >= 2) {
-      const { error: resetError } = await supabase
-        .from("calling_credits")
-        .update({
-          unsuccessful_attempts: 0,
-          credits_used: credits + 1,
-        })
-        .eq("phone_num", caller);
-
-      if (resetError) {
-        console.error(resetError);
-        return NextResponse.json({ error: "Database reset error" }, { status: 500 });
-      }
-    } else {
-      const { error: updateError } = await supabase
-        .from("calling_credits")
-        .update({
-          unsuccessful_attempts: attempts,
-        })
-        .eq("phone_num", caller);
-
-      if (updateError) {
-        console.error(updateError);
-        return NextResponse.json({ error: "Database update error" }, { status: 500 });
-      }
-    }
+async function upsertRecord(
+  caller: string,
+  fields: {
+    credits_used?: number;
+    unsuccessful_attempts?: number;
   }
+) {
+  const { error } = await supabase
+    .from("calling_credits")
+    .upsert(
+      {
+        phone_num: caller,
+        ...fields,
+      },
+      { onConflict: "phone_num" }
+    );
 
-  return NextResponse.json({ success: true });
+  if (error) {
+    console.error("DB write error:", error);
+    throw new Error("Database write failed");
+  }
+}
+
+async function playBusyMessage(callSid: string) {
+  await twilio.calls(callSid).update({
+    url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/busy-message`,
+    method: "POST",
+  });
+}
+
+async function endConferenceRoom(room: string) {
+  const conferences = await twilio.conferences.list({
+    friendlyName: room,
+    status: "in-progress",
+  });
+
+  await Promise.all(
+    conferences.map((c) =>
+      twilio.conferences(c.sid).update({ status: "completed" })
+    )
+  );
 }
