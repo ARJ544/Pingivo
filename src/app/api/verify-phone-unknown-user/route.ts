@@ -26,30 +26,19 @@ export async function POST(req: Request) {
 
   const verifiedPhone = `${data.user_country_code}${data.user_phone_number}`;
 
-  let temp_phone_id: string;
-  let temp_phone_num: string;
-  const { data: getTempPhoneData, error: getTempPhoneError } = await supabase
+  const { data: tempPhoneData, error: tempPhoneError } = await supabase
     .from("temporary_phone")
+    .upsert({ temp_phone: verifiedPhone }, { onConflict: "temp_phone" })
     .select("id, temp_phone")
-    .eq("temp_phone", verifiedPhone)
-    .maybeSingle()
+    .single();
 
-  if (getTempPhoneError || !getTempPhoneData) {
-    const { data: insertData, error: insertError } = await supabase
-      .from("temporary_phone")
-      .insert({ temp_phone: verifiedPhone })
-      .select("id, temp_phone")
-      .single()
-
-    if (insertError) {
-      return NextResponse.json({ error: insertError.message }, { status: 500 });
-    }
-    temp_phone_id = insertData.id;
-    temp_phone_num = insertData.temp_phone;
-  } else {
-    temp_phone_id = getTempPhoneData.id;
-    temp_phone_num = getTempPhoneData.temp_phone;
+  if (tempPhoneError || !tempPhoneData) {
+    console.error("Temporary phone upsert failed:", tempPhoneError);
+    return NextResponse.json({ error: tempPhoneError?.message ?? "Failed" }, { status: 500 });
   }
+
+  const temp_phone_id = tempPhoneData.id;
+  const temp_phone_num = tempPhoneData.temp_phone;
 
   const ONE_HOUR = 60 * 60;
 

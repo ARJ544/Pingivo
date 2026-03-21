@@ -1,6 +1,5 @@
 import { setAllCookie } from "@/app/actions";
 import { createClient } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 const supabase = createClient(
@@ -15,6 +14,7 @@ export function generateSecretCode() {
 }
 
 export async function POST(req: Request) {
+  const start = performance.now();
   const { user_json_url } = await req.json();
 
   const response = await fetch(user_json_url);
@@ -58,6 +58,8 @@ export async function POST(req: Request) {
     if (insertError) {
       return NextResponse.json({ error: insertError.message }, { status: 500 });
     }
+    const end = performance.now();
+    console.log(`Database getting query took ${end - start} ms`);
     await setAllCookie({
       loggedin: true,
       id: insertData.id,
@@ -67,6 +69,8 @@ export async function POST(req: Request) {
       verified: true,
     });
   } else {
+    const end = performance.now();
+    console.log(`Database query took ${end - start} ms`);
     await setAllCookie({
       loggedin: true,
       id: getExistingUserData.id,
@@ -76,15 +80,6 @@ export async function POST(req: Request) {
       verified: true,
     });
   }
-
-  const cookie = await cookies();
-  cookie.set("phone_verified", "true", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 10 * 60,
-  });
 
   return NextResponse.json({ success: true });
 }

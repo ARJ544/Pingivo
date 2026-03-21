@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { getAllCookie, setAllCookie } from "@/app/actions";
-import { authenticateUser, getUserByPhone } from "@/lib/api-helpers";
+import { setAllCookie } from "@/app/actions";
+import { authenticateUser } from "@/lib/api-helpers";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -26,22 +26,7 @@ export async function POST(req: Request) {
   if (!authResult.success) {
     return authResult.response;
   }
-  const phoneCheck = await getUserByPhone(verifiedPhone);
 
-  if (!phoneCheck.success) {
-    return NextResponse.json(
-      { error: "Failed to check phone number" },
-      { status: 500 }
-    );
-  }
-
-  const userAlreadyExists = phoneCheck.user !== null;
-  if (userAlreadyExists) {
-    return NextResponse.json(
-      { error: "Phone Number already exists" },
-      { status: 409 }
-    );
-  }
   const { data: updateData, error: updateError } = await supabase
     .from("simplified_users")
     .update({ phone_num: verifiedPhone })
