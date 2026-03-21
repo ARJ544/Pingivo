@@ -79,7 +79,7 @@ export async function POST(req: Request) {
       return ok("Duplicate webhook ignored");
     }
 
-    const bsuid = contact.user_id || message.from_user_id;
+    const bsuid = contact.user_id || message.from_user_id || contact.wa_id;
     let userPhone = message.from || contact.wa_id;
     const text = message.text?.body?.trim().replace(/^\*+|\*+$/g, "").trim();
 
@@ -124,6 +124,8 @@ export async function POST(req: Request) {
         after(sendWhatsAppMessage(userPhone, "⚠️ *Not Connected*\nThis number is not connected to any Pingivo account."));
         return ok("Not connected");
       }
+      after(sendWhatsAppMessage(userPhone, "✅ *Disconnected successfully!*\nThis WhatsApp number has been removed from Pingivo account. You can connect it again anytime."));
+      return ok("Disconnected successfully");
     }
 
     const token = text.replace(/CONNECT_/i, "").trim();
@@ -156,7 +158,7 @@ export async function POST(req: Request) {
     }
 
     if (userPhone) {
-      after(sendWhatsAppMessage(userPhone, `✅ *Connected successfully!*\n\nYou will now receive:\n• WhatsApp messages on *${updated.phone_num}*\n• Calls at *${updated.phone_num}*\n\nFrom *June onwards*, you will receive:\n• WhatsApp messages on this connected number\n• Calls at *${updated.phone_num}*\n\nYou can disconnect your number any time by sending *DISCONNECT_ME* in this chat or through the Pingivo profile menu.\n*However if disconnected, you will still receive messages if this number is signed-in on Pingivo. -- Till June*\n\n_You can now safely clear this chat._`));
+      await sendWhatsAppMessage(userPhone, `*Your number is now connected successfully.*\n\nWhat happens now:\n\n- You will receive WhatsApp messages on ${updated.phone_num}\n- You will receive calls on ${updated.phone_num}\n\nStarting from June 1:\n\n- WhatsApp messages will be sent only to this connected number\n- Calls will continue on ${updated.phone_num}\n\nYou can disconnect your number at any time by sending DISCONNECT_ME in this chat or from the Pingivo profile menu.\n\nNote:\nIf you disconnect before June, you may still receive messages if this number is registered on Pingivo.\n\nYou can safely clear this chat.`);
     }
     return ok("Connected successfully");
   } catch (error) {
