@@ -1,11 +1,17 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import Twilio from "twilio";
-import { getCaller, getCallCredits, getUserByFinderId } from "@/lib/api-helpers";
+import { getCaller, getUserByFinderId } from "@/lib/api-helpers";
+import { createClient } from "@supabase/supabase-js";
 
 const client = Twilio(
   process.env.TWILIO_ACCOUNT_SID!,
   process.env.TWILIO_AUTH_TOKEN!,
+);
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_ANON_KEY!,
 );
 
 export async function POST() {
@@ -20,19 +26,20 @@ export async function POST() {
       );
     }
 
-    const callerResult = await getCaller();
-    if (!callerResult.success) {
-      return callerResult.response;
-    }
-    const caller = callerResult.caller;
+    const [callerResult, calleeResult] = await Promise.all([
+      getCaller(),
+      getUserByFinderId(callee_cookie_id),
+    ]);
 
-    const calleeResult = await getUserByFinderId(callee_cookie_id);
+    if (!callerResult.success) return callerResult.response;
     if (!calleeResult.success) {
       return NextResponse.json(
         { error: "User not found. Please Refresh the page." },
         { status: 404 }
       );
     }
+
+    const caller = callerResult.caller;
     const callee = calleeResult.user?.phone_num;
 
     if (!caller || !callee) {
@@ -49,22 +56,33 @@ export async function POST() {
       );
     }
 
-    const creditsResult = await getCallCredits(caller);
-    if (!creditsResult.success) {
-      return creditsResult.response;
+    const { data: callingRecord } = await supabase
+      .from("calling_credits")
+      .select("is_calling, credits_used")
+      .eq("phone_num", caller)
+      .maybeSingle();
+
+    if (callingRecord?.is_calling) {
+      return NextResponse.json(
+        { error: "You are already in a call. Please wait for it to finish." },
+        { status: 400 }
+      );
     }
 
-    if (creditsResult.credits.creditsUsed >= 3) {
+    const creditsUsed = callingRecord?.credits_used ?? 0;
+    if (creditsUsed >= 3) {
       return NextResponse.json(
-        {
-          error: "You've used all your free credits (3/3) for today. Next reset at 00:00 UTC"
-        },
+        { error: "You've used all your free credits (3/3) for today. Next reset at 00:00 UTC" },
         { status: 400 }
       );
     }
 
     const mixedNum = `${caller.slice(-5)}${callee.slice(-5)}`;
     const roomName = `conf_${mixedNum}_${Date.now()}`;
+
+    await supabase
+      .from("calling_credits")
+      .upsert({ phone_num: caller, is_calling: true }, { onConflict: "phone_num" });
 
     try {
       await client.calls.create({
@@ -76,18 +94,25 @@ export async function POST() {
         statusCallbackMethod: "POST",
         timeout: 25,
       });
-    } catch (err: any) {
-      console.error("Error while calling caller:", err);
+    } catch (twilioErr: any) {
+      await supabase
+        .from("calling_credits")
+        .update({ is_calling: false })
+        .eq("phone_num", caller);
+
+      console.error("Twilio call failed:", twilioErr);
       return NextResponse.json(
-        { error: "Failed to call You", details: err.message },
+        { error: "Failed to initiate call. Please try again." },
         { status: 500 }
       );
     }
 
     return NextResponse.json({ success: true, message: "Call started" });
+
   } catch (err) {
+    console.error("Error in call initiation:", err);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error. Please try again." },
       { status: 500 }
     );
   }

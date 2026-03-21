@@ -335,6 +335,18 @@ export async function refreshUserToken(userId: string) {
   }
 }
 
+// This function is used to add a credit to the caller after a failed call attempt
+export async function setNotCalling(caller: string) {
+  const { error } = await supabase
+    .from("calling_credits")
+    .update({ is_calling: false })
+    .eq("phone_num", caller);
+
+  if (error) {
+    console.error("setNotCalling failed:", error);
+  }
+}
+
 
 /**
  * Verifies password against hashed password

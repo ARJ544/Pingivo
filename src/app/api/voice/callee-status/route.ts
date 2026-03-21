@@ -14,7 +14,6 @@ const supabase = createClient(
 
 export async function POST(req: NextRequest) {
   try {
-
     const formData = await req.formData();
     const status = formData.get("CallStatus") as string | null;
 
@@ -22,6 +21,7 @@ export async function POST(req: NextRequest) {
     const room = searchParams.get("room");
     const caller = searchParams.get("caller");
     const callerCallSid = searchParams.get("callerCallSid");
+    console.log("Callee Status Update:", { room, caller, status, callerCallSid });
 
     if (!room || !status || !caller) {
       return NextResponse.json(
@@ -37,28 +37,32 @@ export async function POST(req: NextRequest) {
 
     if (["no-answer", "busy", "failed"].includes(status)) {
 
-      const results = await Promise.allSettled([
-        callerCallSid
-          ? playBusyMessage(callerCallSid)
-          : Promise.resolve(),
+      const [r1, r2, recordResult] = await Promise.allSettled([
+        callerCallSid ? playBusyMessage(callerCallSid) : Promise.resolve(),
         endConferenceRoom(room),
+        getCallerRecord(caller),
       ]);
 
-      results.forEach((r, i) => {
+      [r1, r2].forEach((r, i) => {
         if (r.status === "rejected") {
           console.error(`Async task ${i} failed:`, r.reason);
         }
       });
 
-      const record = await getCallerRecord(caller);
+      if (recordResult.status === "rejected") {
+        console.error("getCallerRecord failed:", recordResult.reason);
+        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+      }
+
+      const record = recordResult.value;
 
       if (!record) {
         await upsertRecord(caller, 0, 1);
         return NextResponse.json({ success: true });
       }
 
-      const attempts = (record?.unsuccessful_attempts ?? 0) + 1;
-      const credits = record?.credits_used ?? 0;
+      const attempts = (record.unsuccessful_attempts ?? 0) + 1;
+      const credits = record.credits_used ?? 0;
 
       if (attempts >= 2) {
         await upsertRecord(caller, credits + 1, 0);
@@ -106,6 +110,7 @@ async function upsertRecord(
   caller: string,
   credits_used?: number,
   unsuccessful_attempts?: number,
+  is_calling: boolean = false,
 ) {
   const { error } = await supabase
     .from("calling_credits")
@@ -114,6 +119,7 @@ async function upsertRecord(
         phone_num: caller,
         credits_used: credits_used,
         unsuccessful_attempts: unsuccessful_attempts,
+        is_calling: is_calling,
       },
       { onConflict: "phone_num" }
     );
