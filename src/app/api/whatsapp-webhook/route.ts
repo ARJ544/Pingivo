@@ -79,24 +79,24 @@ export async function POST(req: Request) {
       return ok("Duplicate webhook ignored");
     }
 
-    const bsuid = contact.user_id || message.from_user_id || contact.wa_id;
+    const bsuid = contact.user_id || message.from_user_id;
     let userPhone = message.from || contact.wa_id;
     const text = message.text?.body?.trim().replace(/^\*+|\*+$/g, "").trim();
 
-    // if (userPhone) {
-    //   after(sendWhatsAppMessage(
-    //     userPhone,
-    //     "⏳ *Pingivo WhatsApp Integration — Coming Soon*\n\n" +
-    //     "The WhatsApp API will be available from *31st March 2026*.\n\n" +
-    //     "Once it's live, you'll be able to:\n" +
-    //     "• Link this number to your Pingivo account\n" +
-    //     "• Receive messages directly on WhatsApp\n\n" +
-    //     "To connect after launch, go to your *Pingivo → Profile menu → Connect Whatsapp* and send it here as:\n" +
-    //     "*CONNECT_<your-token>*\n\n" +
-    //     "_Check back on or after 31st March 2026._"
-    //   ));
-    //   return ok("API not active yet");
-    // } // Will be removed after 31st march 2026
+    if (userPhone) {
+      after(sendWhatsAppMessage(
+        userPhone,
+        "⏳ *Pingivo WhatsApp Integration — Coming Soon*\n\n" +
+        "The WhatsApp API will be available from *31st March 2026*.\n\n" +
+        "Once it's live, you'll be able to:\n" +
+        "• Link this number to your Pingivo account\n" +
+        "• Receive messages directly on WhatsApp\n\n" +
+        "To connect after launch, go to your *Pingivo → Profile menu → Connect Whatsapp* and send it here as:\n" +
+        "*CONNECT_<your-token>*\n\n" +
+        "_Check back on or after 31st March 2026._"
+      ));
+      return ok("API not active yet");
+    } // Will be removed after 31st march 2026
 
     if (!text || (!text.toUpperCase().startsWith("CONNECT_") && !text.toUpperCase().startsWith("DISCONNECT_ME"))) {
 
@@ -158,7 +158,7 @@ export async function POST(req: Request) {
     }
 
     if (userPhone) {
-      await sendWhatsAppMessage(userPhone, `*Your number is now connected successfully.*\n\nWhat happens now:\n\n- You will receive WhatsApp messages on ${updated.phone_num}\n- You will receive calls on ${updated.phone_num}\n\nStarting from June 1:\n\n- WhatsApp messages will be sent only to this connected number\n- Calls will continue on ${updated.phone_num}\n\nYou can disconnect your number at any time by sending DISCONNECT_ME in this chat or from the Pingivo profile menu.\n\nNote:\nIf you disconnect before June, you may still receive messages if this number is registered on Pingivo.\n\nYou can safely clear this chat.`);
+      await sendWhatsAppMessage(userPhone, `✅ *Connected successfully!*\n\nWhat happens now:\n\n- You will receive WhatsApp messages on ${updated.phone_num}\n- You will receive calls on ${updated.phone_num}\n\nStarting from early May(Date To Be Decided):\n\n- WhatsApp messages will be sent only to this connected number\n- Calls will continue on ${updated.phone_num}\n\nYou can disconnect your number at any time by sending *DISCONNECT_ME* in this chat or from the Pingivo profile menu.\n\n*Note:\nIf you disconnect before May(Date To Be Decided), you may still receive messages if this number(${updated.phone_num}) is registered on Pingivo.*\n\n_You can safely clear this chat._`);
     }
     return ok("Connected successfully");
   } catch (error) {
