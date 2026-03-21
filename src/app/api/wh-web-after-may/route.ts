@@ -93,7 +93,7 @@ async function handleConnect(bsuid: string, text: string) {
 
   const { data: updated, error: updateError } = await supabase
     .from("simplified_users")
-    .update({ bsuid, token: null })
+    .update({ bsuid: bsuid, token: null })
     .eq("token", token)
     .select("id, phone_num")
     .maybeSingle();
