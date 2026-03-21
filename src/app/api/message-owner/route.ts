@@ -30,6 +30,15 @@ export async function POST(request: Request) {
     );
   }
 
+  const { alertMessage } = await request.json();
+
+  if (!alertMessage || !alertMessage.trim()) {
+    return NextResponse.json(
+      { error: { message: "Please enter a message" } },
+      { status: 400 }
+    );
+  }
+
   const recipientBsuidResult = await getUserByFinderId(receiverFinderId);
   if (!recipientBsuidResult.success) {
     return NextResponse.json(
@@ -49,15 +58,6 @@ export async function POST(request: Request) {
   let bsuid = recipientBsuid;
   if (recipientBsuid.startsWith("+")) {
     bsuid = recipientBsuid.replace(/^\+/, "");
-  }
-
-  const { alertMessage } = await request.json();
-
-  if (!alertMessage || !alertMessage.trim()) {
-    return NextResponse.json(
-      { error: { message: "Please enter a message" } },
-      { status: 400 }
-    );
   }
 
   let formattedMessage = alertMessage.replace(/\n/g, " ").replace(/\t/g, " ").replace(/\s+/g, " ").trim();
