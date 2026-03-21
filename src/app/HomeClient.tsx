@@ -180,51 +180,72 @@ export default function HomeClient({ loggedin, bsuid, token }: { loggedin: boole
         </section>
 
       </main>
-      {showConnectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-          <div className="w-full max-w-xs bg-white dark:bg-slate-900 rounded-xl p-4 shadow-xl border border-slate-200 dark:border-slate-800">
-            <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-1">
-              Activate WhatsApp Messaging
-            </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-              You'll be redirected to WhatsApp to send a message. Don't edit it — just tap send.
-            </p>
 
-            <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 rounded-lg px-3 py-2 mb-3 space-y-1">
-              <p>
-                Use the <span className="font-medium">same number you signed in with</span>, otherwise a different number will be linked.
-              </p>
-              <p>
-                You can connect or disconnect anytime from the <span className="font-medium">profile menu</span> (top right).
-              </p>
+      {showConnectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+          <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl p-4 shadow-xl border border-slate-200/70 dark:border-slate-800">
+
+            {/* Header */}
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="h-9 w-9 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 text-base">
+                💬
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">
+                  Connect WhatsApp
+                </h2>
+                <p className="text-[12px] text-pink-500 dark:text-pink-400 underline">
+                  Required to receive messages from <strong>Finders</strong>
+                </p>
+              </div>
             </div>
 
-            <div className="flex gap-2">
+            {/* Highlight Box */}
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800 rounded-xl px-3 py-2 mb-3">
+              <p className="text-[11px] text-green-700 dark:text-green-300 leading-relaxed">
+                Messages will be delivered on your WhatsApp until <span className="font-semibold">early May(TBD)</span>. After that, only connected users will receive messages.{" "}
+                <br />
+                <div className="mb-0.5 mt-0.5" />
+                <span className="opacity-77">NOTE: You can still connect later, but may miss messages between that time. </span>
+              </p>
+
+            </div>
+
+            {/* Key Points */}
+            <div className="space-y-1.5 mb-3 text-[11px] text-slate-600 dark:text-slate-400">
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">✔</span>
+                <p>Use the <span className="font-medium text-slate-800 dark:text-slate-200">same number</span> you signed in with.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">✔</span>
+                <p>Connect or disconnect via the <span className="font-medium text-slate-800 dark:text-slate-200">profile menu</span> (top-right)</p>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col gap-1.5">
               <Button
                 onClick={() => {
                   handleConnectWhatsApp();
                   setShowConnectModal(false);
                 }}
-                className="flex-1 bg-green-500 hover:bg-green-600 text-white text-sm"
+                className="w-full bg-green-500 hover:bg-green-600 text-white text-xs font-medium h-9 rounded-xl shadow-sm"
               >
-                Continue
+                Connect WhatsApp
               </Button>
-
-              <Button
+              <button
                 onClick={() => setShowConnectModal(false)}
-                variant="outline"
-                className="flex-1 text-sm"
+                className="text-[11px] cursor-pointer text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition py-0.5"
               >
-                Later
-              </Button>
+                Maybe later
+              </button>
             </div>
 
-            <p className="text-[11px] text-center text-red-500 dark:text-red-400 mt-3">
-              Skipping means that you will not receive messages, finders can only reach you via call.
-            </p>
           </div>
         </div>
       )}
     </div>
   );
 }
+
