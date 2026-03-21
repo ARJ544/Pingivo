@@ -75,6 +75,12 @@ export default function UpdateClient() {
           <p className="mt-2 text-slate-600 dark:text-slate-400">
             Verify your New Phone Number to Update
           </p>
+          <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950 px-4 py-3">
+            <p className="text-sm text-amber-800 dark:text-amber-300">
+              <span className="font-semibold">⚠️ Important:</span> If you update your phone number, you must also{" "}
+              <span className="font-semibold">disconnect and reconnect</span> your WhatsApp on Pingivo with the new number — otherwise messages will continue to be routed to your current connected WhatsApp number.
+            </p>
+          </div>
         </div>
 
         <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
