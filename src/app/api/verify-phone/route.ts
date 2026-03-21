@@ -14,7 +14,6 @@ export function generateSecretCode() {
 }
 
 export async function POST(req: Request) {
-  const start = performance.now();
   const { user_json_url } = await req.json();
 
   const response = await fetch(user_json_url);
@@ -58,8 +57,6 @@ export async function POST(req: Request) {
     if (insertError) {
       return NextResponse.json({ error: insertError.message }, { status: 500 });
     }
-    const end = performance.now();
-    console.log(`Database getting query took ${end - start} ms`);
     await setAllCookie({
       loggedin: true,
       id: insertData.id,
@@ -69,8 +66,6 @@ export async function POST(req: Request) {
       verified: true,
     });
   } else {
-    const end = performance.now();
-    console.log(`Database query took ${end - start} ms`);
     await setAllCookie({
       loggedin: true,
       id: getExistingUserData.id,
