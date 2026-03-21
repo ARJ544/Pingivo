@@ -124,7 +124,9 @@ export async function POST(req: Request) {
         after(sendWhatsAppMessage(userPhone, "⚠️ *Not Connected*\nThis number is not connected to any Pingivo account."));
         return ok("Not connected");
       }
-      after(sendWhatsAppMessage(userPhone, "✅ *Disconnected successfully!*\nThis WhatsApp number has been removed from Pingivo account. You can connect it again anytime."));
+      if (userPhone) {
+        after(sendWhatsAppMessage(userPhone, "✅ *Disconnected successfully!*\nThis WhatsApp number has been removed from Pingivo account. You can connect it again anytime."));
+      }
       return ok("Disconnected successfully");
     }
 
