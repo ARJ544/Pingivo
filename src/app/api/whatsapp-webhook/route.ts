@@ -140,7 +140,7 @@ export async function POST(req: Request) {
         return ok("Disconnect failed");
       }
       if (userPhone) {
-        after(sendWhatsAppMessage(userPhone, "✅ *Disconnected successfully!*\nThis WhatsApp number has been removed from Pingivo account. You can connect it again anytime."));
+        after(sendWhatsAppMessage(userPhone, "✅ *Disconnected successfully!*\nThis WhatsApp number has been removed from Pingivo account. You can connect it again anytime.\n*However, you will still receive messages if this number is signed-in on Pingivo.*"));
       }
       return ok("Disconnected");
     }
@@ -195,7 +195,7 @@ export async function POST(req: Request) {
     }
 
     if (userPhone) {
-      after(sendWhatsAppMessage(userPhone, `✅ *Connected successfully!*\n\nYou will now receive:\n• WhatsApp messages on *${user.phone_num}\n• Calls at *${user.phone_num}*\n\nFrom *June onwards*, you will receive:\n• WhatsApp messages on this connected number\n• Calls at *${user.phone_num}*\n\nYou can disconnect your number any time by sending *DISCONNECT_ME* in this chat or through the Pingivo profile menu.\n\n_You can now safely clear this chat._`));
+      after(sendWhatsAppMessage(userPhone, `✅ *Connected successfully!*\n\nYou will now receive:\n• WhatsApp messages on *${user.phone_num}*\n• Calls at *${user.phone_num}*\n\nFrom *June onwards*, you will receive:\n• WhatsApp messages on this connected number\n• Calls at *${user.phone_num}*\n\nYou can disconnect your number any time by sending *DISCONNECT_ME* in this chat or through the Pingivo profile menu.\n*However if disconnected, you will still receive messages if this number is signed-in on Pingivo.*\n\n_You can now safely clear this chat._`));
     }
     return ok("Connected successfully");
   } catch (error) {
