@@ -60,31 +60,23 @@ const MSG = {
 };
 
 async function handleDisconnect(bsuid: string) {
-  const { data: existingUser, error: findError } = await supabase
-    .from("simplified_users")
-    .select("id")
-    .eq("bsuid", bsuid)
-    .maybeSingle();
-
-  if (findError) {
-    after(sendWhatsAppMessage(bsuid, MSG.dbError));
-    return ok("Database error");
-  }
-
-  if (!existingUser) {
-    after(sendWhatsAppMessage(bsuid, MSG.notConnected));
-    return ok("Not connected");
-  }
-
   const newToken = generateSecretCode();
-  const { error: disconnectError } = await supabase
+
+  const { data: disconnected, error: disconnectError } = await supabase
     .from("simplified_users")
     .update({ bsuid: null, token: newToken })
-    .eq("bsuid", bsuid);
+    .eq("bsuid", bsuid)
+    .select("id")
+    .maybeSingle();
 
   if (disconnectError) {
     after(sendWhatsAppMessage(bsuid, MSG.disconnectFailed));
     return ok("Disconnect failed");
+  }
+
+  if (!disconnected) {
+    after(sendWhatsAppMessage(bsuid, MSG.notConnected));
+    return ok("Not connected");
   }
 
   after(sendWhatsAppMessage(bsuid, MSG.disconnected));
@@ -99,38 +91,29 @@ async function handleConnect(bsuid: string, text: string) {
     return ok("Token missing");
   }
 
-  const { data: user, error } = await supabase
-    .from("simplified_users")
-    .select("id, token, phone_num")
-    .eq("token", token)
-    .maybeSingle();
-
-  if (error) {
-    after(sendWhatsAppMessage(bsuid, MSG.connectDbError));
-    return ok("Database error");
-  }
-
-  if (!user) {
-    console.log("Invalid token:", token);
-    after(sendWhatsAppMessage(bsuid, MSG.invalidToken));
-    return ok("Invalid or expired token");
-  }
-
-  const { error: updateError } = await supabase
+  const { data: updated, error: updateError } = await supabase
     .from("simplified_users")
     .update({ bsuid, token: null })
-    .eq("id", user.id);
+    .eq("token", token)
+    .select("id, phone_num")
+    .maybeSingle();
 
   if (updateError) {
     if (updateError.code === "23505") {
       after(sendWhatsAppMessage(bsuid, MSG.duplicateEntry));
       return ok("Duplicate entry");
     }
-    after(sendWhatsAppMessage(bsuid, MSG.updateFailed));
-    return ok("Failed to update");
+    after(sendWhatsAppMessage(bsuid, MSG.connectDbError));
+    return ok("Database error");
   }
 
-  after(sendWhatsAppMessage(bsuid, MSG.connected(user.phone_num)));
+  if (!updated) {
+    console.log("Invalid token:", token);
+    after(sendWhatsAppMessage(bsuid, MSG.invalidToken));
+    return ok("Invalid or expired token");
+  }
+
+  after(sendWhatsAppMessage(bsuid, MSG.connected(updated.phone_num)));
   return ok("Successfully linked");
 }
 
