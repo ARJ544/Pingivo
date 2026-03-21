@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true });
   }
 
-  if (callStatus === "answered") {
+  if (callStatus === "in-progress" || callStatus === "answered") { // callStatus === "answered" is not always correct
     try {
       await twilio.calls.create({
         to: callee,
