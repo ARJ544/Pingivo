@@ -139,7 +139,6 @@ async function sendWhatsAppReplyMessage(to: string, from: string, message: strin
 
     const data = await response.json();
     if (!response.ok) {
-      after(sendWhatsAppMessage(from, "⚠️ Failed to send your message. There may be a temporary issue. Please try again later."));
       throw new Error(JSON.stringify(data));
     }
 
