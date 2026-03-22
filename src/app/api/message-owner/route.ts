@@ -69,6 +69,7 @@ export async function POST(request: Request) {
     );
   }
 
+  // From line 72 to 119 the code will be removed after early may(tbd)
   const url = `https://graph.facebook.com/v25.0/${whatsAppPhoneNumberId}/messages`;
 
   const payload = {
@@ -116,4 +117,10 @@ export async function POST(request: Request) {
   } catch (error: any) {
     return NextResponse.json({ error: { message: "Failed to send alert" } }, { status: 500 });
   }
+  // const message = `To: ${bsuid}\n\nMessage: ${formattedMessage}`;
+  // const encodedMessage = encodeURIComponent(message);
+
+  // const waLink = `https://wa.me/916124530919?text=${encodedMessage}`;
+  // return NextResponse.json({ success: true, waLink });
+
 }

@@ -111,18 +111,32 @@ export default function MessageOwner({
         throw new Error(data.error.message || "Failed to send message");
       }
 
-      // console.log("WhatsApp Response:", data);
-
+      // Remove below 114-118 after early may(tbd)
       setFeedback({
         msg: "Message successfully sent to WhatsApp",
         isError: false,
       });
 
+      // Uncomment after early may(tbd)
+      // if (!res.ok) {
+      //   throw new Error(data.error.message || "Failed to fetch");
+      // }
+
+      // setFeedback({
+      //   msg: "You will be Redirected to send the message via WhatsApp.",
+      //   isError: false,
+      // });
+      // setTimeout(() => {
+      //   if (data.waLink) {
+      //     window.open(data.waLink, "_blank");
+      //   }
+      // }, 1500);
+
     } catch (error: any) {
       console.error("Error:", error);
 
       setFeedback({
-        msg: error.message || "Something went wrong while sending message",
+        msg: error.message || "Something went wrong while fetching details",
         isError: true,
       });
 
@@ -260,6 +274,7 @@ export default function MessageOwner({
                       className={sendBtn}
                     >
                       {sending ? "Sending..." : "Send Message"}
+                      {/* {sending ? "Fetching..." : "Send Message"} */}
                     </button>
                     <p className="text-center text-[10px] text-zinc-400 dark:text-zinc-500 tracking-wide">
                       No verification required

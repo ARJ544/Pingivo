@@ -15,7 +15,7 @@ export default function ReplyPage() {
     if (toParam) {
       setTo(toParam);
 
-      const message = `To: ${toParam}\nMessage: Please type your message`;
+      const message = `To: ${toParam}\n\nMessage: Please type your message`;
       const encodedMessage = encodeURIComponent(message);
 
       const link = `https://wa.me/916124530919?text=${encodedMessage}`;
@@ -60,7 +60,7 @@ export default function ReplyPage() {
 
         {/* Title */}
         <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">
-          Reply on WhatsApp
+          Reply on WhatsApp <span className="underline">Anonymously</span>
         </h2>
 
         {/* Description */}
