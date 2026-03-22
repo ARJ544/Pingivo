@@ -15,7 +15,7 @@ export default function ReplyPage() {
     if (toParam) {
       setTo(toParam);
 
-      const message = `To: ${toParam}\n\nMessage: Please type your message`;
+      const message = `To: ${toParam}\n\nMessage: Type your message here...`;
       const encodedMessage = encodeURIComponent(message);
 
       const link = `https://wa.me/916124530919?text=${encodedMessage}`;
