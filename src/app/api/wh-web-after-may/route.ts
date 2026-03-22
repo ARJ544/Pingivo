@@ -11,7 +11,7 @@ const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || "error";
 
 const MSG = {
   unrecognized:
-    "⚠️ *Unrecognized Command*\nPlease send a message starting with *CONNECT_<your-token>* to connect or *DISCONNECT_ME* to disconnect your WhatsApp number from Pingivo account.\n*To Reply a User* use this *format*:\nTo: <sender_id>\nMessage: <your message>",
+    "⚠️ *Unrecognized Command*\nPlease send a message starting with *CONNECT_<your-token>* to connect or *DISCONNECT_ME* to disconnect your WhatsApp number from Pingivo account.\n*To Reply a User* click the *_Reply Now_* button or use this *format*:\nTo: <receiver_id>\nMessage: <your message>",
   dbError:
     "❌ *An error occurred.*\nPlease resend your message again.",
   notConnected:
@@ -150,6 +150,59 @@ async function sendWhatsAppReplyMessage(to: string, from: string, message: strin
   }
 }
 
+function extractToAndMessage(text: string) {
+  const toMatch = text.match(/To:\s*([^\n\r]+)/i);
+  const messageMatch = text.match(/Message:\s*([\s\S]*)/i);
+
+  const to = toMatch?.[1]?.trim().split(" ")[0];
+  const message = messageMatch?.[1]
+    ?.replace(/\n/g, " ")
+    .replace(/\t/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 500);
+
+  if (!to || !message) return null;
+
+  return { to, message };
+}
+
+async function handleUserReplyMessages(bsuid: string, text: string) {
+
+  if (!/to:/i.test(text) || !/message:/i.test(text)) {
+    after(sendWhatsAppMessage(bsuid, MSG.unrecognized));
+    return ok("Invalid reply format structure");
+  }
+  const parsed = extractToAndMessage(text);
+
+  if (!parsed) {
+    after(sendWhatsAppMessage(
+      bsuid, MSG.unrecognized
+    ));
+    return ok("Invalid message format");
+  }
+  const { to, message } = parsed;
+
+  if (to === bsuid) {
+    await sendWhatsAppMessage(bsuid, "⚠️ You cannot message yourself.");
+    return ok("Self messaging blocked");
+  }
+
+  const res = await sendWhatsAppReplyMessage(to, bsuid, message);
+  if (!res) {
+    after(sendWhatsAppMessage(bsuid, "⚠️ Failed to send message. Please try again later."
+    ));
+    return ok("Failed to send reply message");
+  }
+
+  after(sendWhatsAppMessage(
+    bsuid,
+    `✅ Message sent successfully!`
+  ));
+
+  return ok("Message forwarded");
+}
+
 async function handleDisconnect(bsuid: string) {
   const newToken = generateSecretCode();
 
@@ -206,59 +259,6 @@ async function handleConnect(bsuid: string, text: string) {
 
   after(sendWhatsAppMessage(bsuid, MSG.connected(updated.phone_num)));
   return ok("Successfully linked");
-}
-
-function extractToAndMessage(text: string) {
-  const toMatch = text.match(/To:\s*([^\n\r]+)/i);
-  const messageMatch = text.match(/Message:\s*([\s\S]*)/i);
-
-  const to = toMatch?.[1]?.trim().split(" ")[0];
-  const message = messageMatch?.[1]
-    ?.replace(/\n/g, " ")
-    .replace(/\t/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 500);
-
-  if (!to || !message) return null;
-
-  return { to, message };
-}
-
-async function handleUserReplyMessages(bsuid: string, text: string) {
-
-  if (!/to:/i.test(text) || !/message:/i.test(text)) {
-    after(sendWhatsAppMessage(bsuid, MSG.unrecognized));
-    return ok("Invalid reply format structure");
-  }
-  const parsed = extractToAndMessage(text);
-
-  if (!parsed) {
-    after(sendWhatsAppMessage(
-      bsuid, MSG.unrecognized
-    ));
-    return ok("Invalid message format");
-  }
-  const { to, message } = parsed;
-
-  if (to === bsuid) {
-    await sendWhatsAppMessage(bsuid, "⚠️ You cannot message yourself.");
-    return ok("Self messaging blocked");
-  }
-
-  const res = await sendWhatsAppReplyMessage(to, bsuid, message);
-  if (!res) {
-    after(sendWhatsAppMessage(bsuid, "⚠️ Failed to send message. Please try again later."
-    ));
-    return ok("Failed to send reply message");
-  }
-
-  after(sendWhatsAppMessage(
-    bsuid,
-    `✅ Message sent successfully!`
-  ));
-
-  return ok("Message forwarded");
 }
 
 export async function GET(req: Request) {
