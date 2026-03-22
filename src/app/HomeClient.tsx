@@ -205,7 +205,7 @@ export default function HomeClient({ loggedin, bsuid, token }: { loggedin: boole
               <p className="text-[11px] text-green-700 dark:text-green-300 leading-relaxed">
                 Messages will be delivered on your WhatsApp until <span className="font-semibold">early May(TBD)</span>. After that, only connected users will receive messages.{" "}
                 <br />
-                <div className="mb-0.5 mt-0.5" />
+                <span className="block mb-0.5 mt-0.5" />
                 <span className="opacity-77">NOTE: You can still connect later, but may miss messages between that time. </span>
               </p>
 
