@@ -1,4 +1,4 @@
-# ParkPing
+# ParkPing (OLD and complex ui) - Go to minimal_ui branch instead.
 
 **Privacy-First Vehicle Protection Platform**
 
