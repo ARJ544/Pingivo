@@ -149,17 +149,24 @@ async function sendWhatsAppReplyMessage(to: string, from: string, message: strin
   }
 }
 
+function sanitizeMessageParam(text: string): string {
+  return text
+    .replace(/\r\n/g, " ")
+    .replace(/[\r\n]/g, " ")
+    .replace(/\t/g, " ")
+    .replace(/ {2,}/g, " ")
+    .replace(/\{\{.*?\}\}/g, "")
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+    .trim()
+    .slice(0, 500);
+}
+
 function extractToAndMessage(text: string) {
   const toMatch = text.match(/To:\s*([^\n\r]+)/i);
   const messageMatch = text.match(/Message:\s*([\s\S]*)/i);
 
   const to = toMatch?.[1]?.trim().split(" ")[0];
-  const message = messageMatch?.[1]
-    ?.replace(/\n/g, " ")
-    .replace(/\t/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 500);
+  const message = sanitizeMessageParam(messageMatch?.[1]?.trim() || "");
 
   if (!to || !message) return null;
 
@@ -227,7 +234,7 @@ async function handleDisconnect(bsuid: string) {
 }
 
 async function handleConnect(bsuid: string, text: string) {
-  const token = text.replace(/CONNECT_/i, "").trim();
+  const token = text.replace(/^CONNECT_/i, "").trim();
 
   if (!token) {
     after(sendWhatsAppMessage(bsuid, MSG.tokenMissing));

@@ -176,7 +176,7 @@ export async function POST(req: Request) {
       return ok("Disconnected successfully");
     }
 
-    const token = text.replace(/CONNECT_/i, "").trim();
+    const token = text.replace(/^CONNECT_/i, "").trim();
     if (!token) {
       if (userPhone) {
         after(sendWhatsAppMessage(userPhone, "⚠️ *Token Missing*\nPlease provide a token after CONNECT_. You can find the token in the profile menu of your Pingivo dashboard."));

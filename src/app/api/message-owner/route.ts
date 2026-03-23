@@ -2,6 +2,18 @@ import { getUserByFinderId } from '@/lib/api-helpers';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
+function sanitizeMessageParam(text: string): string {
+  return text
+    .replace(/\r\n/g, " ")
+    .replace(/[\r\n]/g, " ")
+    .replace(/\t/g, " ")
+    .replace(/ {2,}/g, " ")
+    .replace(/\{\{.*?\}\}/g, "")
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+    .trim()
+    .slice(0, 500);
+}
+
 export async function POST(request: Request) {
 
   const cookieStore = await cookies();
@@ -60,7 +72,7 @@ export async function POST(request: Request) {
     bsuid = recipientBsuid.replace(/^\+/, "");
   }
 
-  let formattedMessage = alertMessage.replace(/\n/g, " ").replace(/\t/g, " ").replace(/\s+/g, " ").trim();
+  let formattedMessage = sanitizeMessageParam(alertMessage);
 
   if (formattedMessage.length > 500) {
     return NextResponse.json(
