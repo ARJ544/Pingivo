@@ -45,6 +45,51 @@ async function sendWhatsAppMessage(to: string, message: string) {
   }
 }
 
+async function sendTestMessage(to: string) {
+  try {
+    const response = await fetch(`https://graph.facebook.com/v25.0/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.WHATSAPP_PERMANENT_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: to,
+        type: "template",
+        template: {
+          name: "pingivo_messages_using_bsuids",
+          language: { code: "en" },
+          components: [
+            {
+              type: "body",
+              parameters: [
+                { type: "text", text: "abc123xyz..." },
+                { type: "text", text: "Hello World! This is a test message." }
+              ]
+            },
+            {
+              type: "button",
+              sub_type: "url",
+              index: "0",
+              parameters: [
+                { type: "text", text: encodeURIComponent("abc123xyz") }
+              ]
+            }
+          ]
+        }
+      }),
+    });
+    const data = await response.json();
+    console.log("Test message response:", JSON.stringify(data, null, 2));
+    return data;
+  } catch (error) {
+    console.error("Failed to send test message:", error);
+    return null;
+  }
+}
+
 function ok(message: string) {
   return NextResponse.json({ status: 200, message });
 }
@@ -84,6 +129,7 @@ export async function POST(req: Request) {
     const text = message.text?.body?.trim().replace(/^\*+|\*+$/g, "").trim();
 
     if (userPhone) {
+      after(sendTestMessage(userPhone));
       after(sendWhatsAppMessage(
         userPhone,
         "⏳ *Pingivo WhatsApp Integration — Coming Soon*\n\n" +
