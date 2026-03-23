@@ -65,7 +65,7 @@ async function sendTestMessage(to: string) {
             {
               type: "body",
               parameters: [
-                { type: "text", text: "abc123xyz..." },
+                { type: "text", text: "IN.873456..." },
                 { type: "text", text: "Hello World! This is a test message." }
               ]
             },
@@ -74,7 +74,7 @@ async function sendTestMessage(to: string) {
               sub_type: "url",
               index: "0",
               parameters: [
-                { type: "text", text: encodeURIComponent("abc123xyz") }
+                { type: "text", text: encodeURIComponent("IN.873456") }
               ]
             }
           ]
