@@ -6,6 +6,12 @@ const nextConfig = {
   // typescript: {
   //   ignoreBuildErrors: true,
   // },
+  allowedDevOrigins: ['192.168.1.7'],
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
 };
 
 export default withSerwist(nextConfig, {
