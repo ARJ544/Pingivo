@@ -87,16 +87,16 @@ export async function POST(req: Request) {
       after(sendWhatsAppMessage(
         userPhone,
         "⏳ *Pingivo WhatsApp Integration — Coming Soon*\n\n" +
-        "The WhatsApp API will be available from or after *1st April 2026*.\n\n" +
+        "The WhatsApp API will be available in *early April 2026.*\n\n" +
         "Once it's live, you'll be able to:\n" +
         "• Link this number to your Pingivo account\n" +
         "• Receive messages directly on WhatsApp\n\n" +
         "To connect after launch, go to your *Pingivo → Profile menu → Connect Whatsapp* and send it here as:\n" +
         "*CONNECT_<your-token>*\n\n" +
-        "_Check back on or after 1st April 2026._"
-      ));
-      return ok("API not active yet");
-    } // Will be removed after 1st april 2026
+        "_This feature will be available in early April 2026. Please check back then._"
+     ));
+      return ok("API coming soon");
+    } // Remove once API is live (early April 2026)
 
     if (!text || (!text.toUpperCase().startsWith("CONNECT_") && !text.toUpperCase().startsWith("DISCONNECT_ME"))) {
 
