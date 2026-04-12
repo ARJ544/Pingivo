@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 
 export default function VerifyPhoneUnknownUser({
   temp_phone,
@@ -13,11 +12,12 @@ export default function VerifyPhoneUnknownUser({
   finder_id?: string | undefined;
 }) {
   const router = useRouter();
+  const hiddenButtonRef = useRef<HTMLDivElement>(null);
 
   const searchParams = useSearchParams();
   const queryFinderId = searchParams.get("next");
   const finderId = queryFinderId ?? finder_id;
-  const safeFinderId = finderId ?? "re-scan-the-qr-code"
+  const safeFinderId = finderId ?? "re-scan-the-qr-code";
 
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -29,10 +29,15 @@ export default function VerifyPhoneUnknownUser({
       return;
     }
 
+    const container = hiddenButtonRef.current;
+    if (!container) return;
+
+    container.innerHTML = "";
+
     const script = document.createElement("script");
     script.src = "https://www.phone.email/sign_in_button_v1.js";
     script.async = true;
-    document.querySelector(".pe_signin_button")?.appendChild(script);
+    container.appendChild(script);
 
     let called = false;
 
@@ -46,7 +51,9 @@ export default function VerifyPhoneUnknownUser({
       if (!userObj?.user_json_url) {
         setMessage("Phone verification failed. Please try again.");
         setTimeout(() => {
-          window.location.href = `/search?finder_id=${encodeURIComponent(safeFinderId)}`;
+          window.location.href = `/search?finder_id=${encodeURIComponent(
+            safeFinderId
+          )}`;
         }, 1500);
         return;
       }
@@ -62,12 +69,16 @@ export default function VerifyPhoneUnknownUser({
 
         setMessage("Phone verified successfully! Redirecting...");
         setTimeout(() => {
-          window.location.href = `/search?finder_id=${encodeURIComponent(safeFinderId)}`;
+          window.location.href = `/search?finder_id=${encodeURIComponent(
+            safeFinderId
+          )}`;
         }, 1500);
       } catch {
         setMessage("Something went wrong. Please try again.");
         setTimeout(() => {
-          window.location.href = `/search?finder_id=${encodeURIComponent(safeFinderId)}`;
+          window.location.href = `/search?finder_id=${encodeURIComponent(
+            safeFinderId
+          )}`;
         }, 1500);
       } finally {
         setLoading(false);
@@ -77,33 +88,61 @@ export default function VerifyPhoneUnknownUser({
     return () => {
       window.phoneEmailListener = undefined;
     };
-  }, [router]);
+  }, [router, hasTempPhoneCookie, safeFinderId]);
+
+  const handleCustomClick = () => {
+    const realButton =
+      hiddenButtonRef.current?.querySelector("button") ||
+      hiddenButtonRef.current?.querySelector("a") ||
+      (hiddenButtonRef.current?.firstElementChild as HTMLElement | null);
+
+    realButton?.click();
+  };
+
 
   return (
     <div>
-      {(!hasTempPhoneCookie && !queryFinderId) && (
-        <div className="h-12 w-40">
-          <Button data-client-id="14661853409856503092" className={`pe_signin_button ${loading ? "pointer-events-none opacity-50" : ""} h-12 w-20 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 text-white font-semibold rounded-lg transition active:scale-[0.97]`}>
-
-          </Button>
+      {!hasTempPhoneCookie && !queryFinderId && (
+        <div className="w-full">
+          <button
+            onClick={handleCustomClick}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 bg-red-500 text-white dark:bg-red-400 dark:text-black text-[14.5px] font-medium py-3.5 rounded-full transition-all active:scale-[0.98]"
+          >
+            {loading ? "Verifying..." : "Verify Phone to Call"}
+          </button>
         </div>
       )}
-      {(!hasTempPhoneCookie && queryFinderId) && (
-        <div className="flex min-h-screen flex-col items-center justify-center gap-6">
-          <div
-            className={`pe_signin_button ${loading ? "pointer-events-none opacity-50" : ""}`}
-            data-client-id="14661853409856503092"
-          />
+
+      {!hasTempPhoneCookie && queryFinderId && (
+        <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-4">
+          <div className="w-full max-w-sm">
+            <button
+              onClick={handleCustomClick}
+              disabled={loading}
+              className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 text-white font-semibold py-3 rounded-lg transition active:scale-[0.97] disabled:opacity-50"
+            >
+              {loading ? "Verifying..." : "Verify Phone"}
+            </button>
+          </div>
           {message && (
-            <p className="text-lg font-medium text-center text-slate-700 dark:text-slate-300 px-4 max-w-md">
+            <p className="text-lg font-medium text-center text-slate-700 dark:text-slate-300 max-w-md">
               {message}
             </p>
           )}
         </div>
       )}
 
-      {message && (
-        <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+      <div className="hidden">
+        <div
+          ref={hiddenButtonRef}
+          className="pe_signin_button"
+          data-client-id="14661853409856503092"
+        />
+      </div>
+
+      {message && !queryFinderId && (
+        <p className="text-xs font-medium text-slate-700 dark:text-slate-300 mt-3">
           {message}
         </p>
       )}

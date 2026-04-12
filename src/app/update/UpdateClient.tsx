@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function UpdateClient() {
@@ -8,12 +8,18 @@ export default function UpdateClient() {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const hiddenButtonRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
+    const container = hiddenButtonRef.current;
+    if (!container) return;
+
+    container.innerHTML = "";
 
     const script = document.createElement("script");
     script.src = "https://www.phone.email/sign_in_button_v1.js";
     script.async = true;
-    document.querySelector(".pe_signin_button")?.appendChild(script);
+    container.appendChild(script);
 
     let called = false;
 
@@ -64,6 +70,15 @@ export default function UpdateClient() {
     };
   }, [router]);
 
+  const handleCustomClick = () => {
+    const realButton =
+      hiddenButtonRef.current?.querySelector("button") ||
+      hiddenButtonRef.current?.querySelector("a") ||
+      hiddenButtonRef.current?.firstElementChild as HTMLElement | null;
+
+    realButton?.click();
+  };
+
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-slate-950 py-10 px-4">
       <div className="mx-auto max-w-3xl space-y-8">
@@ -84,15 +99,26 @@ export default function UpdateClient() {
         </div>
 
         <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-          <div className="flex h-30 flex-col items-center justify-center gap-4">
+          <div className="flex flex-col items-center justify-center gap-4 p-6">
 
-            <div
-              className={`pe_signin_button ${loading ? "pointer-events-none opacity-50" : ""}`}
-              data-client-id="14661853409856503092"
-            />
+            <button
+              onClick={handleCustomClick}
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 text-white font-medium text-sm sm:text-[14.5px] py-3.5 rounded-full transition-all duration-150 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Updating..." : "Verify Phone Number"}
+            </button>
+
+            <div className="hidden">
+              <div
+                ref={hiddenButtonRef}
+                className="pe_signin_button"
+                data-client-id="14661853409856503092"
+              />
+            </div>
 
             {message && (
-              <p className="text-lg font-medium text-slate-700 dark:text-slate-300">
+              <p className="text-center mt-5 text-sm font-medium text-green-600 dark:text-green-400">
                 {message}
               </p>
             )}
