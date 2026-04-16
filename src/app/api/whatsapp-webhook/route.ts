@@ -145,7 +145,7 @@ export async function POST(req: Request) {
     }
 
     if (userPhone) {
-      await sendWhatsAppMessage(userPhone, `✅ *Connected successfully!*\n\nWhat happens now:\n\n- You will receive WhatsApp messages on ${updated.phone_num}\n- You will receive calls on ${updated.phone_num}\n\nStarting from early May(Date To Be Decided):\n\n- WhatsApp messages will be sent only to this connected number\n- Calls will continue on ${updated.phone_num}\n\nYou can disconnect your number at any time by sending *DISCONNECT_ME* in this chat or from the Pingivo profile menu.\n\n*Note:\nIf you disconnect before May(Date To Be Decided), you may still receive messages if this number(${updated.phone_num}) is registered on Pingivo.*\n\n_You can safely clear this chat._`);
+      await sendWhatsAppMessage(userPhone, `✅ *Connected successfully!*\n\nWhat happens now:\n\n- You will receive WhatsApp messages on ${updated.phone_num}\n- You will receive calls on ${updated.phone_num}\n\nStarting from early May(Date To Be Decided):\n\n- WhatsApp messages will be sent only to this connected number\n- Calls will continue on ${updated.phone_num}\n\nYou can disconnect your number at any time by sending *DISCONNECT_ME* in this chat or from the Pingivo profile menu.\n\n*Note:*\nIf you disconnect before May(Date To Be Decided), you may still receive messages if ${updated.phone_num} is registered on Pingivo.*\n\n_You can safely clear this chat._`);
     }
     return ok("Connected successfully");
   } catch (error) {
