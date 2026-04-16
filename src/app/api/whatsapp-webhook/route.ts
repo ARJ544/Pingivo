@@ -83,21 +83,6 @@ export async function POST(req: Request) {
     let userPhone = message.from || contact.wa_id;
     const text = message.text?.body?.trim().replace(/^\*+|\*+$/g, "").trim();
 
-    if (userPhone) {
-      after(sendWhatsAppMessage(
-        userPhone,
-        "⏳ *Pingivo WhatsApp Integration — Coming Soon*\n\n" +
-        "The WhatsApp API will be available in *early April 2026.*\n\n" +
-        "Once it's live, you'll be able to:\n" +
-        "• Link this number to your Pingivo account\n" +
-        "• Receive messages directly on WhatsApp\n\n" +
-        "To connect after launch, go to your *Pingivo → Profile menu → Connect Whatsapp* and send it here as:\n" +
-        "*CONNECT_<your-token>*\n\n" +
-        "_This feature will be available in early April 2026. Please check back then._"
-     ));
-      return ok("API coming soon");
-    } // Remove once API is live (early April 2026)
-
     if (!text || (!text.toUpperCase().startsWith("CONNECT_") && !text.toUpperCase().startsWith("DISCONNECT_ME"))) {
 
       if (userPhone) {
