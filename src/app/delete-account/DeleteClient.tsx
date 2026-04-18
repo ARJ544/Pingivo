@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AlertTriangle, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useDeleteAccount } from "@/hooks/useDeleteAccount";
 
 import {
   Dialog,
@@ -18,32 +18,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function DeleteAccountClient() {
-  const router = useRouter();
+  const { deleting, message, handleAccountDelete } = useDeleteAccount();
 
   const [confirmText, setConfirmText] = useState("");
-  const [deleting, setDeleting] = useState(false);
-  const [message, setMessage] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
 
-  const handleAccountDelete = async () => {
+  const handleDelete = async () => {
     if (confirmText !== "delete") return;
-
-    setDeleting(true);
-    try {
-      const res = await fetch("/api/delete-account", {
-        method: "DELETE",
-      });
-      console.log("Response status:", res.status)
-
-      if (!res.ok) {
-        throw new Error("Failed to delete account! Refresh Page again");
-      }
-      setMessage("Account deleted successfully you may refresh page!");
-      router.refresh();
-    } catch (err: any) {
-      setMessage(err.message || "Something went wrong");
-    } finally {
-      setDeleting(false);
+    const success = await handleAccountDelete(confirmText);
+    if (success) {
+      setOpenDialog(false);
+      setConfirmText("");
     }
   };
 
@@ -134,7 +119,7 @@ export default function DeleteAccountClient() {
                 <Button
                   variant="destructive"
                   disabled={confirmText !== "delete" || deleting}
-                  onClick={handleAccountDelete}
+                  onClick={handleDelete}
                 >
                   {deleting ? "Deleting..." : "Delete Account"}
                 </Button>

@@ -1,10 +1,12 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { deleteTempPhone } from "@/app/actions";
 import MessageOwner from "@/components/my_ui/MessageOwner";
+import { useOwnerSearch } from "@/hooks/useOwnerSearch";
+import { useCallCredits } from "@/hooks/useCallCredits";
 
 function Loader() {
   return (
@@ -31,70 +33,9 @@ export default function SearchCar({
   const queryFinderId = searchParams.get("finder_id");
 
   const finderId = queryFinderId ?? "";
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [ownerFound, setOwnerFound] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [callCredits, setCallCredits] = useState(3);
-  const [usedCallCredits, setUsedCallCredits] = useState(0);
-  const [creditsLoading, setCreditsLoading] = useState(true);
-
-  useEffect(() => {
-    if (!queryFinderId) return;
-
-    const fetchOwner = async () => {
-      try {
-        setLoading(true);
-        setIsError(false);
-        const res = await fetch(`/api/search?finder_id=${queryFinderId}`);
-        const result = await res.json();
-        if (!res.ok) throw new Error(result.error || "Request failed");
-        setOwnerFound(true);
-      } catch (err: any) {
-        setMessage(err.message || "User not found");
-        setOwnerFound(false);
-        setIsError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOwner();
-  }, [queryFinderId]);
-
-
-  useEffect(() => {
-    const fetchCallCredits = async () => {
-      try {
-        setCreditsLoading(true);
-        const res = await fetch("/api/get-call-credits");
-
-        if (!res.ok) {
-          await deleteTempPhone();
-          setCallCredits(0);
-          setUsedCallCredits(0);
-          return;
-        }
-
-        const result = await res.json();
-
-        if (!result.success) {
-          setCallCredits(0);
-          setUsedCallCredits(0);
-          return;
-        }
-
-        setCallCredits(result.callCredits);
-        setUsedCallCredits(result.creditsUsed);
-      } catch {
-        setCallCredits(3);
-      } finally {
-        setCreditsLoading(false);
-      }
-    };
-
-    fetchCallCredits();
-  }, []);
+  
+  const { loading, message, ownerFound, isError } = useOwnerSearch(queryFinderId);
+  const { callCredits, usedCallCredits, creditsLoading, refreshCredits } = useCallCredits();
 
 
   const resetTime = useMemo(() => {
@@ -120,14 +61,7 @@ export default function SearchCar({
       throw new Error(result.error || "Something went wrong");
     }
 
-    const creditsRes = await fetch("/api/get-call-credits");
-    if (creditsRes.ok) {
-      const data = await creditsRes.json();
-      if (data.success) {
-        setCallCredits(data.callCredits);
-        setUsedCallCredits(data.creditsUsed);
-      }
-    }
+    await refreshCredits();
   };
 
   const hasPhoneNumber = Boolean(phone_num || temp_phone_number);

@@ -1,83 +1,37 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useCallback } from "react";
+import { usePhoneEmailVerification } from "@/hooks/usePhoneEmailVerification";
 
 export default function UpdateClient() {
   const router = useRouter();
-  const [message, setMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
-  const hiddenButtonRef = useRef<HTMLDivElement>(null);
+  const handleVerification = useCallback(async (userObj: any, setMessage: (msg: string) => void) => {
+    if (!userObj?.user_json_url) {
+      setMessage("Phone verification failed. Please try again.");
+      throw new Error("Phone verification failed. Please try again.");
+    }
 
-  useEffect(() => {
-    const container = hiddenButtonRef.current;
-    if (!container) return;
+    const res = await fetch("/api/update/phone", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_json_url: userObj.user_json_url }),
+    });
 
-    container.innerHTML = "";
+    if (!res.ok) {
+      const errorData = await res.json();
+      const errorMsg = errorData.error || "Something went wrong.";
+      setMessage(errorMsg);
+      throw new Error(errorMsg);
+    }
 
-    const script = document.createElement("script");
-    script.src = "https://www.phone.email/sign_in_button_v1.js";
-    script.async = true;
-    container.appendChild(script);
-
-    let called = false;
-
-    window.phoneEmailListener = async (userObj: any) => {
-      if (called) return;
-      called = true;
-
-      setLoading(true);
-      setMessage("Verifying your phone number...");
-
-      if (!userObj?.user_json_url) {
-        setMessage("Phone verification failed. Please try again.");
-        setTimeout(() => router.refresh(), 1500);
-        return;
-      }
-
-      try {
-        const res = await fetch("/api/update/phone", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_json_url: userObj.user_json_url }),
-        });
-
-        if (!res.ok) {
-          const errorData = await res.json();
-
-          setMessage(errorData.error || "Something went wrong.");
-
-          setTimeout(() => {
-            router.refresh();
-          }, 1500);
-
-          return;
-        }
-
-        setMessage("Phone verified successfully! Redirecting...");
-        setTimeout(() => router.replace("/"), 1200);
-      } catch {
-        setMessage("Something went wrong. Please try again.");
-        setTimeout(() => router.refresh(), 1500);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    return () => {
-      window.phoneEmailListener = undefined;
-    };
+    setMessage("Phone verified successfully! Redirecting...");
+    setTimeout(() => router.replace("/"), 1200);
   }, [router]);
 
-  const handleCustomClick = () => {
-    const realButton =
-      hiddenButtonRef.current?.querySelector("button") ||
-      hiddenButtonRef.current?.querySelector("a") ||
-      hiddenButtonRef.current?.firstElementChild as HTMLElement | null;
-
-    realButton?.click();
-  };
+  const { loading, message, hiddenButtonRef, handleCustomClick } =
+    usePhoneEmailVerification(handleVerification);
 
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-slate-950 py-10 px-4">
