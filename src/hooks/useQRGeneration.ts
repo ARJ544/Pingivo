@@ -1,8 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import jsPDF from "jspdf";
-import "svg2pdf.js";
 import { COMPANY_NAME } from "@/config/company";
 
 export function useQRGeneration(finder_id: string) {
@@ -16,8 +14,18 @@ export function useQRGeneration(finder_id: string) {
     if (!svgRef.current) return;
     setDownloading(true);
     try {
-      const pdf = new jsPDF({ orientation: "portrait", unit: "cm", format: [9, 12], compress: true });
+      const { default: jsPDF } = await import("jspdf");
+      await import("svg2pdf.js");
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "cm",
+        format: [9, 12],
+        compress: true,
+      });
+
       await pdf.svg(svgRef.current, { x: 0, y: 0, width: 9, height: 12 });
+
       pdf.save(`${COMPANY_NAME}-ID-${finder_id}.pdf`);
     } finally {
       setDownloading(false);
@@ -30,6 +38,9 @@ export function useQRGeneration(finder_id: string) {
     setSharing(true);
 
     try {
+      const { default: jsPDF } = await import("jspdf");
+      await import("svg2pdf.js");
+
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "cm",

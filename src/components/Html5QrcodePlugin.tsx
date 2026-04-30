@@ -1,6 +1,5 @@
 "use client";
 
-import { Html5Qrcode, Html5QrcodeResult } from "html5-qrcode";
 import { useEffect, useRef } from "react";
 
 const qrcodeRegionId = "html5qr-code-full-region";
@@ -9,7 +8,7 @@ interface Props {
   fps?: number;
   qrbox?: number;
   disableFlip?: boolean;
-  qrCodeSuccessCallback: (text: string, result: Html5QrcodeResult) => void;
+  qrCodeSuccessCallback: (text: string, result: any) => void;
   qrCodeErrorCallback?: (error: any) => void;
 }
 
@@ -20,15 +19,19 @@ export default function Html5QrcodePlugin({
   qrCodeSuccessCallback,
   qrCodeErrorCallback,
 }: Props) {
-  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const scannerRef = useRef<any>(null);
 
   useEffect(() => {
+    let scanner: any;
+
     const startScanner = async () => {
       try {
+        const { Html5Qrcode } = await import("html5-qrcode");
+
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         stream.getTracks().forEach((track) => track.stop());
 
-        const scanner = new Html5Qrcode(qrcodeRegionId);
+        scanner = new Html5Qrcode(qrcodeRegionId);
         scannerRef.current = scanner;
 
         await scanner.start(
@@ -38,28 +41,26 @@ export default function Html5QrcodePlugin({
             qrbox: { width: qrbox, height: qrbox },
             disableFlip,
           },
-          (text: string, result: Html5QrcodeResult) => {
+          (text: string, result: any) => {
             qrCodeSuccessCallback(text, result);
           },
-          (err) => {
-            if (qrCodeErrorCallback) qrCodeErrorCallback(err);
+          (err: any) => {
+            qrCodeErrorCallback?.(err);
           }
         );
       } catch (err: any) {
         console.error("Camera error:", err);
-        if (qrCodeErrorCallback) qrCodeErrorCallback(err);
+        qrCodeErrorCallback?.(err);
       }
     };
 
     startScanner();
 
     return () => {
-      const scanner = scannerRef.current;
-
-      if (scanner) {
-        scanner
+      if (scannerRef.current) {
+        scannerRef.current
           .stop()
-          .then(() => scanner.clear())
+          .then(() => scannerRef.current.clear())
           .catch(() => { });
       }
       scannerRef.current = null;

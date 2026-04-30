@@ -2,11 +2,22 @@
 
 import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Html5QrcodePlugin from "@/components/Html5QrcodePlugin";
-import { Html5QrcodeResult } from "html5-qrcode";
+import dynamic from "next/dynamic";
 import { COMPANY_NAME } from "@/config/company";
 
+const Html5QrcodePlugin = dynamic(
+  () => import("@/components/Html5QrcodePlugin"),
+  {
+    ssr: false,
+    loading: () => <p>Starting camera...</p>,
+  }
+);
+
 const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL ?? "";
+
+type Html5QrcodeResult = {
+  decodedText?: string;
+};
 
 export default function ScanPage() {
   const router = useRouter();
@@ -14,6 +25,7 @@ export default function ScanPage() {
   const [isUrl, setIsUrl] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const showModalRef = useRef(false);
+  const [startScanner, setStartScanner] = useState(false);
 
   const isValidUrl = (text: string) => {
     try {
@@ -67,14 +79,25 @@ export default function ScanPage() {
           Scan {COMPANY_NAME} QR code using your camera
         </p>
         <div className="relative rounded-xl border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950">
-          <Html5QrcodePlugin
-            fps={10}
-            qrbox={250}
-            disableFlip={false}
-            qrCodeSuccessCallback={onNewScanResult}
-            qrCodeErrorCallback={onError}
-          />
-          <div className="absolute w-full h-0.5 bg-blue-500 animate-scan" />
+          {!startScanner ? (
+            <button
+              onClick={() => setStartScanner(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+            >
+              Start Scanner
+            </button>
+          ) : (
+            <Html5QrcodePlugin
+              fps={10}
+              qrbox={250}
+              disableFlip={false}
+              qrCodeSuccessCallback={onNewScanResult}
+              qrCodeErrorCallback={onError}
+            />
+          )}
+          {startScanner && (
+            <div className="absolute w-full h-0.5 bg-blue-500 animate-scan" />
+          )}
         </div>
       </div>
 
