@@ -67,7 +67,7 @@ export default function HomeClient({ loggedin, bsuid, token }: { loggedin: boole
 
           <div className="flex flex-col gap-4">
             <img
-              src="/bg.jpeg"
+              src="/bg.jpg"
               alt="QR preview"
               className="w-full h-auto object-contain rounded-2xl"
             />
