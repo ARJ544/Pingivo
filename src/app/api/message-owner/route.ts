@@ -81,7 +81,7 @@ export async function POST(request: Request) {
     );
   }
 
-  // From line 72 to 119 the code will be removed after early may(tbd)
+  // From this line 84 the code will be removed after early may(tbd)
   const url = `https://graph.facebook.com/v25.0/${whatsAppPhoneNumberId}/messages`;
 
   const payload = {
@@ -129,6 +129,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     return NextResponse.json({ error: { message: "Failed to send alert" } }, { status: 500 });
   }
+  //  remove till here 132 uncomment from below after early may(tbd)
   // const message = `To: ${bsuid}\n\nMessage: ${formattedMessage}`;
   // const encodedMessage = encodeURIComponent(message);
 
