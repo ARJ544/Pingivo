@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     try {
       await twilio.calls.create({
         to: callee,
-        from: process.env.TWILIO_NUMBER!,
+        from: process.env.NEXT_PUBLIC_TWILIO_NUMBER!,
         url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/webhook?room=${encodeURIComponent(room)}&role=B`,
         timeout: 25,
         statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/callee-status?room=${encodeURIComponent(room)}&caller=${encodeURIComponent(caller)}&callerCallSid=${encodeURIComponent(callerCallSid)}`,

@@ -97,7 +97,7 @@ export async function POST() {
     try {
       await client.calls.create({
         to: caller,
-        from: process.env.TWILIO_NUMBER!,
+        from: process.env.NEXT_PUBLIC_TWILIO_NUMBER!,
         url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/webhook?room=${encodeURIComponent(roomName)}&role=A`,
         statusCallback: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/voice/caller-status?room=${encodeURIComponent(roomName)}&callee=${encodeURIComponent(callee)}&caller=${encodeURIComponent(caller)}`,
         statusCallbackEvent: ["in-progress", "completed", "answered", "no-answer", "busy", "failed"],
